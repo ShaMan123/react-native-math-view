@@ -1,0 +1,19 @@
+{
+  "name": "react-native-math-text-view",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "nativePackage": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "react-native"
+  ],
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "react": "^16.5.2",
+    "react-native": "^0.57.1"
+  }
+}

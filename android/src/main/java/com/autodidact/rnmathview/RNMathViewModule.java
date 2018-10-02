@@ -1,21 +1,18 @@
-package com.reactlibrary;
+package com.autodidact.rnmathview;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
-import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.Callback;
 
-public class MathTextViewModule extends ReactContextBaseJavaModule {
-
+public class RNMathViewModule extends ReactContextBaseJavaModule {
     private final ReactApplicationContext reactContext;
 
-    public MathTextViewModule(ReactApplicationContext reactContext) {
+    public RNMathViewModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
     }
 
     @Override
     public String getName() {
-        return "MathTextViewModule";
+        return "RNMathViewModule";
     }
 }

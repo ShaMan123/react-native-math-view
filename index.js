@@ -5,7 +5,9 @@
 
 //export default RNMathTextView;
 
-import MathTextView from './src';
+//import BaseMathView from './src/MathView';
+import MathView from './src/TouchableMathView';
 export {
-    MathTextView
+    MathView as default,
+    //BaseMathView
 }

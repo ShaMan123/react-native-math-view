@@ -1,5 +1,5 @@
 
-package com.reactlibrary;
+package com.autodidact.rnmathview;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,20 +11,20 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
 import com.facebook.react.bridge.JavaScriptModule;
 
-public class MathTextViewPackage implements ReactPackage {
-    public MathTextViewPackage() {
+public class RNMathViewPackage implements ReactPackage {
+    public RNMathViewPackage() {
     }
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         return Arrays.<NativeModule>asList(
-                new MathTextViewModule(reactContext)
+                new RNMathViewModule(reactContext)
         );
     }
 
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
         return Arrays.<ViewManager>asList(
-                new MathTextViewManager()
+                new RNMathViewManager()
         );
     }
 

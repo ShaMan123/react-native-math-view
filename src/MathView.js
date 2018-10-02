@@ -12,12 +12,14 @@ import ReactNative, {
     ViewPropTypes,
     processColor,
     Dimensions,
-    Animated
+    Animated,
+    View,
+    StyleSheet
 } from 'react-native'
 
 //const { RNMathTextView } = NativeModules;
 
-const RNMathTextView = requireNativeComponent('RNMathTextView', MathTextView, {
+const RNMathTextView = requireNativeComponent('RNMathView', MathView, {
     nativeOnly: {
         nativeID: true,
         onChange: true
@@ -31,22 +33,18 @@ const MATH_ENGINES = {
     MATHJAX: 'MATHJAX'
 }
 
-export default class MathTextView extends React.Component {
+export default class MathView extends React.Component {
     static MATH_ENGINES = MATH_ENGINES;
     static propTypes = {
         style: ViewPropTypes.style,
         text: PropTypes.string.isRequired,
         mathEngine: PropTypes.oneOf(Object.keys(MATH_ENGINES).map((key) => { return MATH_ENGINES[key] })),
-        verticalScroll: PropTypes.bool,
-        horizontalScroll: PropTypes.bool,
     };
 
     static defaultProps = {
         style: null,
         text: '',
         mathEngine: MATH_ENGINES.KATEX,
-        vScroll: true,
-        hScroll: true,
     };
 
     constructor(props) {
@@ -57,6 +55,10 @@ export default class MathTextView extends React.Component {
         }
         this.opacity = new Animated.Value(0);
         this.updated = false;
+        this.style = {
+            opacity: this.opacity,
+            alignSelf: 'baseline'
+        }
     }
 
     componentDidUpdate() {
@@ -87,10 +89,11 @@ export default class MathTextView extends React.Component {
         }
 
         return (
-            <Animated.View style={{ opacity: this.opacity }}>
+            <Animated.View style={[style, this.style]}>
                 <RNMathTextView
                     ref={ref => this._handle = ReactNative.findNodeHandle(ref)}
-                    style={[style, computedStyle]}
+                    {...this.props}
+                    style={computedStyle}
                     onChange={(e) => {
                         if (e.nativeEvent.hasOwnProperty('onSizeChanged')) {
                             const sizeObj = e.nativeEvent.size;
@@ -114,7 +117,8 @@ export default class MathTextView extends React.Component {
                     text={text.replace(/\\\\/g, '\\')}
                     {...scrollProps}
                 />
-            </Animated.View>
+                </Animated.View>
         );
     }
 }
+

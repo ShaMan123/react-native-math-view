@@ -14,10 +14,11 @@ You are welcome to contribute.
     - Bug: does not contain the width of the view => must scroll on long equations.
 
 ### Fallback
-[react-native-autoheight-webview](https://github.com/iou90/react-native-autoheight-webview) - It is too slow.
+[react-native-autoheight-webview](https://github.com/iou90/react-native-autoheight-webview) - performance is not good enough.
+If you want to use it (for now at least) you need to setup the library. Check sample code in [./src/fallback/MathWebView.js](./src/fallback/MathWebView.js)
 
 ### FollowUp
 
 [KaTeX](https://github.com/Khan/KaTeX)
 
-[React with LaTeX](https://github.com/Pomax/BezierInfo-2)
+[React with LaTeX](https://github.com/Pomax/BezierInfo-2) - using server side rendering to speed things up.

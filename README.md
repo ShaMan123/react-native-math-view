@@ -7,6 +7,12 @@ Currently depends on `<WebView>` :(
 
 You are welcome to contribute.
 
+## Installation
+
+`npm install --save github:ShaMan123/react-native-math-view`
+
+`yarn add github:ShaMan123/react-native-math-view`
+
 ## Implementation:
   - [ ] [iOS native MathView](https://github.com/kostub/iosMath)
 

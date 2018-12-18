@@ -1,7 +1,7 @@
 {
   "name": "react-native-math-view",
-  "version": "1.0.0",
-  "description": "Displaying and handling math in react native",
+  "version": "1.0.1",
+  "description": "Math view for react-native",
   "main": "index.js",
   "nativePackage": true,
   "scripts": {
@@ -17,7 +17,7 @@
     "math-view",
     "rn"
   ],
-  "author": "",
+  "author": "ShaMan123 (github.com/ShaMan123)",
   "license": "",
   "peerDependencies": {
     "react": "*",
@@ -25,6 +25,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ShaMan123/react-native-math-view"
+    "url": "https://github.com/ShaMan123/react-native-math-view.git"
   }
 }

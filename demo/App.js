@@ -7,28 +7,23 @@
  */
 
 import React, {Component} from 'react';
-import { Platform, StyleSheet, Text, View, TextInput, SectionList } from 'react-native';
+import { Platform, StyleSheet, Text, View, TextInput, SectionList, UIManager } from 'react-native';
 import MathView from 'react-native-math-view';
 import * as MathStrings from './math';
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android:
-    'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
+if (Platform.OS === 'android') UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(false);
 
-type Props = {};
-export default class App extends Component<Props> {
+export default class App extends Component {
     render() {
         return (
             <View style={styles.container}>
                 <SectionList
                     scrollEnabled
                     renderItem={({ item, index, section }) => {
-                        const { string, key } = item;
+                        const { string } = item;
                         return (
                             <MathView
+                                style={styles.math}
                                 math={string}
                                 text={string}
                                 value={string}
@@ -66,5 +61,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333333',
     marginBottom: 5,
-  },
+    },
+    math: {
+        paddingVertical: 5
+    }
 });

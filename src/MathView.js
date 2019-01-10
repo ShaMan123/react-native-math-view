@@ -1,7 +1,7 @@
 'use strict';
 
-import React from 'react'
-import PropTypes from 'prop-types'
+import React from 'react';
+import PropTypes from 'prop-types';
 import ReactNative, {
     requireNativeComponent,
     NativeModules,
@@ -15,7 +15,7 @@ import ReactNative, {
     Animated,
     View,
     StyleSheet
-} from 'react-native'
+} from 'react-native';
 
 //const { RNMathTextView } = NativeModules;
 
@@ -31,34 +31,34 @@ const MathTextViewManager = NativeModules.RNMathTextViewManager || {};
 const MATH_ENGINES = {
     KATEX: 'KATEX',
     MATHJAX: 'MATHJAX'
-}
+};
 
 export default class MathView extends React.Component {
     static MATH_ENGINES = MATH_ENGINES;
     static propTypes = {
+        mathEngine: PropTypes.oneOf(Object.keys(MATH_ENGINES).map((key) => MATH_ENGINES[key])),
         style: ViewPropTypes.style,
-        text: PropTypes.string.isRequired,
-        mathEngine: PropTypes.oneOf(Object.keys(MATH_ENGINES).map((key) => { return MATH_ENGINES[key] })),
+        text: PropTypes.string.isRequired
     };
 
     static defaultProps = {
         style: null,
         text: '',
-        mathEngine: MATH_ENGINES.KATEX,
+        mathEngine: MATH_ENGINES.KATEX
     };
 
     constructor(props) {
         super(props);
         this.state = {
             width: null,
-            height: null,
-        }
+            height: null
+        };
         this.opacity = new Animated.Value(0);
         this.updated = false;
         this.style = {
             opacity: this.opacity,
             alignSelf: 'baseline'
-        }
+        };
     }
 
     componentDidUpdate() {
@@ -67,9 +67,16 @@ export default class MathView extends React.Component {
             this.updated = true;
             Animated.spring(this.opacity, {
                 toValue: 1,
-                useNativeDriver: true,
+                useNativeDriver: true
             }).start();
         }
+    }
+
+    get mathString() {
+        return Platform.select({
+            android: `\\(${this.props.text.replace(/\\\\/g, '\\')}\\)`,
+            ios: `\\(${this.props.text.replace(/\\\\/g, '\\')}\\)`
+        });
     }
     
     render() {
@@ -80,12 +87,12 @@ export default class MathView extends React.Component {
         if (typeof width === 'number' && typeof height === 'number') {
             computedStyle = {
                 width,
-                height,
+                height
             };
             scrollProps = {
                 verticalScroll: vScroll,
                 horizontalScroll: hScroll
-            }
+            };
         }
 
         return (
@@ -110,11 +117,11 @@ export default class MathView extends React.Component {
                             });
                         }
                         else if (e.nativeEvent.hasOwnProperty('touchEvent')) {
-                            this.props.onPress(e.nativeEvent.touchEvent)
+                            this.props.onPress(e.nativeEvent.touchEvent);
                         }
                     }}
                     mathEngine={mathEngine}
-                    text={text.replace(/\\\\/g, '\\')}
+                    text={this.mathString}
                     {...scrollProps}
                 />
                 </Animated.View>

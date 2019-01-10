@@ -7,7 +7,7 @@
  */
 
 import React, {Component} from 'react';
-import { Platform, StyleSheet, Text, View, TextInput, SectionList, UIManager } from 'react-native';
+import { Platform, StyleSheet, Text, View, TextInput, SectionList, UIManager, Alert } from 'react-native';
 import MathView from 'react-native-math-view';
 import * as MathStrings from './math';
 
@@ -28,6 +28,8 @@ export default class App extends Component {
                                 text={string}
                                 value={string}
                                 fallback={'frisck'}
+                                onPress={() => Alert.alert(`LaTeX: ${string}`)}
+                                //fontColor={this.getColor()}
                                 //enableAnimation={false}
                             />
                         );
@@ -50,7 +52,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
       backgroundColor: '#F5FCFF',
-      backgroundColor: 'pink'
   },
   welcome: {
     fontSize: 20,

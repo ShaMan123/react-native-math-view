@@ -7,7 +7,9 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
+import { Platform, StyleSheet, Text, View, TextInput, SectionList } from 'react-native';
+import MathView from 'react-native-math-view';
+import * as MathStrings from './math';
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -18,14 +20,32 @@ const instructions = Platform.select({
 
 type Props = {};
 export default class App extends Component<Props> {
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>To get started, edit App.js</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
-      </View>
-    );
+    render() {
+        return (
+            <View style={styles.container}>
+                <SectionList
+                    scrollEnabled
+                    renderItem={({ item, index, section }) => {
+                        const { string, key } = item;
+                        return (
+                            <MathView
+                                math={string}
+                                text={string}
+                                value={string}
+                                fallback={'frisck'}
+                                //enableAnimation={false}
+                            />
+                        );
+                    }}
+                    renderSectionHeader={({ section: { title } }) => <Text>{title}</Text>}
+                    sections={[
+                        { title: 'calculus', data: MathStrings.calculus.filter((obj) => obj.math) },
+                        { title: 'trig', data: MathStrings.trig.filter((obj) => obj.math) }
+                    ]}
+                    keyExtractor={(item, index) => item.key}
+                />
+            </View>
+        );
   }
 }
 
@@ -34,7 +54,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+      backgroundColor: '#F5FCFF',
+      backgroundColor: 'pink'
   },
   welcome: {
     fontSize: 20,

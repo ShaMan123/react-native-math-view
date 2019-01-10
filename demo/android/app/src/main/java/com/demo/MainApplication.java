@@ -2,7 +2,6 @@ package com.demo;
 
 import android.app.Application;
 
-import com.autodidact.MathTextView.MathTextViewPackage;
 import com.autodidact.rnmathview.RNMathViewPackage;
 
 import com.facebook.react.ReactApplication;
@@ -26,7 +25,6 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
               new MainReactPackage(),
-              new MathTextViewPackage(),
               new RNMathViewPackage()
       );
     }

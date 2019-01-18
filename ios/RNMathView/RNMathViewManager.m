@@ -4,6 +4,7 @@
 #import <React/RCTView.h>
 #import <React/UIView+React.h>
 #import <React/RCTUIManager.h>
+#import "MTMathUILabel.h"
 
 @implementation RNMathViewManager
 
@@ -27,7 +28,7 @@ RCT_EXPORT_MODULE()
 #pragma mark - Events
 
 RCT_EXPORT_VIEW_PROPERTY(onChange, RCTBubblingEventBlock);
-
+/*
 #pragma mark - Props
 RCT_CUSTOM_VIEW_PROPERTY(localSourceImage, NSDictionary, RNSketchCanvas)
 {
@@ -48,12 +49,15 @@ RCT_CUSTOM_VIEW_PROPERTY(text, NSArray, RNSketchCanvas)
     [currentView setCanvasText:arr];
   });
 }
-
+*/
 #pragma mark - Lifecycle
 
 - (UIView *)view
 {
-  return [[RNSketchCanvas alloc] initWithEventDispatcher: self.bridge.eventDispatcher];
+  MTMathUILabel* label = [[MTMathUILabel alloc] init];
+  label.latex = @"x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}";
+  return label;
+  //return [[RNSketchCanvas alloc] initWithEventDispatcher: self.bridge.eventDispatcher];
 }
 
 #pragma mark - Exported methods

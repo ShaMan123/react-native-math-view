@@ -1,3 +1,16 @@
-PODFILE CHECKSUM: da39a3ee5e6b4b0d3255bfef95601890afd80709
+PODS:
+  - iosMath (0.9.4)
+
+DEPENDENCIES:
+  - iosMath
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - iosMath
+
+SPEC CHECKSUMS:
+  iosMath: f7a6cbadf9d836d2149c2a84c435b1effc244cba
+
+PODFILE CHECKSUM: dfec1ca6e27a437b25b41ec4cf03254e3f4d7505
 
 COCOAPODS: 1.5.3

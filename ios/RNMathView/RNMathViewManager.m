@@ -1,10 +1,13 @@
 
-#import "RNMathViewManager.m"
+#import "RNMathViewManager.h"
+#import <React/RCTViewManager.h>
 #import <React/RCTEventDispatcher.h>
 #import <React/RCTView.h>
 #import <React/UIView+React.h>
 #import <React/RCTUIManager.h>
 #import "MTMathUILabel.h"
+
+
 
 @implementation RNMathViewManager
 

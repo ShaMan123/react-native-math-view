@@ -7,10 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		43EDB0C7848E25A872CDB0F0 /* libPods-RNMathView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 910BB33F1EED5F201D170328 /* libPods-RNMathView.a */; };
-		9209FECA21F37FEC00325353 /* libiosMath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9209FEC921F37FEC00325353 /* libiosMath.a */; };
-		92A8292221F31B81004A0662 /* RNMathViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 92A8292121F31B81004A0662 /* RNMathViewManager.m */; };
-		92A8292321F31CAF004A0662 /* RNMathViewManager.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 92A8292021F31B4E004A0662 /* RNMathViewManager.h */; };
+		9209FFE421F3B9BD00325353 /* RNMathView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9209FFE321F3B9BD00325353 /* RNMathView.m */; };
+		9209FFE721F3D67100325353 /* RNMathViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9209FFE621F3D67100325353 /* RNMathViewManager.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -20,7 +18,6 @@
 			dstPath = "include/$(PRODUCT_NAME)";
 			dstSubfolderSpec = 16;
 			files = (
-				92A8292321F31CAF004A0662 /* RNMathViewManager.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -29,10 +26,10 @@
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNMathView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNMathView.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		7C2C93832D82C060D149ADED /* Pods-RNMathView.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RNMathView.release.xcconfig"; path = "Pods/Target Support Files/Pods-RNMathView/Pods-RNMathView.release.xcconfig"; sourceTree = "<group>"; };
-		910BB33F1EED5F201D170328 /* libPods-RNMathView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RNMathView.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		9209FEC921F37FEC00325353 /* libiosMath.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libiosMath.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		92A8292021F31B4E004A0662 /* RNMathViewManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RNMathViewManager.h; path = RNMathView/RNMathViewManager.h; sourceTree = "<group>"; };
-		92A8292121F31B81004A0662 /* RNMathViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RNMathViewManager.m; path = RNMathView/RNMathViewManager.m; sourceTree = "<group>"; };
+		9209FFE221F3B9BD00325353 /* RNMathView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RNMathView.h; path = RNMathView/RNMathView.h; sourceTree = "<group>"; };
+		9209FFE321F3B9BD00325353 /* RNMathView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RNMathView.m; path = RNMathView/RNMathView.m; sourceTree = "<group>"; };
+		9209FFE521F3D67100325353 /* RNMathViewManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RNMathViewManager.h; path = RNMathView/RNMathViewManager.h; sourceTree = "<group>"; };
+		9209FFE621F3D67100325353 /* RNMathViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RNMathViewManager.m; path = RNMathView/RNMathViewManager.m; sourceTree = "<group>"; };
 		C911985ED44497B069D73B74 /* Pods-RNMathView.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RNMathView.debug.xcconfig"; path = "Pods/Target Support Files/Pods-RNMathView/Pods-RNMathView.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -41,8 +38,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9209FECA21F37FEC00325353 /* libiosMath.a in Frameworks */,
-				43EDB0C7848E25A872CDB0F0 /* libPods-RNMathView.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -69,8 +64,10 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
-				92A8292121F31B81004A0662 /* RNMathViewManager.m */,
-				92A8292021F31B4E004A0662 /* RNMathViewManager.h */,
+				9209FFE521F3D67100325353 /* RNMathViewManager.h */,
+				9209FFE621F3D67100325353 /* RNMathViewManager.m */,
+				9209FFE221F3B9BD00325353 /* RNMathView.h */,
+				9209FFE321F3B9BD00325353 /* RNMathView.m */,
 				134814211AA4EA7D00B7C361 /* Products */,
 				3BAD90121082E645D3D895E3 /* Pods */,
 				BBF1CBB78FEA836FF348762C /* Frameworks */,
@@ -80,8 +77,6 @@
 		BBF1CBB78FEA836FF348762C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				9209FEC921F37FEC00325353 /* libiosMath.a */,
-				910BB33F1EED5F201D170328 /* libPods-RNMathView.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -191,7 +186,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				92A8292221F31B81004A0662 /* RNMathViewManager.m in Sources */,
+				9209FFE421F3B9BD00325353 /* RNMathView.m in Sources */,
+				9209FFE721F3D67100325353 /* RNMathViewManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

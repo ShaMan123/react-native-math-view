@@ -6,17 +6,17 @@ Pod::Spec.new do |s|
   s.description  = <<-DESC
                   RNMathView
                    DESC
-  s.homepage     = ""
+  s.homepage     = "https://github.com/ShaMan123/react-native-math-view"
   s.license      = "MIT"
   # s.license      = { :type => "MIT", :file => "FILE_LICENSE" }
-  s.author             = { "author" => "author@domain.cn" }
+s.author             = { "ShaMan123" => "github: ShaMan123" }
   s.platform     = :ios, "7.0"
-  s.source       = { :git => "https://github.com/author/RNMathView.git", :tag => "master" }
-  s.source_files  = "RNMathView/**/*.{h,m}"
+  s.source       = { :git => "https://github.com/ShaMan123/react-native-math-view.git", :tag => "master" }
+  s.source_files  = "ios/**/*.{h,m}"
   s.requires_arc = true
 
 
-  s.dependency "React"
+  s.dependency "iosMath"
   #s.dependency "others"
 
 end

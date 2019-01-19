@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B3E7B58A1CC2AC0600A0062D /* RNMathView.m in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* RNMathView.m */; };
+		43EDB0C7848E25A872CDB0F0 /* libPods-RNMathView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 910BB33F1EED5F201D170328 /* libPods-RNMathView.a */; };
+		92A8292221F31B81004A0662 /* RNMathViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 92A8292121F31B81004A0662 /* RNMathViewManager.m */; };
+		92A8292321F31CAF004A0662 /* RNMathViewManager.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 92A8292021F31B4E004A0662 /* RNMathViewManager.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -17,6 +19,7 @@
 			dstPath = "include/$(PRODUCT_NAME)";
 			dstSubfolderSpec = 16;
 			files = (
+				92A8292321F31CAF004A0662 /* RNMathViewManager.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -24,8 +27,11 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNMathView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNMathView.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		B3E7B5881CC2AC0600A0062D /* RNMathView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNMathView.h; sourceTree = "<group>"; };
-		B3E7B5891CC2AC0600A0062D /* RNMathView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNMathView.m; sourceTree = "<group>"; };
+		7C2C93832D82C060D149ADED /* Pods-RNMathView.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RNMathView.release.xcconfig"; path = "Pods/Target Support Files/Pods-RNMathView/Pods-RNMathView.release.xcconfig"; sourceTree = "<group>"; };
+		910BB33F1EED5F201D170328 /* libPods-RNMathView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RNMathView.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		92A8292021F31B4E004A0662 /* RNMathViewManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RNMathViewManager.h; path = RNMathView/RNMathViewManager.h; sourceTree = "<group>"; };
+		92A8292121F31B81004A0662 /* RNMathViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RNMathViewManager.m; path = RNMathView/RNMathViewManager.m; sourceTree = "<group>"; };
+		C911985ED44497B069D73B74 /* Pods-RNMathView.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RNMathView.debug.xcconfig"; path = "Pods/Target Support Files/Pods-RNMathView/Pods-RNMathView.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -33,6 +39,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				43EDB0C7848E25A872CDB0F0 /* libPods-RNMathView.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -47,13 +54,32 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		3BAD90121082E645D3D895E3 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				C911985ED44497B069D73B74 /* Pods-RNMathView.debug.xcconfig */,
+				7C2C93832D82C060D149ADED /* Pods-RNMathView.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
-				B3E7B5881CC2AC0600A0062D /* RNMathView.h */,
-				B3E7B5891CC2AC0600A0062D /* RNMathView.m */,
+				92A8292121F31B81004A0662 /* RNMathViewManager.m */,
+				92A8292021F31B4E004A0662 /* RNMathViewManager.h */,
 				134814211AA4EA7D00B7C361 /* Products */,
+				3BAD90121082E645D3D895E3 /* Pods */,
+				BBF1CBB78FEA836FF348762C /* Frameworks */,
 			);
+			sourceTree = "<group>";
+		};
+		BBF1CBB78FEA836FF348762C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				910BB33F1EED5F201D170328 /* libPods-RNMathView.a */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -63,9 +89,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "RNMathView" */;
 			buildPhases = (
+				A82B085F47E320D7CF0725AB /* [CP] Check Pods Manifest.lock */,
 				58B511D71A9E6C8500147676 /* Sources */,
 				58B511D81A9E6C8500147676 /* Frameworks */,
 				58B511D91A9E6C8500147676 /* CopyFiles */,
+				4BDF43CE07C1A2A5AC9C70D6 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -107,12 +135,59 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		4BDF43CE07C1A2A5AC9C70D6 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-RNMathView/Pods-RNMathView-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/iosMath/mathFonts.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/mathFonts.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-RNMathView/Pods-RNMathView-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A82B085F47E320D7CF0725AB /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-RNMathView-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		58B511D71A9E6C8500147676 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B3E7B58A1CC2AC0600A0062D /* RNMathView.m in Sources */,
+				92A8292221F31B81004A0662 /* RNMathViewManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -202,15 +277,13 @@
 		};
 		58B511F01A9E6C8500147676 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C911985ED44497B069D73B74 /* Pods-RNMathView.debug.xcconfig */;
 			buildSettings = {
-				HEADER_SEARCH_PATHS = (
-				"$(inherited)",
-					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(SRCROOT)/../../../React/**",
-					"$(SRCROOT)/../../react-native/React/**",
-				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				OTHER_LDFLAGS = "-ObjC";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"$(inherited)",
+				);
 				PRODUCT_NAME = RNMathView;
 				SKIP_INSTALL = YES;
 			};
@@ -218,15 +291,13 @@
 		};
 		58B511F11A9E6C8500147676 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7C2C93832D82C060D149ADED /* Pods-RNMathView.release.xcconfig */;
 			buildSettings = {
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(SRCROOT)/../../../React/**",
-					"$(SRCROOT)/../../react-native/React/**",
-				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				OTHER_LDFLAGS = "-ObjC";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"$(inherited)",
+				);
 				PRODUCT_NAME = RNMathView;
 				SKIP_INSTALL = YES;
 			};

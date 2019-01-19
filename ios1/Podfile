@@ -1,3 +1,0 @@
-project 'RNMathView.xcworkspace'
-target 'RNMathView'
-pod 'iosMath'

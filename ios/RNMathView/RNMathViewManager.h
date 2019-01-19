@@ -1,5 +1,5 @@
 #import <React/RCTViewManager.h>
-#import "MTMathUILabel.h"
+#import <IosMath/IosMath.h>
 
 @interface RNMathViewManager : RCTViewManager
 

@@ -1335,6 +1335,10 @@
 					node_modules,
 					"react-native-math-view/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-math-view/ios/**",
+					nodes_modules/React,
+					"nodes_modules/react-native",
+					"$(SRCROOT)/../node_modules/react-native",
+					"$(SRCROOT)/../node_modules/react",
 				);
 				INFOPLIST_FILE = demo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1356,6 +1360,10 @@
 					node_modules,
 					"react-native-math-view/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-math-view/ios/**",
+					nodes_modules/React,
+					"nodes_modules/react-native",
+					"$(SRCROOT)/../node_modules/react-native",
+					"$(SRCROOT)/../node_modules/react",
 				);
 				INFOPLIST_FILE = demo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

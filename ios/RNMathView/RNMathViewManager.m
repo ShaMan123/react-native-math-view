@@ -5,6 +5,7 @@
 #import <React/RCTView.h>
 #import <React/UIView+React.h>
 #import <React/RCTUIManager.h>
+#import <IosMath/IosMath.h>
 #import "MTMathUILabel.h"
 
 @implementation RNMathViewManager

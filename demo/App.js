@@ -56,7 +56,22 @@ export default class App extends Component {
                     }}
                     renderSectionHeader={({ section: { title } }) => <Text>{title}</Text>}
                     sections={this.state.sections}
-                    onRefresh={() => setTimeout(() => this.setState({ refreshing: false, sections: this.state.sections }), 2000)}
+                    onRefresh={() => {
+                        this.setState({
+                            sections: [
+                                {
+                                    title: 'calculus',
+                                    data: MathStrings.calculus.filter((obj) => obj.math),
+                                    keyExtractor: (item) => `calculus:${item.string}` + new Date().valueOf()
+                                },
+                                {
+                                    title: 'trig',
+                                    data: MathStrings.trig.filter((obj) => obj.math),
+                                    keyExtractor: (item) => `trig:${item.string}` + new Date().valueOf()
+                                }
+                            ]
+                        })
+                    }}
                     refreshing={this.state.refreshing}
                 />
             </View>
@@ -82,6 +97,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     },
     math: {
-        paddingVertical: 5
+        paddingVertical: 5,
+        backgroundColor: 'blue'
     }
 });

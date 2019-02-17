@@ -22,6 +22,8 @@ import ReactNative, {
     LayoutAnimation
 } from 'react-native';
 
+import memoize from 'lodash/memoize';
+
 const RNMathTextView = requireNativeComponent('RNMathView', TouchableMathView, {
     nativeOnly: {
         nativeID: true,
@@ -108,15 +110,20 @@ export default class TouchableMathView extends React.Component {
         initialOpacity: 0.2
     };
 
+    static memoize = memoize((LaTex) => undefined);
+
     constructor(props) {
         //  animated opacity can be handled in state with LayoutAnimation or in style with Animated.Value
         //  everything is set just un/comment the style of the ScrollView
         super(props);
+        
         this.state = {
             width: null,
             height: null,
+            ...TouchableMathView.memoize(this.props.text),
             opacity: props.initialOpacity
         };
+
         this.opacity = new Animated.Value(props.initialOpacity);
         this.updated = false;
         this.style = {
@@ -131,14 +138,15 @@ export default class TouchableMathView extends React.Component {
         const { width, height } = this.state;
         if (typeof width === 'number' && typeof height === 'number' && !this.updated) {
             this.updated = true;
+            console.log({ width, height })
+            TouchableMathView.memoize.cache.set(this.props.text, { width, height });
 
             Animated.spring(this.opacity, {
                 toValue: 1,
                 useNativeDriver: true
-            }).start();
+            }).start(() => this.props.onFullMount({ width, height }));
 
             this.getScrollView().scrollToEnd();
-            this.props.onFullMount({ width, height });
         }
     }
 

@@ -70,8 +70,8 @@ export default class TouchableMathView extends React.Component {
                     return touchable.displayName === propValue.type.displayName;
                 }) > -1;
             }
-            catch (err) {}
-            
+            catch (err) { }
+
             if (!match) {
                 return new Error(
                     `Invalid prop ${propName} supplied to ${componentName}. Supply one of ${touchables.map((touchable) => { return touchable.displayName }).join(', ')}`
@@ -116,7 +116,7 @@ export default class TouchableMathView extends React.Component {
         //  animated opacity can be handled in state with LayoutAnimation or in style with Animated.Value
         //  everything is set just un/comment the style of the ScrollView
         super(props);
-        
+
         this.state = {
             width: null,
             height: null,
@@ -138,7 +138,7 @@ export default class TouchableMathView extends React.Component {
         const { width, height } = this.state;
         if (typeof width === 'number' && typeof height === 'number' && !this.updated) {
             this.updated = true;
-            console.log({ width, height })
+
             TouchableMathView.memoize.cache.set(this.props.text, { width, height });
 
             Animated.spring(this.opacity, {

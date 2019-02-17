@@ -7,13 +7,33 @@
  */
 
 import React, {Component} from 'react';
-import { Platform, StyleSheet, Text, View, TextInput, SectionList, UIManager, Alert } from 'react-native';
+import { Platform, StyleSheet, Text, View, TextInput, SectionList, UIManager, Alert, Ref } from 'react-native';
 import MathView from 'react-native-math-view';
 import * as MathStrings from './math';
 
-if (Platform.OS === 'android') UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(false);
+//if (Platform.OS === 'android') UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(false);
 
 export default class App extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            refreshing: false,
+            sections: [
+                {
+                    title: 'calculus',
+                    data: MathStrings.calculus.filter((obj) => obj.math),
+                    keyExtractor: (item) => `calculus:${item.string}`
+                },
+                {
+                    title: 'trig',
+                    data: MathStrings.trig.filter((obj) => obj.math),
+                    keyExtractor: (item) => `trig:${item.string}`
+                }
+            ]
+        }
+    }
+   
+
     render() {
         return (
             <View style={styles.container}>
@@ -29,17 +49,15 @@ export default class App extends Component {
                                 value={string}
                                 fallback={'frisck'}
                                 onPress={() => Alert.alert(`LaTeX: ${string}`)}
-                                //fontColor={this.getColor()}
-                                //enableAnimation={false}
+                            //fontColor={this.getColor()}
+                            //enableAnimation={false}
                             />
                         );
                     }}
                     renderSectionHeader={({ section: { title } }) => <Text>{title}</Text>}
-                    sections={[
-                        { title: 'calculus', data: MathStrings.calculus.filter((obj) => obj.math) },
-                        { title: 'trig', data: MathStrings.trig.filter((obj) => obj.math) }
-                    ]}
-                    keyExtractor={(item, index) => item.key}
+                    sections={this.state.sections}
+                    onRefresh={() => setTimeout(() => this.setState({ refreshing: false, sections: this.state.sections }), 2000)}
+                    refreshing={this.state.refreshing}
                 />
             </View>
         );

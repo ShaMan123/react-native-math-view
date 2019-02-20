@@ -54,6 +54,10 @@ function getPropTypes() {
     };
 }
 
+const styles = StyleSheet.create({
+    transparent: { backgroundColor: 'transparent' }
+});
+
 
 export default class TouchableMathView extends React.Component {
     static MATH_ENGINES = MATH_ENGINES;
@@ -131,6 +135,7 @@ export default class TouchableMathView extends React.Component {
             alignSelf: 'baseline'
         };
         this.setTouchableComponent = this.setTouchableComponent.bind(this);
+        this._onChange = this._onChange.bind(this);
         this.setTouchableComponent();
     }
 
@@ -168,7 +173,31 @@ export default class TouchableMathView extends React.Component {
         }
         catch (err) { return; }
 
+        //this.touchableComponent = match ? touchableComponent : TouchableMathView.defaultProps.touchableComponent;
+
         this.touchableComponent = match ? touchableComponent : TouchableMathView.defaultProps.touchableComponent;
+    }
+
+    _onChange(e) {
+        if (e.nativeEvent.hasOwnProperty('onSizeChanged')) {
+            const sizeObj = e.nativeEvent.size;
+            const dimensions = Dimensions.get('window');
+            const width = parseInt(sizeObj.width);
+            const height = parseInt(sizeObj.height);
+            const hScroll = dimensions.width < width;
+            const vScroll = dimensions.height < height;
+            if (this.props.enableAnimation) LayoutAnimation.spring();
+            this.setState({
+                width,
+                height,
+                hScroll,
+                vScroll,
+                opacity: 1
+            });
+        }
+        else if (e.nativeEvent.hasOwnProperty('touchEvent')) {
+            this.props.onPress(e.nativeEvent.touchEvent);
+        }
     }
 
     render() {
@@ -183,34 +212,15 @@ export default class TouchableMathView extends React.Component {
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={[contentContainerStyle]}
-                style={[scrollViewStyle, this.style, /*{ opacity: this.state.opacity }*/]}>
+                style={[scrollViewStyle, this.style, /*{ opacity: this.state.opacity }*/]}
+            >
                 {React.cloneElement(this.touchableComponent, this.props,
-                    <View style={[style, { backgroundColor: 'transparent' }]}>
+                    <View style={[style, styles.transparent]}>
                         <RNMathTextView
                             ref={ref => this._handle = ReactNative.findNodeHandle(ref)}
                             {...this.props}
                             style={computedStyle}
-                            onChange={(e) => {
-                                if (e.nativeEvent.hasOwnProperty('onSizeChanged')) {
-                                    const sizeObj = e.nativeEvent.size;
-                                    const dimensions = Dimensions.get('window');
-                                    const width = parseInt(sizeObj.width);
-                                    const height = parseInt(sizeObj.height);
-                                    const hScroll = dimensions.width < width;
-                                    const vScroll = dimensions.height < height;
-                                    if (enableAnimation) LayoutAnimation.spring();
-                                    this.setState({
-                                        width,
-                                        height,
-                                        hScroll,
-                                        vScroll,
-                                        opacity: 1
-                                    });
-                                }
-                                else if (e.nativeEvent.hasOwnProperty('touchEvent')) {
-                                    this.props.onPress(e.nativeEvent.touchEvent);
-                                }
-                            }}
+                            onChange={this._onChange}
                             mathEngine={mathEngine}
                             text={this.mathString}
                         />
@@ -220,39 +230,3 @@ export default class TouchableMathView extends React.Component {
         );
     }
 }
-
-
-/*
-<TouchableComponent {...this.props}>
-    <View style={[style, { backgroundColor: 'transparent' }]}>
-        <RNMathTextView
-            ref={ref => this._handle = ReactNative.findNodeHandle(ref)}
-            {...this.props}
-            style={computedStyle}
-            onChange={(e) => {
-                if (e.nativeEvent.hasOwnProperty('onSizeChanged')) {
-                    const sizeObj = e.nativeEvent.size;
-                    const dimensions = Dimensions.get('window');
-                    const width = parseInt(sizeObj.width);
-                    const height = parseInt(sizeObj.height);
-                    const hScroll = dimensions.width < width;
-                    const vScroll = dimensions.height < height;
-                    if (enableAnimation) LayoutAnimation.spring();
-                    this.setState({
-                        width,
-                        height,
-                        hScroll,
-                        vScroll,
-                        opacity: 1
-                    });
-                }
-                else if (e.nativeEvent.hasOwnProperty('touchEvent')) {
-                    this.props.onPress(e.nativeEvent.touchEvent)
-                }
-            }}
-            mathEngine={mathEngine}
-            text={text.replace(/\\\\/g, '\\')}
-        />
-    </View>
-    </TouchableComponent>
-    */

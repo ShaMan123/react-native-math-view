@@ -20,12 +20,19 @@
   "author": "ShaMan123 (github.com/ShaMan123)",
   "license": "",
   "peerDependencies": {
+    "lodash": "*",
     "react": "*",
-    "react-native": "*",
-    "lodash": "*"
+    "react-native": "*"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/ShaMan123/react-native-math-view.git"
+  },
+  "dependencies": {
+    "react-native-svg": "^9.2.4",
+    "react-native-svg-uri": "^1.2.3"
+  },
+  "devDependencies": {
+    "react-native": "^0.58.5"
   }
 }

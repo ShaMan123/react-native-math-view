@@ -14,11 +14,12 @@ import ReactNative, {
     Animated,
     View,
     StyleSheet,
+    WebView
 } from 'react-native';
 
 import memoize from 'lodash/memoize';
 
-const RNMathTextView = requireNativeComponent('RNMathView', TouchableMathView, {
+const RNMathTextView = requireNativeComponent('RNMathView', MathView, {
     nativeOnly: {
         nativeID: true,
         onChange: true
@@ -32,59 +33,24 @@ const MATH_ENGINES = {
     MATHJAX: 'MATHJAX'
 };
 
-const touchables = [TouchableOpacity, TouchableHighlight, TouchableWithoutFeedback];
-
-function getPropTypes() {
-    const propTypes = {};
-    const defaultPropTypes = {};
-    touchables.map((touchable) => {
-        Object.assign(propTypes, touchable.propTypes);
-        Object.assign(defaultPropTypes, touchable.defaultPropTypes);
-    });
-
-    return {
-        propTypes,
-        defaultPropTypes
-    };
-}
-
 const styles = StyleSheet.create({
-    transparent: { backgroundColor: 'transparent' },
     wrapper: {
-        display: 'flex', alignItems: 'center'
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        alignSelf: 'center',
+        paddingHorizontal: 10
     }
 });
 
 
-export default class TouchableMathView extends React.Component {
+export default class MathView extends React.Component {
     static MATH_ENGINES = MATH_ENGINES;
     static propTypes = {
-        ...getPropTypes().propTypes,
-        ...ScrollView.propTypes,
         style: ViewPropTypes.style,
-        scrollViewStyle: ViewPropTypes.style,
-        touchableComponent: function (props, propName, componentName) {
-            var match = false;
-            try {
-                const propValue = props[propName];
-                match = touchables.findIndex((touchable) => {
-                    return touchable.displayName === propValue.type.displayName;
-                }) > -1;
-            }
-            catch (err) { }
-
-            if (!match) {
-                return new Error(
-                    `Invalid prop ${propName} supplied to ${componentName}. Supply one of ${touchables.map((touchable) => { return touchable.displayName }).join(', ')}`
-                );
-            }
-        },
         text: PropTypes.string.isRequired,
         mathEngine: PropTypes.oneOf(Object.keys(MATH_ENGINES).map((key) => { return MATH_ENGINES[key] })),
-        verticalScroll: PropTypes.bool,
-        horizontalScroll: PropTypes.bool,
         onFullMount: PropTypes.func,
-        enableAnimation: PropTypes.bool,
         initialOpacity: function (props, propName, componentName) {
             const propValue = props[propName];
             if (typeof propValue !== 'number' || propValue < 0 || propValue > 1) {
@@ -93,25 +59,24 @@ export default class TouchableMathView extends React.Component {
                     ' `' + componentName + '`. Supply a valid opacity value.'
                 );
             }
-        }
+        },
+        initialScale: PropTypes.number
     };
 
     static defaultProps = {
-        ...getPropTypes().defaultPropTypes,
-        ...ScrollView.defaultPropTypes,
         style: null,
-        scrollViewStyle: null,
-        touchableComponent: <TouchableOpacity />,
         text: '',
         mathEngine: MATH_ENGINES.KATEX,
-        verticalScroll: false,
-        horizontalScroll: false,
         onFullMount: () => { },
-        enableAnimation: true,
-        initialOpacity: 0.2
+        initialOpacity: 0.2,
+        initialScale: 0
     };
 
     static memoize = memoize((LaTex) => undefined);
+
+    static getStyleObject = memoize((style) => {
+        return style && StyleSheet.flatten(style);
+    })
 
     constructor(props) {
         super(props);
@@ -119,45 +84,48 @@ export default class TouchableMathView extends React.Component {
         this.state = {
             width: null,
             height: null,
-            ...TouchableMathView.memoize(this.props.text),
-            opacity: props.initialOpacity
+            scale: props.initialScale,
+            opacity: props.initialOpacity,
+            ...MathView.memoize(this.props.text),
+            layout: null
         };
 
         this.opacity = new Animated.Value(props.initialOpacity);
-        this.scale = new Animated.Value(1);
+        this.scale = new Animated.Value(this.state.scale);
         this.updated = false;
         this.style = {
             opacity: this.opacity,
-            transform: [{ scale: this.scale }, { perspective: 1000 }],
-            alignSelf: 'center'
+            transform: [{ scale: this.scale }, { perspective: 1000 }]
         };
-        this.setTouchableComponent = this.setTouchableComponent.bind(this);
+
         this._onChange = this._onChange.bind(this);
-        this.setTouchableComponent();
     }
 
     componentDidUpdate() {
-        const { width, height } = this.state;
+        const { width, height, scale, layout } = this.state;
         if (typeof width === 'number' && typeof height === 'number' && !this.updated) {
             this.updated = true;
-            const animations = [Animated.spring(this.opacity, {
-                toValue: 1,
-                useNativeDriver: true
-            })];
-
-            TouchableMathView.memoize.cache.set(this.props.text, { width, height });
-            const maxWidth = Dimensions.get('window').width - 20;
-
-            if (width > maxWidth) {
-                animations.push(Animated.spring(this.scale, {
-                    toValue: maxWidth / width,
+            MathView.memoize.cache.set(this.props.text, { width, height, scale });
+            //const scale = (this.maxWidth - 20) / width;
+            const animations = [
+                Animated.spring(this.opacity, {
+                    toValue: 1,
                     useNativeDriver: true
-                }))
-            }
+                }),
+                Animated.spring(this.scale, {
+                    toValue: scale,
+                    useNativeDriver: true
+                })
+            ];
 
-            Animated.parallel(animations).start((a) => {
-                this.props.onFullMount({ width, height })
+            Animated.parallel(animations).start(() => {
+                //this.props.onFullMount({ width, height })
+                this.props.onFullMount(layout);
             });
+
+        }
+        if (layout) {
+
         }
     }
 
@@ -168,16 +136,26 @@ export default class TouchableMathView extends React.Component {
         });
     }
 
-    setTouchableComponent() {
-        const { touchableComponent } = this.props;
-        var match = false;
-        try {
-            const { displayName } = touchableComponent.type;
-            match = touchables.findIndex((touchable) => {
-                return touchable.displayName === displayName;
-            }) > -1;
-        }
-        catch (err) { return; }
+    getProp(propName) {
+        return MathView.getStyleObject(this.props.style)[propName];
+    }
+    /*
+    getCombinedPropValue(propBaseName) {
+        return MathView.getProp(`${propBaseName}Left`) + MathView.getProp(`${propBaseName}Right`) ||
+            MathView.getProp(`${propBaseName}Horizontal`) + (MathView.getProp(`${propBaseName}Left`) || MathView.getProp(`${propBaseName}Right`)) ||
+            MathView.getProp(`${propBaseName}Horizontal`) * 2 ||
+            MathView.getProp(propBaseName) * 2 ||
+            0;
+    }
+
+    get layoutDiff() {
+        return MathView.getCombinedPropValue('margin') + MathView.getCombinedPropValue('padding');
+    }
+    */
+    get maxWidth() {
+        const style = MathView.getStyleObject(this.props.style);
+        const dimensions = Dimensions.get('window');
+        return style.width || style.maxWidth || dimensions.width;
     }
 
     _onChange(e) {
@@ -188,12 +166,14 @@ export default class TouchableMathView extends React.Component {
             const height = parseInt(sizeObj.height);
             const hScroll = dimensions.width < width;
             const vScroll = dimensions.height < height;
+            const scale = (this.maxWidth - 20) / width;
             this.setState({
                 width,
                 height,
                 hScroll,
                 vScroll,
-                opacity: 1
+                opacity: 1,
+                scale: scale < 1 ? scale : 1
             });
         }
         else if (e.nativeEvent.hasOwnProperty('touchEvent')) {
@@ -205,8 +185,12 @@ export default class TouchableMathView extends React.Component {
         const { style, mathEngine } = this.props;
         const { width, height } = this.state;
         const computedStyle = typeof width === 'number' && typeof height === 'number' ? { width, height } : {};
+
         return (
-            <Animated.View style={[style, styles.wrapper, this.style]}>
+            <Animated.View
+                style={[styles.wrapper, style, this.style, { maxWidth: this.maxWidth }]}
+                onLayout={(e) => this.setState({ layout: e.nativeEvent.layout })}
+            >
                 <RNMathTextView
                     ref={ref => this._handle = ReactNative.findNodeHandle(ref)}
                     {...this.props}

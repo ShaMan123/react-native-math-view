@@ -106,13 +106,9 @@ export default class MathView extends React.Component {
         const { width, height, layout } = this.state;
         if (typeof width === 'number' && typeof height === 'number' && !this.updated) {
             this.updated = true;
-            //MathView.memoize.cache.set(this.props.text, { width, height, scale });
-            //const scale = (this.maxWidth - 20) / width;
-
-
         }
         if (layout && layout.width > 0 && layout.height > 0) {
-            const scale = (this.maxWidth - 20) / layout.width;
+            const scale = this.maxWidth / layout.width;
             MathView.memoize.cache.set(this.props.text, { width, height, scale });
             const animations = [
                 Animated.spring(this.opacity, {
@@ -126,8 +122,7 @@ export default class MathView extends React.Component {
             ];
 
             Animated.parallel(animations).start(() => {
-                //this.props.onFullMount({ width, height })
-                this.props.onFullMount(layout);
+                this.props.onFullMount({ ...layout, scale });
             });
         }
     }
@@ -142,23 +137,11 @@ export default class MathView extends React.Component {
     getProp(propName) {
         return MathView.getStyleObject(this.props.style)[propName];
     }
-    /*
-    getCombinedPropValue(propBaseName) {
-        return MathView.getProp(`${propBaseName}Left`) + MathView.getProp(`${propBaseName}Right`) ||
-            MathView.getProp(`${propBaseName}Horizontal`) + (MathView.getProp(`${propBaseName}Left`) || MathView.getProp(`${propBaseName}Right`)) ||
-            MathView.getProp(`${propBaseName}Horizontal`) * 2 ||
-            MathView.getProp(propBaseName) * 2 ||
-            0;
-    }
 
-    get layoutDiff() {
-        return MathView.getCombinedPropValue('margin') + MathView.getCombinedPropValue('padding');
-    }
-    */
     get maxWidth() {
         const style = MathView.getStyleObject(this.props.style);
         const dimensions = Dimensions.get('window');
-        return style.width || style.maxWidth || dimensions.width;
+        return (style.width || style.maxWidth || dimensions.width) - 20;
     }
 
     _onChange(e) {

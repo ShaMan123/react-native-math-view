@@ -39,7 +39,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         alignSelf: 'center',
-        paddingHorizontal: 10
+    },
+    tag: {
+        marginHorizontal: 10
     }
 });
 
@@ -85,7 +87,6 @@ export default class MathView extends React.Component {
             width: null,
             height: null,
             scale: props.initialScale,
-            opacity: props.initialOpacity,
             ...MathView.memoize(this.props.text),
             layout: null
         };
@@ -102,18 +103,24 @@ export default class MathView extends React.Component {
     }
 
     componentDidUpdate() {
-        const { width, height, scale, layout } = this.state;
+        const { width, height, layout } = this.state;
         if (typeof width === 'number' && typeof height === 'number' && !this.updated) {
             this.updated = true;
-            MathView.memoize.cache.set(this.props.text, { width, height, scale });
+            //MathView.memoize.cache.set(this.props.text, { width, height, scale });
             //const scale = (this.maxWidth - 20) / width;
+
+
+        }
+        if (layout && layout.width > 0 && layout.height > 0) {
+            const scale = (this.maxWidth - 20) / layout.width;
+            MathView.memoize.cache.set(this.props.text, { width, height, scale });
             const animations = [
                 Animated.spring(this.opacity, {
                     toValue: 1,
                     useNativeDriver: true
                 }),
                 Animated.spring(this.scale, {
-                    toValue: scale,
+                    toValue: scale < 1 ? scale : 1,
                     useNativeDriver: true
                 })
             ];
@@ -122,10 +129,6 @@ export default class MathView extends React.Component {
                 //this.props.onFullMount({ width, height })
                 this.props.onFullMount(layout);
             });
-
-        }
-        if (layout) {
-
         }
     }
 
@@ -161,19 +164,12 @@ export default class MathView extends React.Component {
     _onChange(e) {
         if (e.nativeEvent.hasOwnProperty('onSizeChanged')) {
             const sizeObj = e.nativeEvent.size;
-            const dimensions = Dimensions.get('window');
             const width = parseInt(sizeObj.width);
             const height = parseInt(sizeObj.height);
-            const hScroll = dimensions.width < width;
-            const vScroll = dimensions.height < height;
-            const scale = (this.maxWidth - 20) / width;
+
             this.setState({
                 width,
-                height,
-                hScroll,
-                vScroll,
-                opacity: 1,
-                scale: scale < 1 ? scale : 1
+                height
             });
         }
         else if (e.nativeEvent.hasOwnProperty('touchEvent')) {
@@ -188,13 +184,13 @@ export default class MathView extends React.Component {
 
         return (
             <Animated.View
-                style={[styles.wrapper, style, this.style, { maxWidth: this.maxWidth }]}
+                style={[styles.wrapper, /*style,*/ this.style]}
                 onLayout={(e) => this.setState({ layout: e.nativeEvent.layout })}
             >
                 <RNMathTextView
                     ref={ref => this._handle = ReactNative.findNodeHandle(ref)}
                     {...this.props}
-                    style={computedStyle}
+                    style={[styles.tag, computedStyle]}
                     onChange={this._onChange}
                     mathEngine={mathEngine}
                     text={this.mathString}

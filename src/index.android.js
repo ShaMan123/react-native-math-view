@@ -53,7 +53,7 @@ class MathView extends React.Component {
         style: ViewPropTypes.style,
         text: PropTypes.string.isRequired,
         mathEngine: PropTypes.oneOf(Object.keys(MATH_ENGINES).map((key) => { return MATH_ENGINES[key] })),
-        onFullMount: PropTypes.func,
+        onLayoutCompleted: PropTypes.func,
         initialOpacity: function (props, propName, componentName) {
             const propValue = props[propName];
             if (typeof propValue !== 'number' || propValue < 0 || propValue > 1) {
@@ -71,7 +71,7 @@ class MathView extends React.Component {
         style: null,
         text: '',
         mathEngine: MATH_ENGINES.KATEX,
-        onFullMount: () => { },
+        onLayoutCompleted: () => { },
         initialOpacity: 0.2,
         initialScale: 0
     };
@@ -101,6 +101,7 @@ class MathView extends React.Component {
         };
 
         this._onChange = this._onChange.bind(this);
+        this._onLayout = this._onLayout.bind(this);
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
@@ -118,7 +119,7 @@ class MathView extends React.Component {
     componentDidUpdate(prevProps, prevState) {
         const { width, height, containerLayout } = this.state;
         if (width && containerLayout && (!this.scaleValue || containerLayout.width !== prevState.containerLayout.width)) {
-            const scale = containerLayout.width / width;
+            const scale = (containerLayout.width - 20) / width;
             this.scaleValue = scale;
             MathView.memoize.cache.set(this.props.text, { width, height });
             const animations = [
@@ -127,15 +128,21 @@ class MathView extends React.Component {
                     useNativeDriver: true
                 }),
                 Animated.spring(this.scale, {
-                    toValue:1,// scale < 1 ? scale : 1,
+                    toValue: scale < 1 ? scale : 1,
                     useNativeDriver: true
                 })
             ];
-            console.log(scale)
-            this._handle.setNativeProps({ fontShrink: scale });
+
+            // works beautifully => but causes web view to re-calculate it's size resulting in infinte state updates
+            // if flexWrap will work this method should replace scaling the view with Animated
+            //this._handle.setNativeProps({ fontShrink: scale });
 
             Animated.parallel(animations).start(() => {
-                this.props.onFullMount({ width, height, scale });
+                const e = this.e;
+                e.nativeEvent.layout.width = Math.round(width * scale);
+                e.nativeEvent.layout.height = Math.round(height * scale);
+                e.nativeEvent.scale = scale;
+                this.props.onLayoutCompleted(this.e);
             });
         }
         if (typeof width === 'number' && typeof height === 'number' && !this.updated) {
@@ -220,6 +227,11 @@ class MathView extends React.Component {
       
     }
 
+    _onLayout(e) {
+        e.persist();
+        this.e = e;
+    }
+
     render() {
         const { style, mathEngine } = this.props;
         const { width, height, containerLayout } = this.state;
@@ -228,7 +240,9 @@ class MathView extends React.Component {
         const computedStyle = typeof width === 'number' && typeof height === 'number' ? { width, height } : {};
 
         return (
-            <View style={[styles.wrapper, style]}>
+            <View style={[styles.wrapper, style]}
+                onLayout={this._onLayout}
+            >
                 <Animated.View
                     style={this.style}
                 >

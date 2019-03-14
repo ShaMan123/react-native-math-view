@@ -18,13 +18,52 @@ android {
         abortOnError false
     }
 }
-
+/*
 repositories {
     mavenCentral()
     jcenter()
     google()
     maven {
         url "https://dl.bintray.com/kexanie/maven"
+    }
+}
+*/
+buildscript {
+    repositories {
+        maven { url "https://maven.google.com" }
+        jcenter()
+        google()
+        maven {
+            url 'https://maven.google.com/'
+            name 'Google'
+        }
+        maven {
+            url "https://maven.fabric.io/public"
+        }
+        maven {
+            url "https://dl.bintray.com/kexanie/maven"
+        }
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.3.2'
+    }
+}
+
+allprojects {
+    repositories {
+        mavenLocal()
+        maven { url "https://maven.google.com" }
+        jcenter()
+        google()
+        maven {
+            // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+            url "$rootDir/../example/node_modules/react-native/android"
+        }
+        maven {
+            url 'https://maven.google.com/'
+            name 'Google'
+        }
     }
 }
 

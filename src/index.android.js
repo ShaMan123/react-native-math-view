@@ -92,12 +92,12 @@ class MathView extends React.Component {
             containerLayout: null
         };
 
-        this.opacity = new Animated.Value(props.initialOpacity);
-        this.scale = new Animated.Value(props.initialScale);
+        this.opacityAnimation = new Animated.Value(props.initialOpacity);
+        this.scaleAnimation = new Animated.Value(props.initialScale);
         this.updated = false;
         this.style = {
-            opacity: this.opacity,
-            transform: [{ scale: this.scale }, { perspective: 1000 }]
+            opacity: this.opacityAnimation,
+            transform: [{ scale: this.scaleAnimation }, { perspective: 1000 }]
         };
 
         this._onChange = this._onChange.bind(this);
@@ -110,6 +110,7 @@ class MathView extends React.Component {
                 containerLayout: nextProps.layoutProvider
             };
         }
+        return null;
     }
 
     componentDidMount() {
@@ -123,11 +124,11 @@ class MathView extends React.Component {
             this.scaleValue = scale;
             MathView.memoize.cache.set(this.props.text, { width, height });
             const animations = [
-                Animated.spring(this.opacity, {
+                Animated.spring(this.opacityAnimation, {
                     toValue: 1,
                     useNativeDriver: true
                 }),
-                Animated.spring(this.scale, {
+                Animated.spring(this.scaleAnimation, {
                     toValue: scale < 1 ? scale : 1,
                     useNativeDriver: true
                 })
@@ -180,11 +181,7 @@ class MathView extends React.Component {
 
     measureRef() {
         try {
-            this.props.layoutProvider.current.measure((ox, oy, width, height, px, py) => {
-                this.setState({
-                    containerLayout: { width: parseInt(width), height: parseInt(height) }
-                });
-            });
+            this.props.layoutProvider.current.measure((ox, oy, width, height, px, py) => this.setContainerLayout(width, height));
         }
         catch (err) {
             console.error(err.message);
@@ -195,15 +192,11 @@ class MathView extends React.Component {
         let i = 0;
         const { layoutProvider } = this.props;
         if (typeof layoutProvider === 'function') {
-            const { width, height } = await Promise.resolve(layoutProvider());
-            this.setState({
-                containerLayout: { width, height }
-            });
+            let { width, height } = await Promise.resolve(layoutProvider());
+            this.setContainerLayout(width, height);
         }
         else if (layoutProvider.width) {
-            this.setState({
-                containerLayout: layoutProvider
-            });
+            this.setContainerLayout(layoutProvider.width, layoutProvider.height);
         }
         else {
             const interval = setInterval(() => {
@@ -218,18 +211,32 @@ class MathView extends React.Component {
                     clearInterval(interval);
                     console.warn('RNMathView: The provided ref is not measurable');
                     const { width, height } = Dimensions.get('window');
-                    this.setState({
-                        containerLayout: { width, height }
-                    });
+                    this.setContainerLayout(width, height);
                 }
             }, 50);
         }
-      
+    }
+
+    get isStaticRenderingMode() {
+        const { layoutProvider } = this.props;
+        return layoutProvider && layoutProvider.width ? true : false;
+    }
+
+    setContainerLayout(width, height) {
+        const staticRendering = this.isStaticRenderingMode;
+        this.setState({
+            containerLayout: {
+                width: staticRendering ? Math.min(width, height) : width,
+                height: staticRendering ? Math.max(width, height) : height
+            }
+        });
     }
 
     _onLayout(e) {
         e.persist();
         this.e = e;
+        if (this.layout && e.nativeEvent.layout.width !== this.layout.width) setTimeout(() => this.measureLayout(), 0);
+        this.layout = e.nativeEvent.layout;
     }
 
     render() {

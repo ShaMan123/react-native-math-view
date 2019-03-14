@@ -10,7 +10,6 @@ import React, {Component} from 'react';
 import { Platform, StyleSheet, Text, View, TextInput, SectionList, UIManager, Alert, Dimensions } from 'react-native';
 import MathView from 'react-native-math-view';
 import * as MathStrings from './math';
-
 //if (Platform.OS === 'android') UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(false);
 
 export default class App extends Component {
@@ -37,23 +36,28 @@ export default class App extends Component {
     }
     
     componentDidMount() {
-        setTimeout(() => {
-            this.setState({ width: Dimensions.get('window').width });
-        }, 5000)
-        
-        setTimeout(() => {
-            this.setState({ width: Dimensions.get('window').width*0.25 });
-        }, 10000)
+        this.t = setInterval(() => {
+            setTimeout(() => {
+                this.setState({ width: Dimensions.get('window').width });
+            }, 15000);
 
-        setTimeout(() => {
-            this.setState({ width: Dimensions.get('window').width });
-        }, 20000)
-        
+            setTimeout(() => {
+                this.setState({ width: Dimensions.get('window').width * 0.25 });
+            }, 10000);
+
+            setTimeout(() => {
+                this.setState({ width: Dimensions.get('window').width });
+            }, 20000);
+        }, 20000);
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.t);
     }
     
     render() {
         return (
-            <View style={[styles.container, {width:this.state.width}]} ref={this.ref}>
+            <View style={[styles.container, {maxWidth:this.state.width}]} ref={this.ref}>
                 <SectionList
                     scrollEnabled
                     renderItem={({ item, index, section }) => {
@@ -63,10 +67,11 @@ export default class App extends Component {
                                 style={[styles.math]}
                                 math={string}
                                 text={string}
-                                layoutProvider={{ width: this.state.width, height: 0 }}
+                                //layoutProvider={{ width: this.state.width, height: 0 }}
+                                layoutProvider={this.ref}
                                 fallback={'frisck'}
                                 onPress={() => Alert.alert(`LaTeX: ${string}`)}
-                                onLayoutCompleted={(e)=>console.log(e.nativeEvent)}
+                                //onLayoutCompleted={(e)=>console.log(e.nativeEvent)}
                             />
                         );
                     }}

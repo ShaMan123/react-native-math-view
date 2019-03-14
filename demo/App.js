@@ -40,9 +40,15 @@ export default class App extends Component {
         setTimeout(() => {
             this.setState({ width: Dimensions.get('window').width });
         }, 5000)
+        
         setTimeout(() => {
             this.setState({ width: Dimensions.get('window').width*0.25 });
         }, 10000)
+
+        setTimeout(() => {
+            this.setState({ width: Dimensions.get('window').width });
+        }, 20000)
+        
     }
     
     render() {
@@ -57,11 +63,10 @@ export default class App extends Component {
                                 style={[styles.math]}
                                 math={string}
                                 text={string}
-                                layoutProvider={{width:this.state.width, height: 220}}
+                                layoutProvider={{ width: this.state.width, height: 0 }}
                                 fallback={'frisck'}
                                 onPress={() => Alert.alert(`LaTeX: ${string}`)}
-                            //fontColor={this.getColor()}
-                            //enableAnimation={false}
+                                onLayoutCompleted={(e)=>console.log(e.nativeEvent)}
                             />
                         );
                     }}

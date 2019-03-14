@@ -13,4 +13,6 @@ target 'RNMathView' do
 
   pod 'iosMath'
 
+  pod 'RNSVG', :path => '../node_modules/react-native-svg'
+
 end

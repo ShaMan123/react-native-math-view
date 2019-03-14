@@ -7,7 +7,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "lodash.memoize": "^4.1.2",
+    "lodash": "*",
     "react": "*",
     "react-native": "^0.57.8",
     "react-native-math-view": "file:.."
@@ -17,7 +17,10 @@
     "babel-jest": "23.6.0",
     "jest": "23.6.0",
     "metro-react-native-babel-preset": "0.47.0",
-    "react-test-renderer": "16.5.0"
+    "react-test-renderer": "16.5.0",
+    "babel-preset-react-native": "5.0.0",
+    "@babel/runtime": "7.3.4",
+    "prop-types": "^15.7.2"
   },
   "jest": {
     "preset": "react-native"

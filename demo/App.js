@@ -7,7 +7,7 @@
  */
 
 import React, {Component} from 'react';
-import { Platform, StyleSheet, Text, View, TextInput, SectionList, UIManager, Alert, Ref } from 'react-native';
+import { Platform, StyleSheet, Text, View, TextInput, SectionList, UIManager, Alert, Dimensions } from 'react-native';
 import MathView from 'react-native-math-view';
 import * as MathStrings from './math';
 
@@ -29,24 +29,35 @@ export default class App extends Component {
                     data: MathStrings.trig.filter((obj) => obj.math),
                     keyExtractor: (item) => `trig:${item.string}`
                 }
-            ]
+            ],
+            width: Dimensions.get('window').width * 0.5
         }
-    }
-   
 
+        this.ref = React.createRef();
+    }
+    
+    componentDidMount() {
+        setTimeout(() => {
+            this.setState({ width: Dimensions.get('window').width });
+        }, 5000)
+        setTimeout(() => {
+            this.setState({ width: Dimensions.get('window').width*0.25 });
+        }, 10000)
+    }
+    
     render() {
         return (
-            <View style={styles.container}>
+            <View style={[styles.container, {width:this.state.width}]} ref={this.ref}>
                 <SectionList
                     scrollEnabled
                     renderItem={({ item, index, section }) => {
                         const { string } = item;
                         return (
                             <MathView
-                                style={styles.math}
+                                style={[styles.math]}
                                 math={string}
                                 text={string}
-                                value={string}
+                                layoutProvider={{width:this.state.width, height: 220}}
                                 fallback={'frisck'}
                                 onPress={() => Alert.alert(`LaTeX: ${string}`)}
                             //fontColor={this.getColor()}

@@ -1,5 +1,6 @@
 package com.autodidact.rnmathview;
 
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
@@ -20,8 +21,13 @@ public class RNMathViewManager extends SimpleViewManager<RNMathView> {
     private static final String PROPS_HORIZONTAL_SCROLL = "horizontalScroll";
     private static final String PROPS_SHOW_SCROLLBAR_DELAY = "showScrollBarDelay";
     private static final String PROPS_FONT_COLOR = "fontColor";
+    private static final String PROPS_FONT_SHRINK = "fontShrink";
+    private static final String PROPS_FLEX_WRAP = "flexWrap";
+    private static final String PROPS_CONTAINER_LAYOUT = "containerLayout";
+
     private static final String PROPS_MATH_ENGINE_KATEX = "KATEX";
     private static final String PROPS_MATH_ENGINE_MATHJAX = "MATHJAX";
+    private static final String PROPS_FLEX_WRAP_WRAP = "wrap";
 
     @Override
     public String getName() {
@@ -71,6 +77,21 @@ public class RNMathViewManager extends SimpleViewManager<RNMathView> {
     @ReactProp(name = PROPS_FONT_COLOR)
     public void setPropsFontColor(RNMathView viewContainer, String color) {
         viewContainer.setFontColor(color);
+    }
+
+    @ReactProp(name = PROPS_FONT_SHRINK)
+    public void setPropsFontShrink(RNMathView viewContainer, float scale) {
+        viewContainer.shrinkFontScale(scale);
+    }
+
+    @ReactProp(name = PROPS_FLEX_WRAP)
+    public void setPropsFlexWrap(RNMathView viewContainer, String value) {
+        viewContainer.setFlexWrap(value == PROPS_FLEX_WRAP_WRAP);
+    }
+
+    @ReactProp(name = PROPS_CONTAINER_LAYOUT)
+    public void setPropsContainerLayout(RNMathView viewContainer, ReadableMap layout) {
+        viewContainer.setContainerDimensions(layout.getInt("width"), layout.getInt("height"));
     }
 
     public Map getExportedCustomBubblingEventTypeConstants() {

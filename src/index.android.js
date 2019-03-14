@@ -14,7 +14,7 @@ import ReactNative, {
     Animated,
     View,
     StyleSheet,
-    WebView
+    findNodeHandle
 } from 'react-native';
 
 import memoize from 'lodash/memoize';
@@ -39,6 +39,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         alignSelf: 'center',
+        flex: 1
     },
     tag: {
         marginHorizontal: 10
@@ -62,7 +63,8 @@ class MathView extends React.Component {
                 );
             }
         },
-        initialScale: PropTypes.number
+        initialScale: PropTypes.number,
+        layoutProvider: PropTypes.any.isRequired
     };
 
     static defaultProps = {
@@ -86,13 +88,12 @@ class MathView extends React.Component {
         this.state = {
             width: null,
             height: null,
-            scale: props.initialScale,
             ...MathView.memoize(this.props.text),
-            layout: null
+            containerLayout: null
         };
 
         this.opacity = new Animated.Value(props.initialOpacity);
-        this.scale = new Animated.Value(this.state.scale);
+        this.scale = new Animated.Value(props.initialScale);
         this.updated = false;
         this.style = {
             opacity: this.opacity,
@@ -102,29 +103,45 @@ class MathView extends React.Component {
         this._onChange = this._onChange.bind(this);
     }
 
-    componentDidUpdate() {
-        const { width, height, layout } = this.state;
-        if (typeof width === 'number' && typeof height === 'number' && !this.updated) {
-            this.updated = true;
+    static getDerivedStateFromProps(nextProps, prevState) {
+        if (nextProps.layoutProvider.width && nextProps.layoutProvider !== prevState.layoutProvider) {
+            return {
+                containerLayout: nextProps.layoutProvider
+            };
         }
-        if (layout && layout.width > 0 && layout.height > 0) {
-            const scale = this.maxWidth / layout.width;
-            MathView.memoize.cache.set(this.props.text, { width, height, scale });
+    }
+
+    componentDidMount() {
+        this.measureLayout();
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        const { width, height, containerLayout } = this.state;
+        if (width && containerLayout && (!this.scaleValue || containerLayout.width !== prevState.containerLayout.width)) {
+            const scale = containerLayout.width / width;
+            this.scaleValue = scale;
+            MathView.memoize.cache.set(this.props.text, { width, height });
             const animations = [
                 Animated.spring(this.opacity, {
                     toValue: 1,
                     useNativeDriver: true
                 }),
                 Animated.spring(this.scale, {
-                    toValue: scale < 1 ? scale : 1,
+                    toValue:1,// scale < 1 ? scale : 1,
                     useNativeDriver: true
                 })
             ];
+            console.log(scale)
+            this._handle.setNativeProps({ fontShrink: scale });
 
             Animated.parallel(animations).start(() => {
-                this.props.onFullMount({ ...layout, scale });
+                this.props.onFullMount({ width, height, scale });
             });
         }
+        if (typeof width === 'number' && typeof height === 'number' && !this.updated) {
+            this.updated = true;
+        }
+
     }
 
     get mathString() {
@@ -136,12 +153,6 @@ class MathView extends React.Component {
 
     getProp(propName) {
         return MathView.getStyleObject(this.props.style)[propName];
-    }
-
-    get maxWidth() {
-        const style = MathView.getStyleObject(this.props.style);
-        const dimensions = Dimensions.get('window');
-        return (style.width || style.maxWidth || dimensions.width) - 20;
     }
 
     _onChange(e) {
@@ -160,27 +171,80 @@ class MathView extends React.Component {
         }
     }
 
+    measureRef() {
+        try {
+            this.props.layoutProvider.current.measure((ox, oy, width, height, px, py) => {
+                this.setState({
+                    containerLayout: { width: parseInt(width), height: parseInt(height) }
+                });
+            });
+        }
+        catch (err) {
+            console.error(err.message);
+        }
+    }
+
+    async measureLayout() {
+        let i = 0;
+        const { layoutProvider } = this.props;
+        if (typeof layoutProvider === 'function') {
+            const { width, height } = await Promise.resolve(layoutProvider());
+            this.setState({
+                containerLayout: { width, height }
+            });
+        }
+        else if (layoutProvider.width) {
+            this.setState({
+                containerLayout: layoutProvider
+            });
+        }
+        else {
+            const interval = setInterval(() => {
+                if (layoutProvider.current && layoutProvider.current.measure) {
+                    clearInterval(interval);
+                    this.measureRef();
+                }
+                else if (i < 5) {
+                    i++;
+                }
+                else {
+                    clearInterval(interval);
+                    console.warn('RNMathView: The provided ref is not measurable');
+                    const { width, height } = Dimensions.get('window');
+                    this.setState({
+                        containerLayout: { width, height }
+                    });
+                }
+            }, 50);
+        }
+      
+    }
+
     render() {
         const { style, mathEngine } = this.props;
-        const { width, height } = this.state;
+        const { width, height, containerLayout } = this.state;
+        if (!containerLayout) return null;
+
         const computedStyle = typeof width === 'number' && typeof height === 'number' ? { width, height } : {};
 
         return (
-            <Animated.View
-                style={[styles.wrapper, style, this.style]}
-                onLayout={(e) => this.setState({ layout: e.nativeEvent.layout })}
-            >
-                <RNMathView
-                    ref={ref => this._handle = ReactNative.findNodeHandle(ref)}
-                    {...this.props}
-                    style={[styles.tag, computedStyle]}
-                    onChange={this._onChange}
-                    mathEngine={mathEngine}
-                    text={this.mathString}
-                    verticalScroll={false}
-                    horizontalScroll={false}
-                />
-            </Animated.View>
+            <View style={[styles.wrapper, style]}>
+                <Animated.View
+                    style={this.style}
+                >
+                    <RNMathView
+                        ref={ref => this._handle = ref}
+                        {...this.props}
+                        style={[styles.tag, computedStyle]}
+                        onChange={this._onChange}
+                        mathEngine={mathEngine}
+                        text={this.mathString}
+                        verticalScroll={false}
+                        horizontalScroll={false}
+                        containerLayout={containerLayout}
+                    />
+                </Animated.View>
+            </View>
         );
     }
 }

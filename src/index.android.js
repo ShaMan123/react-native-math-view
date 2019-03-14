@@ -141,7 +141,7 @@ class MathView extends React.Component {
                 const e = this.e;
                 e.nativeEvent.layout.width = Math.round(width * scale);
                 e.nativeEvent.layout.height = Math.round(height * scale);
-                e.nativeEvent.scale = scale;
+                e.nativeEvent.scale = scale < 1 ? scale : 1;
                 this.props.onLayoutCompleted(this.e);
             });
         }

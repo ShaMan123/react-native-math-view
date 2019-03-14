@@ -19,14 +19,14 @@ import ReactNative, {
 
 import memoize from 'lodash/memoize';
 
-const RNMathTextView = requireNativeComponent('RNMathView', MathView, {
+const RNMathView = requireNativeComponent('RNMathView', MathView, {
     nativeOnly: {
         nativeID: true,
         onChange: true
     }
 });
 
-const MathTextViewManager = NativeModules.RNMathViewManager || {};
+const MathViewManager = NativeModules.RNMathViewManager || {};
 
 const MATH_ENGINES = {
     KATEX: 'KATEX',
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
 });
 
 
-export default class MathView extends React.Component {
+class MathView extends React.Component {
     static MATH_ENGINES = MATH_ENGINES;
     static propTypes = {
         style: ViewPropTypes.style,
@@ -167,18 +167,22 @@ export default class MathView extends React.Component {
 
         return (
             <Animated.View
-                style={[styles.wrapper, /*style,*/ this.style]}
+                style={[styles.wrapper, style, this.style]}
                 onLayout={(e) => this.setState({ layout: e.nativeEvent.layout })}
             >
-                <RNMathTextView
+                <RNMathView
                     ref={ref => this._handle = ReactNative.findNodeHandle(ref)}
                     {...this.props}
                     style={[styles.tag, computedStyle]}
                     onChange={this._onChange}
                     mathEngine={mathEngine}
                     text={this.mathString}
+                    verticalScroll={false}
+                    horizontalScroll={false}
                 />
             </Animated.View>
         );
     }
 }
+
+export default MathView;

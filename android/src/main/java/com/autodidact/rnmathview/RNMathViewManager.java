@@ -30,10 +30,10 @@ public class RNMathViewManager extends SimpleViewManager<RNMathView> {
 
     @Override
     protected RNMathView createViewInstance(ThemedReactContext context) {
-        RNMathView.View = new RNMathView(context);
-        //RNMathView.View.setEngine(0);
-        //RNMathView.View.setText(" This come from string.You can insert inline formula:  \\(ax^2 + bx + c = 0\\)  or displayed formula: $$\\sum_{i = 0}^n i^2 = \\frac{(n ^ 2 + n)(2n + 1)}{6}$$");
-        return RNMathView.View;
+        RNMathView view = new RNMathView(context);
+        //view.setEngine(0);
+        //view.setText(" This come from string.You can insert inline formula:  \\(ax^2 + bx + c = 0\\)  or displayed formula: $$\\sum_{i = 0}^n i^2 = \\frac{(n ^ 2 + n)(2n + 1)}{6}$$");
+        return view;
     }
 
     @ReactProp(name = PROPS_MATH_ENGINE)

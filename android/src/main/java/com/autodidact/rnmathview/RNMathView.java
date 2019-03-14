@@ -108,7 +108,6 @@ public class RNMathView extends MathView {
         setStyleString("flexWrap", "wrap", el) +
         setStyleString("flexDirection", "row", el) +
         setStyleString("alignItems", "center", el);
-        Log.d("RNMathView", "flexWrapStyle: "+script);
         return script;
     }
 

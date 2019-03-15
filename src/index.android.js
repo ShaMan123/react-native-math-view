@@ -64,7 +64,7 @@ class MathView extends React.Component {
             }
         },
         initialScale: PropTypes.number,
-        layoutProvider: PropTypes.any.isRequired
+        layoutProvider: PropTypes.any
     };
 
     static defaultProps = {
@@ -188,6 +188,11 @@ class MathView extends React.Component {
         }
     }
 
+    measureWindow() {
+        const { width, height } = Dimensions.get('window');
+        this.setContainerLayout(width, height);
+    }
+
     async measureLayout() {
         let i = 0;
         const { layoutProvider } = this.props;
@@ -195,10 +200,7 @@ class MathView extends React.Component {
             let { width, height } = await Promise.resolve(layoutProvider());
             this.setContainerLayout(width, height);
         }
-        else if (layoutProvider.width) {
-            this.setContainerLayout(layoutProvider.width, layoutProvider.height);
-        }
-        else {
+        else if (layoutProvider.current) {
             const interval = setInterval(() => {
                 if (layoutProvider.current && layoutProvider.current.measure) {
                     clearInterval(interval);
@@ -210,10 +212,15 @@ class MathView extends React.Component {
                 else {
                     clearInterval(interval);
                     console.warn('RNMathView: The provided ref is not measurable');
-                    const { width, height } = Dimensions.get('window');
-                    this.setContainerLayout(width, height);
+                    this.measureWindow();
                 }
             }, 50);
+        }
+        else if (layoutProvider.width) {
+            this.setContainerLayout(layoutProvider.width, layoutProvider.height);
+        }
+        else {
+            this.measureWindow();
         }
     }
 

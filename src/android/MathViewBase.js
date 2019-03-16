@@ -119,7 +119,7 @@ class MathViewBase extends Component {
 
     render() {
         const { forwardedRef, ...props } = this.props;
-        console.log(this.state)
+        
         return (
             <RNMathView
                 {...props}

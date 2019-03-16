@@ -19,7 +19,6 @@ import ReactNative, {
 import memoize from 'lodash/memoize';
 import MathViewBase, { MATH_ENGINES} from './MathViewBase';
 
-
 class MathView extends React.Component {
     static propTypes = {
         style: ViewPropTypes.style,
@@ -83,16 +82,7 @@ class MathView extends React.Component {
                 })
             ];
 
-            Animated.parallel(animations)
-                .start(() => {
-                /*
-                const e = this.e;
-                e.nativeEvent.layout.width = Math.round(width * scale);
-                e.nativeEvent.layout.height = Math.round(height * scale);
-                e.nativeEvent.scale = scale < 1 ? scale : 1;
-                this.props.onLayoutCompleted(e);
-                */
-            });
+            Animated.parallel(animations).start();
         }
     }
 
@@ -108,27 +98,27 @@ class MathView extends React.Component {
     }
 
     render() {
-        const { style, containerStyle, ...props } = this.props;
+        const { style, onLayout, ...props } = this.props;
         const { containerLayout, webViewLayout } = this.state;
         return (
             <View
-                style={[style]}
+                style={style}
             >
                 <View
                     style={[/*webViewLayout || */StyleSheet.absoluteFill]}
                     onLayout={this._onStubLayout}
                 />
                 <Animated.View
-                    style={[{ opacity: this.opacityAnimation }]}
+                    style={[{ opacity: this.opacityAnimation, transform: [{ scale: this.scaleAnimation }, { perspective: 1000 }] }]}
                 >
-                    
                     {
                         containerLayout &&
                         <MathViewBase
                             ref={ref => this._handle = ref}
                             {...props}
-                            onSizeChanged={(layout) =>/* layout.width!==this.state.layout && */this.setState({ webViewLayout: layout })}
+                            onSizeChanged={(layout) =>/* layout.width!==this.state.webViewLayout.width && */this.setState({ webViewLayout: layout })}
                             containerLayout={containerLayout}
+                            onLayout={(e) => onLayout && onLayout(e)}
                         />
                     }
 

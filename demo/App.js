@@ -1,17 +1,12 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
 
 import React, {Component} from 'react';
-import { Platform, StyleSheet, Text, View, TextInput, SectionList, UIManager, Alert, Dimensions } from 'react-native';
+import { Platform, StyleSheet, Text, View, TextInput, SectionList, FlatList, UIManager, Alert, Dimensions, ScrollView, i18Manager } from 'react-native';
+import * as _ from 'lodash';
 import MathView from 'react-native-math-view';
 import * as MathStrings from './math';
-//if (Platform.OS === 'android') UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(false);
 
+//if (Platform.OS === 'android') UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(false);
+//i18Manager.allowRTL(false);
 export default class App extends Component {
     constructor(props) {
         super(props);
@@ -29,52 +24,84 @@ export default class App extends Component {
                     keyExtractor: (item) => `trig:${item.string}`
                 }
             ],
-            width: Dimensions.get('window').width * 0.5
+            width: Dimensions.get('window').width-50,
+            fontScale: 1
         }
 
         this.ref = React.createRef();
     }
     
     componentDidMount() {
+        let i = 0;
+        const interval = 7000;
+        
         this.t = setInterval(() => {
-            setTimeout(() => {
-                this.setState({ width: Dimensions.get('window').width });
-            }, 15000);
-
-            setTimeout(() => {
-                this.setState({ width: Dimensions.get('window').width * 0.25 });
-            }, 10000);
-
-            setTimeout(() => {
-                this.setState({ width: Dimensions.get('window').width });
-            }, 20000);
-        }, 20000);
+            this.setState({ width: Dimensions.get('window').width * (i % 4 + 1) * 0.25 });
+            i++;
+        }, interval);
+        
     }
 
     componentWillUnmount() {
         clearInterval(this.t);
     }
-    
-    render() {
+
+    renderItem(item) {
+        const { string } = item;
         return (
-            <View style={[styles.container, {maxWidth:this.state.width}]} ref={this.ref}>
+            <MathView
+                style={[styles.math, { backgroundColor: 'red' }, { maxWidth: this.state.width }]} //{ display: 'flex',alignItems: 'center',/* justifyContent: 'flex-start', alignContent: 'flex-start', backgroundColor: 'red',*/ margin: 10}]}
+                math={string}
+                text={string}
+                fontColor='white'
+                //layoutProvider={this.ref}
+                fallback={'frisck'}
+                onPress={() => Alert.alert(`LaTeX: ${string}`)}
+                containerStyle={{ padding: 5, backgroundColor: 'red' }}
+            //onLayoutCompleted={(e)=>console.log(e.nativeEvent)}
+            />
+        );
+    }
+
+    render3() {
+        return (
+            <View style={[styles.container]} ref={this.ref}>
+                <FlatList
+                    scrollEnabled
+                    renderItem={({ item, index, section }) => this.renderItem(item)}
+                    renderSectionHeader={({ section: { title } }) => <Text>{title}</Text>}
+                    data={_.flatten(this.state.sections.map(s => s.data))}
+                    onRefresh={() => {
+                        this.setState({
+                            sections: [
+                                {
+                                    title: 'calculus',
+                                    data: MathStrings.calculus.filter((obj) => obj.math),
+                                    keyExtractor: (item) => `calculus:${item.string}` + new Date().valueOf()
+                                },
+                                {
+                                    title: 'trig',
+                                    data: MathStrings.trig.filter((obj) => obj.math),
+                                    keyExtractor: (item) => `trig:${item.string}` + new Date().valueOf()
+                                }
+                            ]
+                        })
+                    }}
+                    refreshing={this.state.refreshing}
+                    contentContainerStyle={[styles.flexContainer]}
+                    keyExtractor={(item) => `${item.string}`}
+                    style={{flex:1}}
+                />
+            </View>
+        );
+    }
+    
+    render2() {
+        return (
+            <View style={[{ flex: 1 }]} ref={this.ref}>
                 <SectionList
                     scrollEnabled
-                    renderItem={({ item, index, section }) => {
-                        const { string } = item;
-                        return (
-                            <MathView
-                                style={[styles.math]}
-                                math={string}
-                                text={string}
-                                //layoutProvider={{ width: this.state.width, height: 0 }}
-                                layoutProvider={this.ref}
-                                fallback={'frisck'}
-                                onPress={() => Alert.alert(`LaTeX: ${string}`)}
-                                //onLayoutCompleted={(e)=>console.log(e.nativeEvent)}
-                            />
-                        );
-                    }}
+                    renderItem={({ item, index, section }) => this.renderItem(item)}
                     renderSectionHeader={({ section: { title } }) => <Text>{title}</Text>}
                     sections={this.state.sections}
                     onRefresh={() => {
@@ -94,31 +121,37 @@ export default class App extends Component {
                         })
                     }}
                     refreshing={this.state.refreshing}
+                    style={{flex:1}}
                 />
             </View>
         );
-  }
+    }
+    
+
+    render() {
+        return this.render3();
+    }
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-      backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
+    container: {
+        flex: 1,
+        //flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#F5FCFF',
+    },
+    flexContainer: {
+        display: 'flex',
+        flexDirection: 'row',//styleUtil.row,
+        flexWrap: 'wrap',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
     },
     math: {
-        paddingVertical: 5,
-        backgroundColor: 'blue'
+        borderRadius: 25,
+        margin: 5,
+        maxHeight: 35,
+        justifyContent: 'center'
     }
 });

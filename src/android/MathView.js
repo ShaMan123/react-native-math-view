@@ -22,9 +22,11 @@ import MathViewBase, { MATH_ENGINES} from './MathViewBase';
 class MathView extends React.Component {
     static propTypes = {
         style: ViewPropTypes.style,
+        paddingHorizontal: PropTypes.number,
+        paddingVertical: PropTypes.number,
         text: PropTypes.string.isRequired,
        
-        onLayoutCompleted: PropTypes.func,
+        onLayout: PropTypes.func,
         initialOpacity: function (props, propName, componentName) {
             const propValue = props[propName];
             if (typeof propValue !== 'number' || propValue < 0 || propValue > 1) {
@@ -41,6 +43,8 @@ class MathView extends React.Component {
 
     static defaultProps = {
         style: null,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
         text: '',
         
         onLayoutCompleted: () => { },
@@ -90,34 +94,35 @@ class MathView extends React.Component {
         const { layout } = e.nativeEvent;
         const { width, height } = layout;
         const containerLayout = { width, height };
-        if (!this.state.containerLayout) {
-            this.setState({
-                containerLayout
-            });
-        }
+        this.setState({
+            containerLayout
+        });
     }
 
     render() {
-        const { style, onLayout, ...props } = this.props;
+        const { style, onLayout, paddingHorizontal, paddingVertical, ...props } = this.props;
         const { containerLayout, webViewLayout } = this.state;
         return (
             <View
-                style={style}
+                style={[style, webViewLayout]}
+                onLayout={this._onStubLayout}
             >
-                <View
-                    style={[/*webViewLayout || */StyleSheet.absoluteFill]}
-                    onLayout={this._onStubLayout}
-                />
                 <Animated.View
-                    style={[{ opacity: this.opacityAnimation, transform: [{ scale: this.scaleAnimation }, { perspective: 1000 }] }]}
+                    style={[{
+                        opacity: this.opacityAnimation,
+                        transform: [{ scale: this.scaleAnimation }, { perspective: 1000 }],
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }]}
                 >
                     {
                         containerLayout &&
                         <MathViewBase
                             ref={ref => this._handle = ref}
                             {...props}
-                            onSizeChanged={(layout) =>/* layout.width!==this.state.webViewLayout.width && */this.setState({ webViewLayout: layout })}
-                            containerLayout={containerLayout}
+                            style={StyleSheet.absoluteFill}
+                            onSizeChanged={(layout) => this.setState({ webViewLayout: layout })}
+                            containerLayout={{ width: Math.max(containerLayout.width - paddingHorizontal * 2, 0), height: containerLayout.height + paddingVertical * 2 }}
                             onLayout={(e) => onLayout && onLayout(e)}
                         />
                     }

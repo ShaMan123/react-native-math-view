@@ -50,7 +50,8 @@ public class RNMathView extends MathView {
             public void onPageFinished(WebView webView, String url) {
                 runSetFontColorJS();
                 if(isFlexWrap) loadScript(flexWrapStyle());
-                loadScript(resizeObserverScript());
+                //loadScript(resizeObserverScript());
+                loadScript(getSizeJSFormula());
                 super.onPageFinished(webView, url);
             }
         });

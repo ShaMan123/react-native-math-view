@@ -64,7 +64,8 @@ class MathViewBase extends Component {
         let scale = 1;
         
         if (nextProps.containerLayout && prevState.width && prevState.height) {
-            const computedScale = (nextProps.containerLayout.width - 20) / prevState.width;
+            const computedScale = (nextProps.containerLayout.width) / prevState.width;
+            console.log('!',nextProps.containerLayout.width, prevState.width)
             scale = computedScale > 0 && computedScale < 1 ? computedScale : 1;
             if (prevState.scale !== scale) return { scale };
         }
@@ -88,9 +89,9 @@ class MathViewBase extends Component {
             const sizeObj = e.nativeEvent.size;
             const width = Math.round(sizeObj.width);
             const height = Math.round(sizeObj.height);
-            const computedScale = this.props.containerLayout ? (this.props.containerLayout.width - 20) / width : 1;
+            const computedScale = this.props.containerLayout ? (this.props.containerLayout.width) / width : 1;
             const scale = computedScale > 0 && computedScale < 1 ? computedScale : 1;
-            
+
             if (!(this.state.width && this.state.height)) {
                 MathViewBase.measure.cache.set(this.props.text, { width, height });
                 this.setState({
@@ -127,7 +128,6 @@ class MathViewBase extends Component {
                 ref={forwardedRef}
                 onChange={this._onChange}
                 text={this.mathString}
-                fontShrink={this.state.scale}
             />
         );
     }

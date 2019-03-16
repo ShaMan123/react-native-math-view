@@ -59,7 +59,8 @@ class MathView extends React.Component {
         
         this.state = {
             containerLayout: null,
-            webViewLayout: null
+            webViewLayout: null,
+            math: props.text
         };
 
         this.opacityAnimation = new Animated.Value(props.initialOpacity);
@@ -69,25 +70,34 @@ class MathView extends React.Component {
         
     }
 
+    static getDerivedStateFromProps(nextProps, prevState) {
+        if (nextProps.text !== prevState.math) {
+            return {
+                math: nextProps.text,
+                webViewLayout: null
+            };
+        }
+        return null;
+    }
+
     componentDidUpdate(prevProps, prevState) {
         const { webViewLayout, containerLayout } = this.state;
-        if (webViewLayout && containerLayout && (!prevState.webViewLayout||prevState.containerLayout)) {
-            this.updated = true;
+        const toValue = webViewLayout && containerLayout && (!prevState.webViewLayout || prevState.containerLayout) ? 1 : 0;
+        this.updated = true;
 
-            
-            const animations = [
-                Animated.spring(this.opacityAnimation, {
-                    toValue: 1,
-                    useNativeDriver: true
-                }),
-                Animated.spring(this.scaleAnimation, {
-                    toValue: 1,
-                    useNativeDriver: true
-                })
-            ];
 
-            Animated.parallel(animations).start();
-        }
+        const animations = [
+            Animated.spring(this.opacityAnimation, {
+                toValue: toValue,
+                useNativeDriver: true
+            }),
+            Animated.spring(this.scaleAnimation, {
+                toValue: toValue,
+                useNativeDriver: true
+            })
+        ];
+
+        Animated.parallel(animations).start();
     }
 
     _onStubLayout(e) {

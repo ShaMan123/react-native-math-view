@@ -24,7 +24,8 @@ export default class App extends Component {
                     keyExtractor: (item) => `trig:${item.string}`
                 }
             ],
-            width: Dimensions.get('window').width-50,
+            width: Dimensions.get('window').width - 50,
+            tag: null,
             fontScale: 1
         }
 
@@ -34,9 +35,13 @@ export default class App extends Component {
     componentDidMount() {
         let i = 0;
         const interval = 7000;
+        const tags = MathStrings.calculus.filter((obj) => obj.math);
         
         this.t = setInterval(() => {
-            this.setState({ width: Dimensions.get('window').width * (i % 4 + 1) * 0.25 });
+            this.setState({
+                width: Dimensions.get('window').width * (i % 4 + 1) * 0.25,
+                tag: tags[i%tags.length]
+            });
             i++;
         }, interval);
         
@@ -126,10 +131,14 @@ export default class App extends Component {
             </View>
         );
     }
+
+    renderT() {
+        return this.state.tag && React.cloneElement(this.renderItem(this.state.tag), { style: [styles.math, { backgroundColor: 'red' }] });
+    }
     
 
     render() {
-        return this.render3();
+        return this.renderT();
     }
 }
 

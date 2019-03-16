@@ -76,7 +76,7 @@ class MathView extends React.Component {
         initialScale: 0
     };
 
-    static memoize = memoize((LaTex) => undefined);
+    static measure = memoize((LaTex) => undefined);
 
     static getStyleObject = memoize((style) => {
         return style && StyleSheet.flatten(style);
@@ -88,13 +88,16 @@ class MathView extends React.Component {
         this.state = {
             width: null,
             height: null,
-            ...MathView.memoize(this.props.text),
+            layout: null,
+            ...MathView.measure(this.props.text),
             containerLayout: null
         };
 
         this.opacityAnimation = new Animated.Value(props.initialOpacity);
         this.scaleAnimation = new Animated.Value(props.initialScale);
         this.updated = false;
+        this.webViewDidMount = false;
+        this.containerLayoutDidChange = false;
         this.style = {
             opacity: this.opacityAnimation,
             transform: [{ scale: this.scaleAnimation }, { perspective: 1000 }]
@@ -105,7 +108,7 @@ class MathView extends React.Component {
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
-        if (nextProps.layoutProvider.width && nextProps.layoutProvider !== prevState.layoutProvider) {
+        if (nextProps.layoutProvider && nextProps.layoutProvider.width){
             return {
                 containerLayout: nextProps.layoutProvider
             };
@@ -118,38 +121,43 @@ class MathView extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { width, height, containerLayout } = this.state;
-        if (width && containerLayout && (!this.scaleValue || containerLayout.width !== prevState.containerLayout.width)) {
+        const { width, height, containerLayout, layout } = this.state;
+       
+        this.webViewDidMount = width && height;
+        this.containerLayoutDidChange = (containerLayout && prevState.containerLayout && containerLayout.width !== prevState.containerLayout.width) || !this.updated;
+        
+        if (this.webViewDidMount && this.containerLayoutDidChange) {
+            this.updated = true;
             const scale = (containerLayout.width - 20) / width;
-            this.scaleValue = scale;
-            MathView.memoize.cache.set(this.props.text, { width, height });
+            const clampedScale = scale < 1 ? scale : 1;
+            this.scaleValue = { clampedScale, measuredScale: scale };
+            MathView.measure.cache.set(this.props.text, { width, height });
             const animations = [
                 Animated.spring(this.opacityAnimation, {
                     toValue: 1,
                     useNativeDriver: true
                 }),
                 Animated.spring(this.scaleAnimation, {
-                    toValue: scale < 1 ? scale : 1,
+                    toValue: clampedScale,
                     useNativeDriver: true
                 })
             ];
 
             // works beautifully => but causes web view to re-calculate it's size resulting in infinte state updates
             // if flexWrap will work this method should replace scaling the view with Animated
-            //this._handle.setNativeProps({ fontShrink: scale });
+
+            //if (clampedScale < 1) this._handle.setNativeProps({ fontShrink: clampedScale });
 
             Animated.parallel(animations).start(() => {
+                /*
                 const e = this.e;
                 e.nativeEvent.layout.width = Math.round(width * scale);
                 e.nativeEvent.layout.height = Math.round(height * scale);
                 e.nativeEvent.scale = scale < 1 ? scale : 1;
-                this.props.onLayoutCompleted(this.e);
+                this.props.onLayoutCompleted(e);
+                */
             });
         }
-        if (typeof width === 'number' && typeof height === 'number' && !this.updated) {
-            this.updated = true;
-        }
-
     }
 
     get mathString() {
@@ -164,7 +172,8 @@ class MathView extends React.Component {
     }
 
     _onChange(e) {
-        if (e.nativeEvent.hasOwnProperty('onSizeChanged')) {
+        console.log('sdfkhttekh3ku4ctekiurawreakufQEDJKEFSfekahuhadgruagrladgr')
+        if (e.nativeEvent.hasOwnProperty('onSizeChanged') /*&& !this.webViewDidMount*/) {
             const sizeObj = e.nativeEvent.size;
             const width = parseInt(sizeObj.width);
             const height = parseInt(sizeObj.height);
@@ -181,7 +190,9 @@ class MathView extends React.Component {
 
     measureRef() {
         try {
-            this.props.layoutProvider.current.measure((ox, oy, width, height, px, py) => this.setContainerLayout(width, height));
+            this.props.layoutProvider.current.measure((ox, oy, width, height, px, py) => {
+                this.setContainerLayout(width, height);
+            });
         }
         catch (err) {
             console.error(err.message);
@@ -192,7 +203,11 @@ class MathView extends React.Component {
         const { width, height } = Dimensions.get('window');
         this.setContainerLayout(width, height);
     }
-
+    /*
+    measureLayout() {
+        setTimeout(() => this._measureLayout(), 500);
+    }
+    */
     async measureLayout() {
         let i = 0;
         const { layoutProvider } = this.props;
@@ -240,10 +255,11 @@ class MathView extends React.Component {
     }
 
     _onLayout(e) {
-        e.persist();
-        this.e = e;
-        if (this.layout && e.nativeEvent.layout.width !== this.layout.width) setTimeout(() => this.measureLayout(), 0);
-        this.layout = e.nativeEvent.layout;
+        //e.persist();
+        //this.e = e;
+        this.measureLayout();
+        //if (this.layout && e.nativeEvent.layout.width !== this.layout.width) setTimeout(() => this.measureLayout(), 0);
+        //this.setState({ layout: e.nativeEvent.layout });
     }
 
     render() {
@@ -270,6 +286,7 @@ class MathView extends React.Component {
                         verticalScroll={false}
                         horizontalScroll={false}
                         containerLayout={containerLayout}
+                        fontColor='white'
                     />
                 </Animated.View>
             </View>

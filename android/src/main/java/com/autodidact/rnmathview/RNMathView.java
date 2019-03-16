@@ -30,6 +30,7 @@ public class RNMathView extends MathView {
     private int mScrollBarDefaultDelayBeforeFade;
     private int mScrollBarFadeDuration;
     private String mFontColor;
+    private float mFontScale = 1;
     private boolean isFlexWrap = false;
 
     public RNMathView(ThemedReactContext context) {
@@ -145,6 +146,7 @@ public class RNMathView extends MathView {
     }
 
     public void shrinkFontScale(float scale) {
+        mFontScale = scale;
         getSettings().setTextZoom((int)Math.min(scale*100, 100));
     }
 

@@ -87,33 +87,9 @@ class MathView extends React.Component {
         return null;
     }
 
-    getSnapshotBeforeUpdate(prevProps, prevState) {
-        /*
-        const { math } = this.state;
-        console.log(prevProps)
-        console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
-        console.log(this.props)
-        console.log('##############################################');
-        console.log(prevState)
-        console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
-        console.log(this.state)
-        console.log('______________________________________________________________');
-        */
-        const aboutToChangeMath = this.state.math !== prevState.math;
-        const inTransition = !prevState.webViewLayout || prevState.scale>this.state.scale;
-        return aboutToChangeMath && inTransition;
-    }
-
-    componentDidUpdate(prevProps, prevState, inTransition) {
+    componentDidUpdate(prevProps, prevState) {
         const { webViewLayout, containerLayout, scale, math, lastMeasured } = this.state;
-        console.log('cc', math, scale)
-        /*
-        if (prevState.scale > this.state.scale) {
-            this.scaleAnimation.setValue(0);
-        }
-        */
-        
-        
+
         if (webViewLayout && containerLayout) {
             this.updated = true;
             const animations = [
@@ -202,7 +178,7 @@ class MathView extends React.Component {
     }
 
     render() {
-        const { style, containerStyle, onLayout, ...props } = this.props;
+        const { style, containerStyle } = this.props;
         const members = this.state.lastMeasured === this.state.math ? [this.state.math] : [this.state.prevMath, this.state.math];
         return (
             <View style={containerStyle}>
@@ -218,8 +194,6 @@ class MathView extends React.Component {
                         keyExtractor={(math) => `${this.key}:${math}`}
                         data={members}
                         renderItem={({ item }) => this.renderBaseView(item, members)}
-                        //contentContainerStyle={[{ display: 'flex' }]}
-                        //style={{alignSelf:'center'}}
                     />
 
                 </View>
@@ -227,21 +201,6 @@ class MathView extends React.Component {
         );
     }
 }
-
-/*
- * 
- * {this.state.lastMeasured === this.state.prevMath && this.renderBaseView(this.state.prevMath)}
-                        {this.renderBaseView(this.state.math)}
-
-
- <FlatList
-                            style={{ backgroundColor: 'orange'}}
-                            keyExtractor={(math) => `${this.key}:${math}`}
-                            data={members}
-                            renderItem={({ item }) => this.renderBaseView(item)}
-                            //contentContainerStyle={{display:'flex'}}
-                        />
-*/
 
 const styles = StyleSheet.create({
     centerContent: {

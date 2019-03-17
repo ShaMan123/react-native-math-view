@@ -162,7 +162,7 @@ export default class App extends Component {
                     onPress={() => this.setState((prev) => {
                         return { state: (prev.state + 1) % 3 };
                     })}
-                    title="press to change flex mode"
+                    title="press to change view"
                 />
             </View>
         );

@@ -55,7 +55,7 @@ class MathViewBase extends Component {
     constructor(props) {
         super(props);
         this._onChange = this._onChange.bind(this);
-        const math = MathViewBase.pasreMath(props.text);
+        const math = MathViewBase.pasreMath(props.math);
         this.state = {
             width: null,
             height: null,
@@ -68,8 +68,8 @@ class MathViewBase extends Component {
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
-        if (nextProps.text !== prevState.math) {
-            const math = MathViewBase.pasreMath(nextProps.text);
+        if (nextProps.math !== prevState.math) {
+            const math = MathViewBase.pasreMath(nextProps.math);
             const measured = MathViewBase.measure(math);
             return {
                 width: null,
@@ -129,7 +129,7 @@ class MathViewBase extends Component {
                 style={this.computedStyle}
                 ref={forwardedRef}
                 onChange={this._onChange}
-                text={this.state.math}
+                math={this.state.math}
             />
         );
     }

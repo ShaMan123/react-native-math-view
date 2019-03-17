@@ -59,7 +59,6 @@ export default class App extends Component {
                 containerStyle={[styles.mathContainer]}
                 style={[styles.mathInner, { maxWidth: this.state.width }]}
                 math={string}
-                text={string}
                 fontColor='white'
                 //layoutProvider={this.ref}
                 fallback={'frisck'}

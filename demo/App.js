@@ -1,12 +1,12 @@
 
 import React, {Component} from 'react';
-import { Platform, StyleSheet, Text, View, TextInput, SectionList, FlatList, UIManager, Alert, Dimensions, ScrollView, i18Manager } from 'react-native';
+import { Platform, StyleSheet, Text, View, TextInput, SectionList, FlatList, UIManager, Alert, Dimensions, ScrollView, YellowBox, Button } from 'react-native';
 import * as _ from 'lodash';
 import MathView from 'react-native-math-view';
 import * as MathStrings from './math';
 
-//if (Platform.OS === 'android') UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(false);
-//i18Manager.allowRTL(false);
+YellowBox.ignoreWarnings(['Warning: `flexWrap: `wrap`` is not supported with the `VirtualizedList` components.']);
+
 export default class App extends Component {
     constructor(props) {
         super(props);
@@ -26,7 +26,8 @@ export default class App extends Component {
             ],
             width: Dimensions.get('window').width - 50,
             tag: null,
-            fontScale: 1
+            fontScale: 1,
+            state: 0
         }
 
         this.ref = React.createRef();
@@ -55,8 +56,8 @@ export default class App extends Component {
         const { string } = item;
         return (
             <MathView
-                containerStyle={[styles.math, { backgroundColor: 'red' }]}
-                style={[{ maxWidth: this.state.width, maxHeight: 35}]}
+                containerStyle={[styles.mathContainer]}
+                style={[styles.mathInner, { maxWidth: this.state.width }]}
                 math={string}
                 text={string}
                 fontColor='white'
@@ -69,25 +70,14 @@ export default class App extends Component {
     }
 
     renderItem(item) {
-        const { string } = item;
         return (
             <View style={[styles.flexContainer, { flex: 1, backgroundColor: 'pink', margin: 5 }]}>
-                <MathView
-                    containerStyle={[styles.math, { backgroundColor: 'red' }]}
-                    style={[{ maxWidth: this.state.width, height: 35, justifyContent: 'center' }]}
-                    math={string}
-                    text={string}
-                    fontColor='white'
-                    //layoutProvider={this.ref}
-                    fallback={'frisck'}
-                    onPress={() => Alert.alert(`LaTeX: ${string}`)}
-                //onLayoutCompleted={(e)=>console.log(e.nativeEvent)}
-                />
+                {this.renderFlexItem(item)}
             </View>
         );
     }
 
-    render3() {
+    render2() {
         return (
             <View style={[styles.container]} ref={this.ref}>
                 <FlatList
@@ -120,7 +110,7 @@ export default class App extends Component {
         );
     }
     
-    render2() {
+    render1() {
         return (
             <View style={[{ flex: 1 }]} ref={this.ref}>
                 <SectionList
@@ -151,16 +141,34 @@ export default class App extends Component {
         );
     }
 
-    renderT() {
-        return this.state.tag && React.cloneElement(this.renderItem(this.state.tag), { style: [styles.math, { backgroundColor: 'red', display: 'flex', maxWidth: 200}] });
+    render0() {
+        return (
+            <View style={[{ flex: 1, backgroundColor: 'pink' }, styles.flexContainer, styles.centerContent]}>
+                {this.state.tag && React.cloneElement(this.renderFlexItem(this.state.tag), {style:styles.mathInner})}
+            </View>
+        );
     }
     
 
     render() {
-        return this.render2();
+        console.log(this.state.state)
+        return (
+            <View style={{ flex: 1 }}>
+                <View style={{ flex: 1 }}>
+                    {this[`render${this.state.state}`]()}
+                    </View>
+                <Button
+                    //style={{bottom: 0}}
+                    onPress={() => this.setState((prev) => {
+                        return { state: (prev.state + 1) % 3 };
+                    })}
+                    title="press to change flex mode"
+                />
+            </View>
+        );
+        }
     }
-}
-
+    
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -176,10 +184,21 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         alignItems: 'center'
     },
-    math: {
+    mathContainer: {
         borderRadius: 50,
         margin: 5,
         padding: 10,
-        justifyContent: 'center'
+        justifyContent: 'center',
+        backgroundColor: 'red'
+    },
+    mathInner: {
+        height: 35,
+        minWidth: 35,
+        justifyContent: 'center',
+        backgroundColor: 'blue'
+    },
+    centerContent: {
+        justifyContent: 'center',
+        alignItems: 'center',
     }
 });

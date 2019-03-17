@@ -62,6 +62,8 @@ class MathViewBase extends Component {
             ...MathViewBase.measure(math),
             math
         };
+
+        this.updated = false;
         
     }
 
@@ -81,8 +83,8 @@ class MathViewBase extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if ((prevState.width !== this.state.width || prevState.math !== this.state.math) && this.computedStyle && this.props.onSizeChanged) {
-            console.log('fire', this.computedStyle)
+        if ((prevState.width !== this.state.width || prevState.math !== this.state.math || !this.updated) && this.computedStyle && this.props.onSizeChanged) {
+            this.updated = true;
             this.props.onSizeChanged(this.computedStyle);
         }
     }

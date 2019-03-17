@@ -22,8 +22,6 @@ import MathViewBase, { MATH_ENGINES} from './MathViewBase';
 class MathView extends React.Component {
     static propTypes = {
         style: ViewPropTypes.style,
-        paddingHorizontal: PropTypes.number,
-        paddingVertical: PropTypes.number,
         text: PropTypes.string.isRequired,
        
         onLayout: PropTypes.func,
@@ -43,8 +41,6 @@ class MathView extends React.Component {
 
     static defaultProps = {
         style: null,
-        paddingHorizontal: 10,
-        paddingVertical: 5,
         text: '',
         
         onLayoutCompleted: () => { },
@@ -73,6 +69,7 @@ class MathView extends React.Component {
 
     static getDerivedStateFromProps(nextProps, prevState) {
         if (nextProps.text !== prevState.math) {
+            console.log('------------------------------------------------------------------------------------------------');
             return {
                 math: nextProps.text,
                 webViewLayout: null
@@ -81,9 +78,30 @@ class MathView extends React.Component {
         return null;
     }
 
-    componentDidUpdate(prevProps, prevState) {
-        const { webViewLayout, containerLayout, scale } = this.state;
-        if (webViewLayout && containerLayout) {
+    getSnapshotBeforeUpdate(prevProps, prevState) {
+        /*
+        const { math } = this.state;
+        console.log(prevProps)
+        console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+        console.log(this.props)
+        console.log('##############################################');
+        console.log(prevState)
+        console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+        console.log(this.state)
+        console.log('______________________________________________________________');
+        */
+        const aboutToChangeMath = this.state.math !== prevState.math;
+        const inTransition = !prevState.webViewLayout;
+        return aboutToChangeMath && inTransition;
+    }
+
+    componentDidUpdate(prevProps, prevState, inTransition) {
+        const { webViewLayout, containerLayout, scale, math } = this.state;
+        console.log(inTransition)
+        if (inTransition) {
+            this.opacityAnimation.setValue(0);
+        }
+        else if (webViewLayout && containerLayout) {
             this.updated = true;
             const animations = [
                 Animated.spring(this.opacityAnimation, {
@@ -124,14 +142,17 @@ class MathView extends React.Component {
         });
     }
 
-    render() {
-        const { style, containerStyle, onLayout, paddingHorizontal, paddingVertical, ...props } = this.props;
-        const { containerLayout, webViewLayout, scale } = this.state;
-        
-        const size = webViewLayout && scale ? {
+    get stylable() {
+        const { webViewLayout, scale } = this.state;
+
+        return webViewLayout && scale ? {
             width: webViewLayout.width * scale,
             height: webViewLayout.height * scale
         } : null;
+    }
+
+    render() {
+        const { style, containerStyle, onLayout, ...props } = this.props;
 
         return (
             <View style={containerStyle}>
@@ -139,15 +160,13 @@ class MathView extends React.Component {
                     style={style}
                 >
                     <View
-                        style={[StyleSheet.absoluteFill, { backgroundColor: 'blue' }]}
+                        style={[StyleSheet.absoluteFill]}
                         onLayout={this._onStubLayout}
                     />
                     <Animated.View
-                        style={[{
+                        style={[styles.centerContent, {
                             opacity: this.opacityAnimation,
-                            transform: [{ scale: this.scaleAnimation }, { perspective: 1000 }],
-                            justifyContent: 'center',
-                            alignItems: 'center'
+                            transform: [{ scale: this.scaleAnimation }, { perspective: 1000 }]
                         }]}
                     >
                         <MathViewBase
@@ -163,5 +182,12 @@ class MathView extends React.Component {
         );
     }
 }
+
+const styles = StyleSheet.create({
+    centerContent: {
+        justifyContent: 'center',
+        alignItems: 'center'
+    }
+})
 
 export default MathView;

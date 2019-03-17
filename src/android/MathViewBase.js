@@ -82,9 +82,11 @@ class MathViewBase extends Component {
         return null;
     }
 
+
     componentDidUpdate(prevProps, prevState) {
         if ((prevState.width !== this.state.width || prevState.math !== this.state.math || !this.updated) && this.computedStyle && this.props.onSizeChanged) {
             this.updated = true;
+            
             this.props.onSizeChanged(this.computedStyle);
         }
     }
@@ -95,7 +97,7 @@ class MathViewBase extends Component {
             const width = Math.round(sizeObj.width);
             const height = Math.round(sizeObj.height);
 
-            if (!this.state.width) {
+            if (!this.computedStyle) {
                 MathViewBase.measure.cache.set(this.state.math, { width, height });
                 this.setState({
                     width,

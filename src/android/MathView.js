@@ -15,8 +15,10 @@ import ReactNative, {
     View,
     StyleSheet,
     findNodeHandle, 
+    FlatList
 } from 'react-native';
 import memoize from 'lodash/memoize';
+import uniqueId from 'lodash/uniqueId';
 import MathViewBase, { MATH_ENGINES} from './MathViewBase';
 
 class MathView extends React.Component {
@@ -50,13 +52,18 @@ class MathView extends React.Component {
         ...MathViewBase.defaultProps
     };
 
+    key = uniqueId('MathView');
+
     constructor(props) {
         super(props);
-        
+
         this.state = {
             containerLayout: null,
             webViewLayout: null,
-            math: props.text
+            math: props.text,
+            prevMath: null,
+            lastMeasured: null,
+            scale: props.initialScale
         };
 
         this.opacityAnimation = new Animated.Value(props.initialOpacity);
@@ -64,14 +71,16 @@ class MathView extends React.Component {
 
         this._onStubLayout = this._onStubLayout.bind(this);
         this._onSizeChanged = this._onSizeChanged.bind(this);
+
+        this.mathRefs = {};
         
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
         if (nextProps.text !== prevState.math) {
-            console.log('------------------------------------------------------------------------------------------------');
             return {
                 math: nextProps.text,
+                prevMath: prevState.math,
                 webViewLayout: null
             };
         }
@@ -91,21 +100,25 @@ class MathView extends React.Component {
         console.log('______________________________________________________________');
         */
         const aboutToChangeMath = this.state.math !== prevState.math;
-        const inTransition = !prevState.webViewLayout;
+        const inTransition = !prevState.webViewLayout || prevState.scale>this.state.scale;
         return aboutToChangeMath && inTransition;
     }
 
     componentDidUpdate(prevProps, prevState, inTransition) {
-        const { webViewLayout, containerLayout, scale, math } = this.state;
-        console.log(inTransition)
-        if (inTransition) {
-            this.opacityAnimation.setValue(0);
+        const { webViewLayout, containerLayout, scale, math, lastMeasured } = this.state;
+        console.log('cc', math, scale)
+        /*
+        if (prevState.scale > this.state.scale) {
+            this.scaleAnimation.setValue(0);
         }
-        else if (webViewLayout && containerLayout) {
+        */
+        
+        
+        if (webViewLayout && containerLayout) {
             this.updated = true;
             const animations = [
                 Animated.spring(this.opacityAnimation, {
-                    toValue: 1,
+                    toValue: webViewLayout && containerLayout ? 1 : 0,
                     useNativeDriver: true
                 }),
                 Animated.spring(this.scaleAnimation, {
@@ -116,11 +129,16 @@ class MathView extends React.Component {
 
             Animated.parallel(animations).start();
         }
+        
     }
-
+    
     getScale({ containerLayout = this.state.containerLayout, webViewLayout = this.state.webViewLayout }) {
         if (!containerLayout || !webViewLayout) return 0;
         const scale = Math.min(containerLayout.width / webViewLayout.width, containerLayout.height / webViewLayout.height, 1);
+        if (scale < this.state.scale) {
+            this.opacityAnimation.setValue(0);
+            this.scaleAnimation.setValue(0);
+        }
         return scale;
     }
 
@@ -129,17 +147,26 @@ class MathView extends React.Component {
         const { width, height } = layout;
         const containerLayout = { width, height };
         const scale = this.getScale({ containerLayout });
+        
         this.setState({
             containerLayout,
-            scale: this.getScale({ containerLayout })
+            scale
         });
     }
 
-    _onSizeChanged(webViewLayout) {
+    _onSizeChanged(math, webViewLayout) {
+        const scale = this.getScale({ webViewLayout });
+       
         this.setState({
             webViewLayout,
-            scale: this.getScale({ webViewLayout })
+            lastMeasured: math,
+            scale
         });
+        /*
+        if (math === this.state.math) {
+            
+        }
+        */
     }
 
     get stylable() {
@@ -151,9 +178,32 @@ class MathView extends React.Component {
         } : null;
     }
 
+    renderBaseView(math, members) {
+        const { style, containerStyle, onLayout, ...props } = this.props;
+        if (!math) return null;
+        const isMeasurer = members.length === 2 && this.state.math === math;
+        return (
+            <Animated.View
+                style={[styles.centerContent, {
+                    opacity: this.opacityAnimation,
+                    transform: [{ scale: this.scaleAnimation }, { perspective: 1000 }]
+                }]}
+            >
+                <MathViewBase
+                    //ref={ref => this.mathRefs[this.state.math] = ref}
+                    {...props}
+                    text={math}
+                    style={[StyleSheet.absoluteFill]}
+                    onSizeChanged={this._onSizeChanged.bind(this, math)}
+                    onLayout={(e) => onLayout && onLayout(e)}
+                />
+            </Animated.View>
+        );
+    }
+
     render() {
         const { style, containerStyle, onLayout, ...props } = this.props;
-
+        const members = this.state.lastMeasured === this.state.math ? [this.state.math] : [this.state.prevMath, this.state.math];
         return (
             <View style={containerStyle}>
                 <View
@@ -163,25 +213,35 @@ class MathView extends React.Component {
                         style={[StyleSheet.absoluteFill]}
                         onLayout={this._onStubLayout}
                     />
-                    <Animated.View
-                        style={[styles.centerContent, {
-                            opacity: this.opacityAnimation,
-                            transform: [{ scale: this.scaleAnimation }, { perspective: 1000 }]
-                        }]}
-                    >
-                        <MathViewBase
-                            ref={ref => this._handle = ref}
-                            {...props}
-                            style={[StyleSheet.absoluteFill]}
-                            onSizeChanged={this._onSizeChanged}
-                            onLayout={(e) => onLayout && onLayout(e)}
-                        />
-                    </Animated.View>
+
+                    <FlatList
+                        keyExtractor={(math) => `${this.key}:${math}`}
+                        data={members}
+                        renderItem={({ item }) => this.renderBaseView(item, members)}
+                        //contentContainerStyle={[{ display: 'flex' }]}
+                        //style={{alignSelf:'center'}}
+                    />
+
                 </View>
             </View>
         );
     }
 }
+
+/*
+ * 
+ * {this.state.lastMeasured === this.state.prevMath && this.renderBaseView(this.state.prevMath)}
+                        {this.renderBaseView(this.state.math)}
+
+
+ <FlatList
+                            style={{ backgroundColor: 'orange'}}
+                            keyExtractor={(math) => `${this.key}:${math}`}
+                            data={members}
+                            renderItem={({ item }) => this.renderBaseView(item)}
+                            //contentContainerStyle={{display:'flex'}}
+                        />
+*/
 
 const styles = StyleSheet.create({
     centerContent: {

@@ -35,7 +35,7 @@ export default class App extends Component {
     
     componentDidMount() {
         let i = 0;
-        const interval = 7000;
+        const interval = 4000;
         const tags = MathStrings.calculus.filter((obj) => obj.math);
         
         this.t = setInterval(() => {
@@ -144,7 +144,7 @@ export default class App extends Component {
     render0() {
         return (
             <View style={[{ flex: 1, backgroundColor: 'pink' }, styles.flexContainer, styles.centerContent]}>
-                {this.state.tag && React.cloneElement(this.renderFlexItem(this.state.tag), {style:styles.mathInner})}
+                {this.state.tag && React.cloneElement(this.renderFlexItem(this.state.tag), { style: [{backgroundColor:'blue'}]})}
             </View>
         );
     }

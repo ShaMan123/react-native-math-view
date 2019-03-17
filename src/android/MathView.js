@@ -24,7 +24,7 @@ import MathViewBase, { MATH_ENGINES} from './MathViewBase';
 class MathView extends React.Component {
     static propTypes = {
         style: ViewPropTypes.style,
-        text: PropTypes.string.isRequired,
+        math: PropTypes.string.isRequired,
        
         onLayout: PropTypes.func,
         initialOpacity: function (props, propName, componentName) {
@@ -43,7 +43,7 @@ class MathView extends React.Component {
 
     static defaultProps = {
         style: null,
-        text: '',
+        math: '',
         
         onLayoutCompleted: () => { },
         initialOpacity: 0.2,
@@ -60,7 +60,7 @@ class MathView extends React.Component {
         this.state = {
             containerLayout: null,
             webViewLayout: null,
-            math: props.text,
+            math: props.math,
             prevMath: null,
             lastMeasured: null,
             scale: props.initialScale
@@ -77,9 +77,9 @@ class MathView extends React.Component {
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
-        if (nextProps.text !== prevState.math) {
+        if (nextProps.math !== prevState.math) {
             return {
-                math: nextProps.text,
+                math: nextProps.math,
                 prevMath: prevState.math,
                 webViewLayout: null
             };
@@ -168,7 +168,7 @@ class MathView extends React.Component {
                 <MathViewBase
                     //ref={ref => this.mathRefs[this.state.math] = ref}
                     {...props}
-                    text={math}
+                    math={math}
                     style={[StyleSheet.absoluteFill]}
                     onSizeChanged={this._onSizeChanged.bind(this, math)}
                     onLayout={(e) => onLayout && onLayout(e)}

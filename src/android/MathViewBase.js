@@ -129,7 +129,7 @@ class MathViewBase extends Component {
                 style={this.computedStyle}
                 ref={forwardedRef}
                 onChange={this._onChange}
-                math={this.state.math}
+                text={this.state.math}
             />
         );
     }

@@ -15,15 +15,15 @@ import ReactNative, {
     View,
     StyleSheet,
     findNodeHandle, 
+    FlatList
 } from 'react-native';
 import memoize from 'lodash/memoize';
+import uniqueId from 'lodash/uniqueId';
 import MathViewBase, { MATH_ENGINES} from './MathViewBase';
 
 class MathView extends React.Component {
     static propTypes = {
         style: ViewPropTypes.style,
-        paddingHorizontal: PropTypes.number,
-        paddingVertical: PropTypes.number,
         text: PropTypes.string.isRequired,
        
         onLayout: PropTypes.func,
@@ -43,8 +43,6 @@ class MathView extends React.Component {
 
     static defaultProps = {
         style: null,
-        paddingHorizontal: 10,
-        paddingVertical: 5,
         text: '',
         
         onLayoutCompleted: () => { },
@@ -54,19 +52,27 @@ class MathView extends React.Component {
         ...MathViewBase.defaultProps
     };
 
+    key = uniqueId('MathView');
+
     constructor(props) {
         super(props);
-        
+
         this.state = {
             containerLayout: null,
             webViewLayout: null,
-            math: props.text
+            math: props.text,
+            prevMath: null,
+            lastMeasured: null,
+            scale: props.initialScale
         };
 
         this.opacityAnimation = new Animated.Value(props.initialOpacity);
         this.scaleAnimation = new Animated.Value(props.initialScale);
 
         this._onStubLayout = this._onStubLayout.bind(this);
+        this._onSizeChanged = this._onSizeChanged.bind(this);
+
+        this.mathRefs = {};
         
     }
 
@@ -74,6 +80,7 @@ class MathView extends React.Component {
         if (nextProps.text !== prevState.math) {
             return {
                 math: nextProps.text,
+                prevMath: prevState.math,
                 webViewLayout: null
             };
         }
@@ -81,66 +88,125 @@ class MathView extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { webViewLayout, containerLayout } = this.state;
-        const toValue = webViewLayout && containerLayout && (!prevState.webViewLayout || prevState.containerLayout) ? 1 : 0;
-        this.updated = true;
+        const { webViewLayout, containerLayout, scale, math, lastMeasured } = this.state;
 
+        if (webViewLayout && containerLayout) {
+            this.updated = true;
+            const animations = [
+                Animated.spring(this.opacityAnimation, {
+                    toValue: webViewLayout && containerLayout ? 1 : 0,
+                    useNativeDriver: true
+                }),
+                Animated.spring(this.scaleAnimation, {
+                    toValue: scale,
+                    useNativeDriver: true
+                })
+            ];
 
-        const animations = [
-            Animated.spring(this.opacityAnimation, {
-                toValue: toValue,
-                useNativeDriver: true
-            }),
-            Animated.spring(this.scaleAnimation, {
-                toValue: toValue,
-                useNativeDriver: true
-            })
-        ];
-
-        Animated.parallel(animations).start();
+            Animated.parallel(animations).start();
+        }
+        
+    }
+    
+    getScale({ containerLayout = this.state.containerLayout, webViewLayout = this.state.webViewLayout }) {
+        if (!containerLayout || !webViewLayout) return 0;
+        const scale = Math.min(containerLayout.width / webViewLayout.width, containerLayout.height / webViewLayout.height, 1);
+        if (scale < this.state.scale) {
+            this.opacityAnimation.setValue(0);
+            this.scaleAnimation.setValue(0);
+        }
+        return scale;
     }
 
     _onStubLayout(e) {
         const { layout } = e.nativeEvent;
         const { width, height } = layout;
         const containerLayout = { width, height };
+        const scale = this.getScale({ containerLayout });
+        
         this.setState({
-            containerLayout
+            containerLayout,
+            scale
         });
     }
 
-    render() {
-        const { style, onLayout, paddingHorizontal, paddingVertical, ...props } = this.props;
-        const { containerLayout, webViewLayout } = this.state;
-        return (
-            <View
-                style={[style, webViewLayout]}
-                onLayout={this._onStubLayout}
-            >
-                <Animated.View
-                    style={[{
-                        opacity: this.opacityAnimation,
-                        transform: [{ scale: this.scaleAnimation }, { perspective: 1000 }],
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                    }]}
-                >
-                    {
-                        containerLayout &&
-                        <MathViewBase
-                            ref={ref => this._handle = ref}
-                            {...props}
-                            style={StyleSheet.absoluteFill}
-                            onSizeChanged={(layout) => this.setState({ webViewLayout: layout })}
-                            containerLayout={{ width: Math.max(containerLayout.width - paddingHorizontal * 2, 0), height: containerLayout.height + paddingVertical * 2 }}
-                            onLayout={(e) => onLayout && onLayout(e)}
-                        />
-                    }
+    _onSizeChanged(math, webViewLayout) {
+        const scale = this.getScale({ webViewLayout });
+       
+        this.setState({
+            webViewLayout,
+            lastMeasured: math,
+            scale
+        });
+        /*
+        if (math === this.state.math) {
+            
+        }
+        */
+    }
 
-                </Animated.View>
+    get stylable() {
+        const { webViewLayout, scale } = this.state;
+
+        return webViewLayout && scale ? {
+            width: webViewLayout.width * scale,
+            height: webViewLayout.height * scale
+        } : null;
+    }
+
+    renderBaseView(math, members) {
+        const { style, containerStyle, onLayout, ...props } = this.props;
+        if (!math) return null;
+        const isMeasurer = members.length === 2 && this.state.math === math;
+        return (
+            <Animated.View
+                style={[styles.centerContent, {
+                    opacity: this.opacityAnimation,
+                    transform: [{ scale: this.scaleAnimation }, { perspective: 1000 }]
+                }]}
+            >
+                <MathViewBase
+                    //ref={ref => this.mathRefs[this.state.math] = ref}
+                    {...props}
+                    text={math}
+                    style={[StyleSheet.absoluteFill]}
+                    onSizeChanged={this._onSizeChanged.bind(this, math)}
+                    onLayout={(e) => onLayout && onLayout(e)}
+                />
+            </Animated.View>
+        );
+    }
+
+    render() {
+        const { style, containerStyle } = this.props;
+        const members = this.state.lastMeasured === this.state.math ? [this.state.math] : [this.state.prevMath, this.state.math];
+        return (
+            <View style={containerStyle}>
+                <View
+                    style={style}
+                >
+                    <View
+                        style={[StyleSheet.absoluteFill]}
+                        onLayout={this._onStubLayout}
+                    />
+
+                    <FlatList
+                        keyExtractor={(math) => `${this.key}:${math}`}
+                        data={members}
+                        renderItem={({ item }) => this.renderBaseView(item, members)}
+                    />
+
+                </View>
             </View>
         );
     }
 }
+
+const styles = StyleSheet.create({
+    centerContent: {
+        justifyContent: 'center',
+        alignItems: 'center'
+    }
+})
 
 export default MathView;

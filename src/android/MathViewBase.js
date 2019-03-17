@@ -35,7 +35,7 @@ export const MATH_ENGINES = {
 
 class MathViewBase extends Component {
     static propTypes = {
-        mathEngine: PropTypes.oneOf(Object.keys(MATH_ENGINES).map((key) => { return MATH_ENGINES[key] })),
+        mathEngine: PropTypes.oneOf(Object.keys(MATH_ENGINES).map((key) => MATH_ENGINES[key])),
         horizontalScroll: PropTypes.bool,
         verticalScroll: PropTypes.bool
 
@@ -60,40 +60,33 @@ class MathViewBase extends Component {
             width: null,
             height: null,
             ...MathViewBase.measure(math),
-            math,
-            scale: 1
+            math
         };
+
+        this.updated = false;
         
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
-        let scale = 1, computedScale;
-
         if (nextProps.text !== prevState.math) {
             const math = MathViewBase.pasreMath(nextProps.text);
             const measured = MathViewBase.measure(math);
-            computedScale = measured ? (nextProps.containerLayout.width) / measured.width : 0;
-            scale = computedScale > 0 && computedScale < 1 ? computedScale : 1;
             return {
                 width: null,
                 height: null,
                 math,
-                ...measured,
-                scale
+                ...measured
             };
         }
-        else if (nextProps.containerLayout && prevState.width && prevState.height) {
-            computedScale = (nextProps.containerLayout.width) / prevState.width;
-            scale = computedScale > 0 && computedScale < 1 ? computedScale : 1;
-            if (prevState.scale !== scale) return { scale };
-        }
-        
+
         return null;
     }
 
+
     componentDidUpdate(prevProps, prevState) {
-        if ((prevState.width !== this.state.width || prevState.math !== this.state.math) && this.props.onSizeChanged) {
-            console.log('fire', this.computedStyle)
+        if ((prevState.width !== this.state.width || prevState.math !== this.state.math || !this.updated) && this.computedStyle && this.props.onSizeChanged) {
+            this.updated = true;
+            
             this.props.onSizeChanged(this.computedStyle);
         }
     }
@@ -103,15 +96,12 @@ class MathViewBase extends Component {
             const sizeObj = e.nativeEvent.size;
             const width = Math.round(sizeObj.width);
             const height = Math.round(sizeObj.height);
-            const computedScale = this.props.containerLayout ? (this.props.containerLayout.width) / width : 1;
-            const scale = computedScale > 0 && computedScale < 1 ? computedScale : 1;
-            
-            if (!this.state.width) {
+
+            if (!this.computedStyle) {
                 MathViewBase.measure.cache.set(this.state.math, { width, height });
                 this.setState({
                     width,
-                    height,
-                    scale
+                    height
                 });
             }
             
@@ -122,13 +112,11 @@ class MathViewBase extends Component {
     }
 
     get computedStyle() {
-        const { width, height, scale } = this.state;
+        const { width, height } = this.state;
 
-        return width &&  height && scale ? {
-            width: width * scale,
-            height: height * scale,
-            //maxWidth: width,
-            //maxHeight: height
+        return width &&  height ? {
+            width,
+            height
         } : null;
     }
 

@@ -1,12 +1,12 @@
 
 import React, {Component} from 'react';
-import { Platform, StyleSheet, Text, View, TextInput, SectionList, FlatList, UIManager, Alert, Dimensions, ScrollView, i18Manager } from 'react-native';
+import { Platform, StyleSheet, Text, View, TextInput, SectionList, FlatList, UIManager, Alert, Dimensions, ScrollView, YellowBox, Button } from 'react-native';
 import * as _ from 'lodash';
 import MathView from 'react-native-math-view';
 import * as MathStrings from './math';
 
-//if (Platform.OS === 'android') UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(false);
-//i18Manager.allowRTL(false);
+YellowBox.ignoreWarnings(['Warning: `flexWrap: `wrap`` is not supported with the `VirtualizedList` components.']);
+
 export default class App extends Component {
     constructor(props) {
         super(props);
@@ -26,7 +26,8 @@ export default class App extends Component {
             ],
             width: Dimensions.get('window').width - 50,
             tag: null,
-            fontScale: 1
+            fontScale: 1,
+            state: 0
         }
 
         this.ref = React.createRef();
@@ -34,12 +35,12 @@ export default class App extends Component {
     
     componentDidMount() {
         let i = 0;
-        const interval = 7000;
+        const interval = 4000;
         const tags = MathStrings.calculus.filter((obj) => obj.math);
         
         this.t = setInterval(() => {
             this.setState({
-                width: Dimensions.get('window').width * (i % 4 + 1) * 0.25,
+                width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width - 50),
                 tag: tags[i%tags.length]
             });
             i++;
@@ -51,29 +52,37 @@ export default class App extends Component {
         clearInterval(this.t);
     }
 
-    renderItem(item) {
+    renderFlexItem(item) {
         const { string } = item;
         return (
             <MathView
-                style={[styles.math, { backgroundColor: 'red' }, { maxWidth: this.state.width }]} //{ display: 'flex',alignItems: 'center',/* justifyContent: 'flex-start', alignContent: 'flex-start', backgroundColor: 'red',*/ margin: 10}]}
+                containerStyle={[styles.mathContainer]}
+                style={[styles.mathInner, { maxWidth: this.state.width }]}
                 math={string}
                 text={string}
                 fontColor='white'
                 //layoutProvider={this.ref}
                 fallback={'frisck'}
                 onPress={() => Alert.alert(`LaTeX: ${string}`)}
-                containerStyle={{ padding: 5, backgroundColor: 'red' }}
             //onLayoutCompleted={(e)=>console.log(e.nativeEvent)}
             />
         );
     }
 
-    render3() {
+    renderItem(item) {
+        return (
+            <View style={[styles.flexContainer, { flex: 1, backgroundColor: 'pink', margin: 5 }]}>
+                {this.renderFlexItem(item)}
+            </View>
+        );
+    }
+
+    render2() {
         return (
             <View style={[styles.container]} ref={this.ref}>
                 <FlatList
                     scrollEnabled
-                    renderItem={({ item, index, section }) => this.renderItem(item)}
+                    renderItem={({ item, index, section }) => this.renderFlexItem(item)}
                     renderSectionHeader={({ section: { title } }) => <Text>{title}</Text>}
                     data={_.flatten(this.state.sections.map(s => s.data))}
                     onRefresh={() => {
@@ -95,13 +104,13 @@ export default class App extends Component {
                     refreshing={this.state.refreshing}
                     contentContainerStyle={[styles.flexContainer]}
                     keyExtractor={(item) => `${item.string}`}
-                    style={{flex:1}}
+                    style={{flex:1, backgroundColor:'pink'}}
                 />
             </View>
         );
     }
     
-    render2() {
+    render1() {
         return (
             <View style={[{ flex: 1 }]} ref={this.ref}>
                 <SectionList
@@ -132,16 +141,34 @@ export default class App extends Component {
         );
     }
 
-    renderT() {
-        return this.state.tag && React.cloneElement(this.renderItem(this.state.tag), { style: [styles.math, { backgroundColor: 'red' }] });
+    render0() {
+        return (
+            <View style={[{ flex: 1, backgroundColor: 'pink' }, styles.flexContainer, styles.centerContent]}>
+                {this.state.tag && React.cloneElement(this.renderFlexItem(this.state.tag), { style: [{backgroundColor:'blue'}]})}
+            </View>
+        );
     }
     
 
     render() {
-        return this.renderT();
+        console.log(this.state.state)
+        return (
+            <View style={{ flex: 1 }}>
+                <View style={{ flex: 1 }}>
+                    {this[`render${this.state.state}`]()}
+                    </View>
+                <Button
+                    //style={{bottom: 0}}
+                    onPress={() => this.setState((prev) => {
+                        return { state: (prev.state + 1) % 3 };
+                    })}
+                    title="press to change view"
+                />
+            </View>
+        );
+        }
     }
-}
-
+    
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -155,12 +182,23 @@ const styles = StyleSheet.create({
         flexDirection: 'row',//styleUtil.row,
         flexWrap: 'wrap',
         justifyContent: 'flex-start',
-        alignItems: 'center',
+        alignItems: 'center'
     },
-    math: {
-        borderRadius: 25,
+    mathContainer: {
+        borderRadius: 50,
         margin: 5,
-        maxHeight: 35,
-        justifyContent: 'center'
+        padding: 10,
+        justifyContent: 'center',
+        backgroundColor: 'red'
+    },
+    mathInner: {
+        height: 35,
+        minWidth: 35,
+        justifyContent: 'center',
+        backgroundColor: 'blue'
+    },
+    centerContent: {
+        justifyContent: 'center',
+        alignItems: 'center',
     }
 });

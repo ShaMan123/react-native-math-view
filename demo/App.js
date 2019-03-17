@@ -39,7 +39,7 @@ export default class App extends Component {
         
         this.t = setInterval(() => {
             this.setState({
-                width: Dimensions.get('window').width * (i % 4 + 1) * 0.25,
+                width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width - 50),
                 tag: tags[i%tags.length]
             });
             i++;
@@ -51,20 +51,39 @@ export default class App extends Component {
         clearInterval(this.t);
     }
 
-    renderItem(item) {
+    renderFlexItem(item) {
         const { string } = item;
         return (
             <MathView
-                style={[styles.math, { backgroundColor: 'red' }, { maxWidth: this.state.width }]} //{ display: 'flex',alignItems: 'center',/* justifyContent: 'flex-start', alignContent: 'flex-start', backgroundColor: 'red',*/ margin: 10}]}
+                containerStyle={[styles.math, { backgroundColor: 'red' }]}
+                style={[{ maxWidth: this.state.width, maxHeight: 35}]}
                 math={string}
                 text={string}
                 fontColor='white'
                 //layoutProvider={this.ref}
                 fallback={'frisck'}
                 onPress={() => Alert.alert(`LaTeX: ${string}`)}
-                containerStyle={{ padding: 5, backgroundColor: 'red' }}
             //onLayoutCompleted={(e)=>console.log(e.nativeEvent)}
             />
+        );
+    }
+
+    renderItem(item) {
+        const { string } = item;
+        return (
+            <View style={[styles.flexContainer, { flex: 1, backgroundColor: 'pink', margin: 5 }]}>
+                <MathView
+                    containerStyle={[styles.math, { backgroundColor: 'red' }]}
+                    style={[{ maxWidth: this.state.width, height: 35, justifyContent: 'center' }]}
+                    math={string}
+                    text={string}
+                    fontColor='white'
+                    //layoutProvider={this.ref}
+                    fallback={'frisck'}
+                    onPress={() => Alert.alert(`LaTeX: ${string}`)}
+                //onLayoutCompleted={(e)=>console.log(e.nativeEvent)}
+                />
+            </View>
         );
     }
 
@@ -73,7 +92,7 @@ export default class App extends Component {
             <View style={[styles.container]} ref={this.ref}>
                 <FlatList
                     scrollEnabled
-                    renderItem={({ item, index, section }) => this.renderItem(item)}
+                    renderItem={({ item, index, section }) => this.renderFlexItem(item)}
                     renderSectionHeader={({ section: { title } }) => <Text>{title}</Text>}
                     data={_.flatten(this.state.sections.map(s => s.data))}
                     onRefresh={() => {
@@ -95,7 +114,7 @@ export default class App extends Component {
                     refreshing={this.state.refreshing}
                     contentContainerStyle={[styles.flexContainer]}
                     keyExtractor={(item) => `${item.string}`}
-                    style={{flex:1}}
+                    style={{flex:1, backgroundColor:'pink'}}
                 />
             </View>
         );
@@ -133,12 +152,12 @@ export default class App extends Component {
     }
 
     renderT() {
-        return this.state.tag && React.cloneElement(this.renderItem(this.state.tag), { style: [styles.math, { backgroundColor: 'red' }] });
+        return this.state.tag && React.cloneElement(this.renderItem(this.state.tag), { style: [styles.math, { backgroundColor: 'red', display: 'flex', maxWidth: 200}] });
     }
     
 
     render() {
-        return this.renderT();
+        return this.render2();
     }
 }
 
@@ -155,12 +174,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',//styleUtil.row,
         flexWrap: 'wrap',
         justifyContent: 'flex-start',
-        alignItems: 'center',
+        alignItems: 'center'
     },
     math: {
-        borderRadius: 25,
+        borderRadius: 50,
         margin: 5,
-        maxHeight: 35,
+        padding: 10,
         justifyContent: 'center'
     }
 });

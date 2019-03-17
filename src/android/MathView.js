@@ -67,6 +67,7 @@ class MathView extends React.Component {
         this.scaleAnimation = new Animated.Value(props.initialScale);
 
         this._onStubLayout = this._onStubLayout.bind(this);
+        this._onSizeChanged = this._onSizeChanged.bind(this);
         
     }
 
@@ -81,63 +82,83 @@ class MathView extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { webViewLayout, containerLayout } = this.state;
-        const toValue = webViewLayout && containerLayout && (!prevState.webViewLayout || prevState.containerLayout) ? 1 : 0;
-        this.updated = true;
+        const { webViewLayout, containerLayout, scale } = this.state;
+        if (webViewLayout && containerLayout) {
+            this.updated = true;
+            const animations = [
+                Animated.spring(this.opacityAnimation, {
+                    toValue: 1,
+                    useNativeDriver: true
+                }),
+                Animated.spring(this.scaleAnimation, {
+                    toValue: scale,
+                    useNativeDriver: true
+                })
+            ];
 
+            Animated.parallel(animations).start();
+        }
+    }
 
-        const animations = [
-            Animated.spring(this.opacityAnimation, {
-                toValue: toValue,
-                useNativeDriver: true
-            }),
-            Animated.spring(this.scaleAnimation, {
-                toValue: toValue,
-                useNativeDriver: true
-            })
-        ];
-
-        Animated.parallel(animations).start();
+    getScale({ containerLayout = this.state.containerLayout, webViewLayout = this.state.webViewLayout }) {
+        if (!containerLayout || !webViewLayout) return 0;
+        const scale = Math.min(containerLayout.width / webViewLayout.width, containerLayout.height / webViewLayout.height, 1);
+        return scale;
     }
 
     _onStubLayout(e) {
         const { layout } = e.nativeEvent;
         const { width, height } = layout;
         const containerLayout = { width, height };
+        const scale = this.getScale({ containerLayout });
         this.setState({
-            containerLayout
+            containerLayout,
+            scale: this.getScale({ containerLayout })
+        });
+    }
+
+    _onSizeChanged(webViewLayout) {
+        this.setState({
+            webViewLayout,
+            scale: this.getScale({ webViewLayout })
         });
     }
 
     render() {
-        const { style, onLayout, paddingHorizontal, paddingVertical, ...props } = this.props;
-        const { containerLayout, webViewLayout } = this.state;
+        const { style, containerStyle, onLayout, paddingHorizontal, paddingVertical, ...props } = this.props;
+        const { containerLayout, webViewLayout, scale } = this.state;
+        
+        const size = webViewLayout && scale ? {
+            width: webViewLayout.width * scale,
+            height: webViewLayout.height * scale
+        } : null;
+
         return (
-            <View
-                style={[style, webViewLayout]}
-                onLayout={this._onStubLayout}
-            >
-                <Animated.View
-                    style={[{
-                        opacity: this.opacityAnimation,
-                        transform: [{ scale: this.scaleAnimation }, { perspective: 1000 }],
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                    }]}
+            <View style={containerStyle}>
+                <View
+                    style={style}
                 >
-                    {
-                        containerLayout &&
+                    <View
+                        style={[StyleSheet.absoluteFill, { backgroundColor: 'blue' }]}
+                        onLayout={this._onStubLayout}
+                    />
+                    <Animated.View
+                        style={[{
+                            opacity: this.opacityAnimation,
+                            transform: [{ scale: this.scaleAnimation }, { perspective: 1000 }],
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }]}
+                    >
                         <MathViewBase
                             ref={ref => this._handle = ref}
                             {...props}
-                            style={StyleSheet.absoluteFill}
-                            onSizeChanged={(layout) => this.setState({ webViewLayout: layout })}
-                            containerLayout={{ width: Math.max(containerLayout.width - paddingHorizontal * 2, 0), height: containerLayout.height + paddingVertical * 2 }}
+                            style={[StyleSheet.absoluteFill]}
+                            onSizeChanged={this._onSizeChanged}
                             onLayout={(e) => onLayout && onLayout(e)}
                         />
-                    }
-
-                </Animated.View>
+                    </Animated.View>
+                </View>
             </View>
         );
     }

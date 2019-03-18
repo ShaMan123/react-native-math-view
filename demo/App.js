@@ -26,9 +26,9 @@ export default class App extends Component {
                 }
             ],
             width: Dimensions.get('window').width,
-            tag: null,
             fontScale: 1,
-            state: 1
+            state: 1,
+            tag: MathStrings.calculus.filter((obj) => obj.math)[0]
         }
 
         this.ref = React.createRef();
@@ -41,7 +41,7 @@ export default class App extends Component {
         
         this.t = setInterval(() => {
             this.setState({
-                width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
+                //width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
                 tag: tags[i%tags.length]
             });
             i++;

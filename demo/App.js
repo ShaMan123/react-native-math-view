@@ -37,7 +37,7 @@ export default class App extends Component {
         let i = 0;
         const interval = 4000;
         const tags = MathStrings.calculus.filter((obj) => obj.math);
-        
+        /*
         this.t = setInterval(() => {
             this.setState({
                 width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
@@ -45,7 +45,7 @@ export default class App extends Component {
             });
             i++;
         }, interval);
-        
+        */
     }
 
     componentWillUnmount() {

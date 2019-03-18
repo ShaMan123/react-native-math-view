@@ -221,13 +221,13 @@ class MathView extends React.Component {
 
     render() {
         const { style, containerStyle, stubContainerStyle, stubStyle } = this.props;
-        const { prevContainerLayout, outerContainerLayout, containerLayout, prevMath, lastMeasured, math } = this.state;
+        const { prevContainerLayout, outerContainerLayout, containerLayout, prevMath, lastMeasured, math, webViewLayout } = this.state;
         const members = [math];
         if (lastMeasured === prevMath) members.unshift(prevMath);
-        
+
         return (
             <View
-                style={[containerStyle, !containerLayout && styles.default, !containerLayout && styles.transparent]}
+                style={[containerStyle, (!containerLayout || !webViewLayout) && styles.default, !containerLayout && styles.transparent]}
                 onLayout={this._onContainerLayout}
             >
                 <View
@@ -243,13 +243,11 @@ class MathView extends React.Component {
                         style={[StyleSheet.absoluteFill, styles.default]}
                         onLayout={this._onStubLayout}
                     />
-                    <View style={[StyleSheet.absoluteFill, styles.default, styles.centerContent, !containerLayout && styles.invisible, { backgroundColor: 'red' }]}>
+                    <View style={[StyleSheet.absoluteFill, styles.default, styles.centerContent, !containerLayout && styles.invisible]}>
                         <FlatList
                             keyExtractor={(math) => `${this.key}:${math}`}
                             data={members}
                             renderItem={({ item }) => this.renderBaseView(item, members)}
-
-                            //contentContainerStyle={styles.centerContent}
                         />
                     </View>
                 </View>

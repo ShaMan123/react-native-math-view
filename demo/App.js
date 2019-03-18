@@ -40,7 +40,7 @@ export default class App extends Component {
         
         this.t = setInterval(() => {
             this.setState({
-                width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
+                //width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
                 tag: tags[i%tags.length]
             });
             i++;
@@ -56,8 +56,8 @@ export default class App extends Component {
         const { string } = item;
         return (
             <MathView
-                containerStyle={[styles.mathContainer/*, { flex: 1 }/*{ maxWidth: this.state.width }*/]}
-                style={[styles.mathInner, { flex: 1 }]}
+                containerStyle={[styles.mathContainer, {display:'flex'}/*{ maxWidth: this.state.width }*/]}
+                style={[styles.mathInner]}
                 math={string}
                 fontColor='white'
                 //layoutProvider={this.ref}
@@ -76,12 +76,36 @@ export default class App extends Component {
         );
     }
 
+    renderTestFlexItem(item) {
+        const { string } = item;
+        return (
+            <MathView
+                containerStyle={[/*styles.flexContainer,*/ {backgroundColor:'red',margin:5}/* { flex: 1, maxHeight: 50 }/*{ maxWidth: this.state.width }*/]}
+                style={[styles.mathInner, styles.flexContainer]}
+                math={string}
+                fontColor='white'
+                //layoutProvider={this.ref}
+                fallback={'frisck'}
+                onPress={() => Alert.alert(`LaTeX: ${string}`)}
+            //onLayoutCompleted={(e)=>console.log(e.nativeEvent)}
+            />
+        );
+    }
+
+    renderTestItem(item) {
+        return (
+            <View style={[{ backgroundColor: 'red' }]}>
+                {this.renderFlexItem(item)}
+            </View>
+        );
+    }
+
     render2() {
         return (
             <View style={[styles.container, { maxWidth: this.state.width }]} ref={this.ref}>
                 <FlatList
                     scrollEnabled
-                    renderItem={({ item, index, section }) => this.renderFlexItem(item)}
+                    renderItem={({ item, index, section }) => this.renderTestItem(item)}
                     renderSectionHeader={({ section: { title } }) => <Text>{title}</Text>}
                     data={_.flatten(this.state.sections.map(s => s.data))}
                     onRefresh={() => {
@@ -101,7 +125,7 @@ export default class App extends Component {
                         })
                     }}
                     refreshing={this.state.refreshing}
-                    contentContainerStyle={[styles.flexContainer]}
+                    //contentContainerStyle={[styles.flexContainer, { maxWidth: 200 }]}
                     keyExtractor={(item) => `${item.string}`}
                     style={{flex:1, backgroundColor:'pink'}}
                 />

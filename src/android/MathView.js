@@ -19,7 +19,8 @@ import ReactNative, {
 } from 'react-native';
 import memoize from 'lodash/memoize';
 import uniqueId from 'lodash/uniqueId';
-import MathViewBase, { MATH_ENGINES} from './MathViewBase';
+import MathViewBase, { MATH_ENGINES } from './MathViewBase';
+import ViewOverflow from 'react-native-view-overflow';
 
 class MathView extends React.Component {
     static propTypes = {
@@ -133,9 +134,12 @@ class MathView extends React.Component {
     }
 
     _onStubContainerLayout(e) {
+
+        /*
         this.stub && this.stub.measure((ox, oy, width, height, a, b) => {
             this.measureStub({ width, height });
         });
+        */
     }
 
     _onSizeChanged(math, webViewLayout) {
@@ -157,7 +161,16 @@ class MathView extends React.Component {
         const { webViewLayout, scale } = this.state;
 
         return webViewLayout && scale ? {
-            width: webViewLayout.width * scale,
+            maxWidth: webViewLayout.width * scale,
+            maxHeight: webViewLayout.height * scale
+        } : null;
+    }
+
+    get stylableContainer() {
+        const { containerLayout, scale } = this.state;
+
+        return webViewLayout && scale ? {
+            maxWidth: webViewLayout.width * scale,
             height: webViewLayout.height * scale
         } : null;
     }
@@ -190,24 +203,28 @@ class MathView extends React.Component {
         const members = [this.state.math];
         if (this.state.lastMeasured === this.state.prevMath) members.unshift(this.state.prevMath);
         return (
-            <View style={containerStyle}>
+            <View style={[containerStyle, !this.state.webViewLayout && { flex: 1, opacity: 0 }]}>
                 <View
-                    style={style}
+                    style={[style, /*StyleSheet.absoluteFill,*/ this.stylable]}
                 >
-                    <View
-                        ref={(ref) => this.stub = ref}
-                        style={[StyleSheet.absoluteFill]}
-                        onLayout={this._onStubLayout}
-                    //onLayout={this._onStubLayout}
-                    />
+                    <View style={[StyleSheet.absoluteFill]}>
+                        <View
+                            style={[{ flex: 1, backgroundColor: 'green' }]}
+                            //ref={(ref) => this.stub = ref}
+                            //style={[StyleSheet.absoluteFill, this.stylable]}
+                            onLayout={this._onStubLayout}
+                        //onLayout={this._onStubLayout}
+                        />
+                    </View>
+                    
                     <FlatList
                         keyExtractor={(math) => `${this.key}:${math}`}
                         data={members}
                         renderItem={({ item }) => this.renderBaseView(item, members)}
-                        style={StyleSheet.absoluteFill}
+                    //style={StyleSheet.absoluteFill}
                     />
-
                 </View>
+                
             </View>
         );
     }

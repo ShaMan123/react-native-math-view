@@ -62,7 +62,11 @@ class MathView extends React.Component {
             math: props.math,
             prevMath: null,
             lastMeasured: null,
-            scale: props.initialScale
+            scale: props.initialScale,
+            stylable: null,
+            containerStyle: props.containerStyle,
+            prevContainerLayout: null,
+            outerContainerLayout: null
         };
 
         this.opacityAnimation = new Animated.Value(props.initialOpacity);
@@ -83,6 +87,14 @@ class MathView extends React.Component {
                 prevMath: prevState.math,
                 webViewLayout: null
             };
+        }
+        if (nextProps.containerStyle !== prevState.containerStyle) {
+            return {
+                containerStyle: nextProps.containerStyle,
+                prevContainerLayout: prevState.containerLayout,
+                containerLayout: null,
+                scale: nextProps.initialScale
+            }
         }
         return null;
     }
@@ -148,7 +160,11 @@ class MathView extends React.Component {
         this.setState({
             webViewLayout,
             lastMeasured: math,
-            scale
+            scale,
+            stylable: {
+                minWidth: webViewLayout.width * scale,
+                minHeight: webViewLayout.height * scale
+            }
         });
         /*
         if (math === this.state.math) {
@@ -161,20 +177,20 @@ class MathView extends React.Component {
         const { webViewLayout, scale } = this.state;
 
         return webViewLayout && scale ? {
-            maxWidth: webViewLayout.width * scale,
-            maxHeight: webViewLayout.height * scale
+            minWidth: webViewLayout.width * scale,
+            minHeight: webViewLayout.height * scale
         } : null;
     }
-
+    
     get stylableContainer() {
         const { containerLayout, scale } = this.state;
 
-        return webViewLayout && scale ? {
-            maxWidth: webViewLayout.width * scale,
-            height: webViewLayout.height * scale
+        return containerLayout && scale ? {
+            maxWidth: containerLayout.width * scale,
+            maxHeight: containerLayout.height * scale
         } : null;
     }
-
+    
     renderBaseView(math, members) {
         const { style, containerStyle, onLayout, ...props } = this.props;
         if (!math) return null;
@@ -200,31 +216,41 @@ class MathView extends React.Component {
 
     render() {
         const { style, containerStyle } = this.props;
-        const members = [this.state.math];
-        if (this.state.lastMeasured === this.state.prevMath) members.unshift(this.state.prevMath);
+        const { stylable, prevContainerLayout, outerContainerLayout, containerLayout, prevMath, lastMeasured, math } = this.state;
+        const members = [math];
+        if (lastMeasured === prevMath) members.unshift(prevMath);
+        
         return (
-            <View style={[containerStyle, !this.state.webViewLayout && { flex: 1, opacity: 0 }]}>
+            <View
+                style={[containerStyle, !containerLayout && { flex: 1, backgroundColor: 'transparent' }]}
+                onLayout={(e) => {
+                    const { width, height } = e.nativeEvent.layout;
+                    this.setState({ outerContainerLayout: { width, height }})
+                }}
+            >
                 <View
-                    style={[style, /*StyleSheet.absoluteFill,*/ this.stylable]}
+                    style={[StyleSheet.absoluteFill, outerContainerLayout, !containerLayout ? { backgroundColor: 'orange' } : { backgroundColor: 'transparent' }]}
+                />
+                <View
+                    style={[style, this.stylable, !containerLayout && { backgroundColor: 'transparent'}]}
                 >
-                    <View style={[StyleSheet.absoluteFill]}>
-                        <View
-                            style={[{ flex: 1, backgroundColor: 'green' }]}
-                            //ref={(ref) => this.stub = ref}
-                            //style={[StyleSheet.absoluteFill, this.stylable]}
-                            onLayout={this._onStubLayout}
-                        //onLayout={this._onStubLayout}
-                        />
-                    </View>
-                    
+                    <View
+                        style={[StyleSheet.absoluteFill, prevContainerLayout, !containerLayout ? { backgroundColor: 'blue' } : { backgroundColor: 'transparent' }]}
+                    />
+                    <View
+                        style={[StyleSheet.absoluteFill,{ flex: 1 }]}
+                        //ref={(ref) => this.stub = ref}
+                        //style={[StyleSheet.absoluteFill, this.stylable]}
+                        onLayout={this._onStubLayout}
+                    //onLayout={this._onStubLayout}
+                    />
                     <FlatList
                         keyExtractor={(math) => `${this.key}:${math}`}
                         data={members}
                         renderItem={({ item }) => this.renderBaseView(item, members)}
-                    //style={StyleSheet.absoluteFill}
+                        style={[StyleSheet.absoluteFill, !containerLayout && {opacity: 0}]}
                     />
                 </View>
-                
             </View>
         );
     }
@@ -234,7 +260,11 @@ const styles = StyleSheet.create({
     centerContent: {
         justifyContent: 'center',
         alignItems: 'center'
+    },
+    transient: {
+        flex: 1,
+        opacity: 0
     }
-})
+});
 
 export default MathView;

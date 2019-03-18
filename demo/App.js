@@ -24,7 +24,7 @@ export default class App extends Component {
                     keyExtractor: (item) => `trig:${item.string}`
                 }
             ],
-            width: Dimensions.get('window').width,
+            width: Dimensions.get('window').width*0.5,
             tag: null,
             fontScale: 1,
             state: 1
@@ -40,7 +40,7 @@ export default class App extends Component {
         
         this.t = setInterval(() => {
             this.setState({
-                //width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
+                width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
                 tag: tags[i%tags.length]
             });
             i++;
@@ -56,7 +56,7 @@ export default class App extends Component {
         const { string } = item;
         return (
             <MathView
-                containerStyle={[styles.mathContainer, {display:'flex'}/*{ maxWidth: this.state.width }*/]}
+                containerStyle={[styles.mathContainer,/*{ flexWrap:'wrap'}*/]}
                 style={[styles.mathInner]}
                 math={string}
                 fontColor='white'
@@ -158,7 +158,8 @@ export default class App extends Component {
                         })
                     }}
                     refreshing={this.state.refreshing}
-                    style={{flex:1}}
+                    style={{ flex: 1 }}
+                    extraData={this.state.width}
                 />
             </View>
         );
@@ -224,7 +225,7 @@ const styles = StyleSheet.create({
         height: 35,
         minWidth: 35,
         justifyContent: 'center',
-        backgroundColor: 'blue'
+        backgroundColor: 'blue',
     },
     centerContent: {
         justifyContent: 'center',

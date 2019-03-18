@@ -24,10 +24,10 @@ export default class App extends Component {
                     keyExtractor: (item) => `trig:${item.string}`
                 }
             ],
-            width: Dimensions.get('window').width*0.5,
+            width: Dimensions.get('window').width,
             tag: null,
             fontScale: 1,
-            state: 1
+            state: 0
         }
 
         this.ref = React.createRef();
@@ -117,12 +117,12 @@ export default class App extends Component {
                             sections: [
                                 {
                                     title: 'calculus',
-                                    data: MathStrings.calculus.filter((obj) => obj.math),
+                                    data: MathStrings.calculus.filter((obj) => obj.math).reverse(),
                                     keyExtractor: (item) => `calculus:${item.string}` + new Date().valueOf()
                                 },
                                 {
                                     title: 'trig',
-                                    data: MathStrings.trig.filter((obj) => obj.math),
+                                    data: MathStrings.trig.filter((obj) => obj.math).reverse(),
                                     keyExtractor: (item) => `trig:${item.string}` + new Date().valueOf()
                                 }
                             ]
@@ -150,12 +150,12 @@ export default class App extends Component {
                             sections: [
                                 {
                                     title: 'calculus',
-                                    data: MathStrings.calculus.filter((obj) => obj.math),
+                                    data: MathStrings.calculus.filter((obj) => obj.math).reverse(),
                                     keyExtractor: (item) => `calculus:${item.string}` + new Date().valueOf()
                                 },
                                 {
                                     title: 'trig',
-                                    data: MathStrings.trig.filter((obj) => obj.math),
+                                    data: MathStrings.trig.filter((obj) => obj.math).reverse(),
                                     keyExtractor: (item) => `trig:${item.string}` + new Date().valueOf()
                                 }
                             ]
@@ -171,10 +171,10 @@ export default class App extends Component {
 
     render0() {
         return (
-            <View style={[{ backgroundColor: 'pink' }, styles.flexContainer, styles.centerContent]}>
-                <View style={[styles.flexContainer]}>
-                    {this.state.tag && React.cloneElement(this.renderFlexItem(this.state.tag))}
-                    </View>
+            <View style={[{ backgroundColor: 'pink' }, styles.centerContent]}>
+                <View style={styles.flexContainer}>
+                    {this.state.tag && React.cloneElement(this.renderFlexItem(this.state.tag), {stubContainerStyle:null,stubStyle:null})}
+                </View>
             </View>
         );
     }

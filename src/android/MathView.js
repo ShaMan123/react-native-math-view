@@ -63,7 +63,6 @@ class MathView extends React.Component {
             prevMath: null,
             lastMeasured: null,
             scale: props.initialScale,
-            stylable: null,
             containerStyle: props.containerStyle,
             prevContainerLayout: null,
             outerContainerLayout: null
@@ -73,7 +72,7 @@ class MathView extends React.Component {
         this.scaleAnimation = new Animated.Value(props.initialScale);
 
         this._onStubLayout = this._onStubLayout.bind(this);
-        this._onStubContainerLayout = this._onStubContainerLayout.bind(this);
+        this._onContainerLayout = this._onContainerLayout.bind(this);
         this._onSizeChanged = this._onSizeChanged.bind(this);
 
         this.mathRefs = {};
@@ -154,17 +153,18 @@ class MathView extends React.Component {
         */
     }
 
+    _onContainerLayout(e) {
+        const { width, height } = e.nativeEvent.layout;
+        this.setState({ outerContainerLayout: { width, height } })
+    }
+
     _onSizeChanged(math, webViewLayout) {
         const scale = this.getScale({ webViewLayout });
        
         this.setState({
             webViewLayout,
             lastMeasured: math,
-            scale,
-            stylable: {
-                minWidth: webViewLayout.width * scale,
-                minHeight: webViewLayout.height * scale
-            }
+            scale
         });
         /*
         if (math === this.state.math) {
@@ -179,15 +179,6 @@ class MathView extends React.Component {
         return webViewLayout && scale ? {
             minWidth: webViewLayout.width * scale,
             minHeight: webViewLayout.height * scale
-        } : null;
-    }
-    
-    get stylableContainer() {
-        const { containerLayout, scale } = this.state;
-
-        return containerLayout && scale ? {
-            maxWidth: containerLayout.width * scale,
-            maxHeight: containerLayout.height * scale
         } : null;
     }
     
@@ -216,40 +207,37 @@ class MathView extends React.Component {
 
     render() {
         const { style, containerStyle } = this.props;
-        const { stylable, prevContainerLayout, outerContainerLayout, containerLayout, prevMath, lastMeasured, math } = this.state;
+        const { prevContainerLayout, outerContainerLayout, containerLayout, prevMath, lastMeasured, math } = this.state;
         const members = [math];
         if (lastMeasured === prevMath) members.unshift(prevMath);
         
         return (
             <View
-                style={[containerStyle, !containerLayout && { flex: 1, backgroundColor: 'transparent' }]}
-                onLayout={(e) => {
-                    const { width, height } = e.nativeEvent.layout;
-                    this.setState({ outerContainerLayout: { width, height }})
-                }}
+                style={[containerStyle, !containerLayout && styles.default, !containerLayout && styles.transparent]}
+                onLayout={this._onContainerLayout}
             >
                 <View
-                    style={[StyleSheet.absoluteFill, outerContainerLayout, !containerLayout ? { backgroundColor: 'orange' } : { backgroundColor: 'transparent' }]}
+                    style={[StyleSheet.absoluteFill, outerContainerLayout, !containerLayout ? { backgroundColor: 'orange' } : styles.transparent]}
                 />
                 <View
-                    style={[style, this.stylable, !containerLayout && { backgroundColor: 'transparent'}]}
+                    style={[style, this.stylable, !containerLayout && styles.transparent]}
                 >
                     <View
-                        style={[StyleSheet.absoluteFill, prevContainerLayout, !containerLayout ? { backgroundColor: 'blue' } : { backgroundColor: 'transparent' }]}
+                        style={[StyleSheet.absoluteFill, prevContainerLayout, !containerLayout ? { backgroundColor: 'blue' } : styles.transparent]}
                     />
                     <View
-                        style={[StyleSheet.absoluteFill,{ flex: 1 }]}
-                        //ref={(ref) => this.stub = ref}
-                        //style={[StyleSheet.absoluteFill, this.stylable]}
+                        style={[StyleSheet.absoluteFill, styles.default]}
                         onLayout={this._onStubLayout}
-                    //onLayout={this._onStubLayout}
                     />
-                    <FlatList
-                        keyExtractor={(math) => `${this.key}:${math}`}
-                        data={members}
-                        renderItem={({ item }) => this.renderBaseView(item, members)}
-                        style={[StyleSheet.absoluteFill, !containerLayout && {opacity: 0}]}
-                    />
+                    <View style={[StyleSheet.absoluteFill, styles.default, styles.centerContent, !containerLayout && styles.invisible, { backgroundColor: 'red' }]}>
+                        <FlatList
+                            keyExtractor={(math) => `${this.key}:${math}`}
+                            data={members}
+                            renderItem={({ item }) => this.renderBaseView(item, members)}
+
+                            //contentContainerStyle={styles.centerContent}
+                        />
+                    </View>
                 </View>
             </View>
         );
@@ -261,8 +249,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center'
     },
-    transient: {
-        flex: 1,
+    default: {
+        flex: 1
+    },
+    transparent: {
+        backgroundColor: 'transparent'
+    },
+    invisible: {
         opacity: 0
     }
 });

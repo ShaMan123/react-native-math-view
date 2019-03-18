@@ -24,7 +24,10 @@ import ViewOverflow from 'react-native-view-overflow';
 
 class MathView extends React.Component {
     static propTypes = {
+        containerStyle: ViewPropTypes.style,
         style: ViewPropTypes.style,
+        stubContainerStyle: ViewPropTypes.style,
+        stubStyle: ViewPropTypes.style,
         math: PropTypes.string.isRequired,
         onLayout: PropTypes.func,
         initialOpacity: function (props, propName, componentName) {
@@ -37,19 +40,28 @@ class MathView extends React.Component {
             }
         },
         initialScale: PropTypes.number,
-        ...MathViewBase.propTypes
+        ...MathViewBase.propTypes,
+        extraData: PropTypes.any
     };
 
     static defaultProps = {
+        containerStyle: null,
         style: null,
-        math: '',
+        stubContainerStyle: null,
+        stubStyle: null,
+        math: null,
         
         onLayoutCompleted: () => { },
         initialOpacity: 0.2,
         initialScale: 0,
+        extraData: null,
 
         ...MathViewBase.defaultProps
     };
+
+    static getStyleObject(style) {
+        return StyleSheet.flatten(style);
+    }
 
     key = uniqueId('MathView');
 
@@ -63,9 +75,9 @@ class MathView extends React.Component {
             prevMath: null,
             lastMeasured: null,
             scale: props.initialScale,
-            containerStyle: props.containerStyle,
             prevContainerLayout: null,
-            outerContainerLayout: null
+            outerContainerLayout: null,
+            extraData: props.extraData
         };
 
         this.opacityAnimation = new Animated.Value(props.initialOpacity);
@@ -87,14 +99,16 @@ class MathView extends React.Component {
                 webViewLayout: null
             };
         }
-        if (nextProps.containerStyle !== prevState.containerStyle) {
+
+        if (nextProps.extraData !== prevState.extraData) {
             return {
-                containerStyle: nextProps.containerStyle,
-                prevContainerLayout: prevState.containerLayout,
                 containerLayout: null,
-                scale: nextProps.initialScale
-            }
+                prevContainerLayout: prevState.containerLayout,
+                scale: nextProps.initialScale,
+                extraData: nextProps.extraData
+            };
         }
+
         return null;
     }
 
@@ -206,7 +220,7 @@ class MathView extends React.Component {
     }
 
     render() {
-        const { style, containerStyle } = this.props;
+        const { style, containerStyle, stubContainerStyle, stubStyle } = this.props;
         const { prevContainerLayout, outerContainerLayout, containerLayout, prevMath, lastMeasured, math } = this.state;
         const members = [math];
         if (lastMeasured === prevMath) members.unshift(prevMath);
@@ -217,13 +231,13 @@ class MathView extends React.Component {
                 onLayout={this._onContainerLayout}
             >
                 <View
-                    style={[StyleSheet.absoluteFill, outerContainerLayout, !containerLayout ? { backgroundColor: 'orange' } : styles.transparent]}
+                    style={[stubContainerStyle, StyleSheet.absoluteFill, !containerLayout ? outerContainerLayout : styles.transparent]}
                 />
                 <View
                     style={[style, this.stylable, !containerLayout && styles.transparent]}
                 >
                     <View
-                        style={[StyleSheet.absoluteFill, prevContainerLayout, !containerLayout ? { backgroundColor: 'blue' } : styles.transparent]}
+                        style={[stubStyle, StyleSheet.absoluteFill, !containerLayout ? prevContainerLayout : styles.transparent]}
                     />
                     <View
                         style={[StyleSheet.absoluteFill, styles.default]}

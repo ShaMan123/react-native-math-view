@@ -54,15 +54,19 @@ export default class App extends Component {
 
     renderFlexItem(item) {
         const { string } = item;
+        console.log('rendering!!!')
         return (
             <MathView
-                containerStyle={[styles.mathContainer,/*{ flexWrap:'wrap'}*/]}
-                style={[styles.mathInner]}
+                containerStyle={styles.mathContainer}
+                style={styles.mathInner}
+                stubContainerStyle={{ backgroundColor: 'orange' }}
+                stubStyle={{ backgroundColor: 'red' }}
                 math={string}
                 fontColor='white'
                 //layoutProvider={this.ref}
                 fallback={'frisck'}
                 onPress={() => Alert.alert(`LaTeX: ${string}`)}
+                extraData={this.state.width}
             //onLayoutCompleted={(e)=>console.log(e.nativeEvent)}
             />
         );
@@ -168,7 +172,9 @@ export default class App extends Component {
     render0() {
         return (
             <View style={[{ backgroundColor: 'pink' }, styles.flexContainer, styles.centerContent]}>
-                {this.state.tag && React.cloneElement(this.renderFlexItem(this.state.tag), { style: [{ backgroundColor: 'blue', flex: 1, minHeight: 35}]})}
+                <View style={[styles.flexContainer]}>
+                    {this.state.tag && React.cloneElement(this.renderFlexItem(this.state.tag))}
+                    </View>
             </View>
         );
     }

@@ -5,6 +5,7 @@ import * as _ from 'lodash';
 import MathView from 'react-native-math-view';
 import * as MathStrings from './math';
 
+
 YellowBox.ignoreWarnings(['Warning: `flexWrap: `wrap`` is not supported with the `VirtualizedList` components.']);
 
 export default class App extends Component {
@@ -27,7 +28,7 @@ export default class App extends Component {
             width: Dimensions.get('window').width,
             tag: null,
             fontScale: 1,
-            state: 0
+            state: 1
         }
 
         this.ref = React.createRef();
@@ -37,7 +38,7 @@ export default class App extends Component {
         let i = 0;
         const interval = 4000;
         const tags = MathStrings.calculus.filter((obj) => obj.math);
-        /*
+        
         this.t = setInterval(() => {
             this.setState({
                 width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
@@ -45,7 +46,7 @@ export default class App extends Component {
             });
             i++;
         }, interval);
-        */
+        
     }
 
     componentWillUnmount() {
@@ -54,19 +55,19 @@ export default class App extends Component {
 
     renderFlexItem(item) {
         const { string } = item;
-        console.log('rendering!!!')
+
         return (
             <MathView
                 containerStyle={styles.mathContainer}
                 style={styles.mathInner}
                 stubContainerStyle={{ backgroundColor: 'orange' }}
-                stubStyle={{ backgroundColor: 'red' }}
+                stubStyle={{ backgroundColor: 'blue' }}
                 math={string}
                 fontColor='white'
-                //layoutProvider={this.ref}
                 fallback={'frisck'}
                 onPress={() => Alert.alert(`LaTeX: ${string}`)}
                 extraData={this.state.width}
+                animated
             //onLayoutCompleted={(e)=>console.log(e.nativeEvent)}
             />
         );
@@ -91,6 +92,7 @@ export default class App extends Component {
                 //layoutProvider={this.ref}
                 fallback={'frisck'}
                 onPress={() => Alert.alert(`LaTeX: ${string}`)}
+                
             //onLayoutCompleted={(e)=>console.log(e.nativeEvent)}
             />
         );
@@ -118,12 +120,12 @@ export default class App extends Component {
                                 {
                                     title: 'calculus',
                                     data: MathStrings.calculus.filter((obj) => obj.math).reverse(),
-                                    keyExtractor: (item) => `calculus:${item.string}` + new Date().valueOf()
+                                    keyExtractor: (item) => `calculus:${item.string}`
                                 },
                                 {
                                     title: 'trig',
                                     data: MathStrings.trig.filter((obj) => obj.math).reverse(),
-                                    keyExtractor: (item) => `trig:${item.string}` + new Date().valueOf()
+                                    keyExtractor: (item) => `trig:${item.string}`
                                 }
                             ]
                         })
@@ -150,13 +152,13 @@ export default class App extends Component {
                             sections: [
                                 {
                                     title: 'calculus',
-                                    data: MathStrings.calculus.filter((obj) => obj.math).reverse(),
-                                    keyExtractor: (item) => `calculus:${item.string}` + new Date().valueOf()
+                                    data: this.state.sections[0].data.reverse(),
+                                    keyExtractor: (item) => `calculus:${item.string}`
                                 },
                                 {
                                     title: 'trig',
-                                    data: MathStrings.trig.filter((obj) => obj.math).reverse(),
-                                    keyExtractor: (item) => `trig:${item.string}` + new Date().valueOf()
+                                    data: this.state.sections[1].data.reverse(),
+                                    keyExtractor: (item) => `trig:${item.string}`
                                 }
                             ]
                         })

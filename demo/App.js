@@ -24,10 +24,10 @@ export default class App extends Component {
                     keyExtractor: (item) => `trig:${item.string}`
                 }
             ],
-            width: Dimensions.get('window').width - 50,
+            width: Dimensions.get('window').width,
             tag: null,
             fontScale: 1,
-            state: 0
+            state: 1
         }
 
         this.ref = React.createRef();
@@ -40,7 +40,7 @@ export default class App extends Component {
         
         this.t = setInterval(() => {
             this.setState({
-                width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width - 50),
+                width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
                 tag: tags[i%tags.length]
             });
             i++;
@@ -56,8 +56,8 @@ export default class App extends Component {
         const { string } = item;
         return (
             <MathView
-                containerStyle={[styles.mathContainer]}
-                style={[styles.mathInner, { maxWidth: this.state.width }]}
+                containerStyle={[styles.mathContainer/*, { flex: 1 }/*{ maxWidth: this.state.width }*/]}
+                style={[styles.mathInner, { flex: 1 }]}
                 math={string}
                 fontColor='white'
                 //layoutProvider={this.ref}
@@ -70,7 +70,7 @@ export default class App extends Component {
 
     renderItem(item) {
         return (
-            <View style={[styles.flexContainer, { flex: 1, backgroundColor: 'pink', margin: 5 }]}>
+            <View style={[styles.flexContainer, { flex: 1, backgroundColor: 'pink' }]}>
                 {this.renderFlexItem(item)}
             </View>
         );
@@ -78,7 +78,7 @@ export default class App extends Component {
 
     render2() {
         return (
-            <View style={[styles.container]} ref={this.ref}>
+            <View style={[styles.container, { maxWidth: this.state.width }]} ref={this.ref}>
                 <FlatList
                     scrollEnabled
                     renderItem={({ item, index, section }) => this.renderFlexItem(item)}
@@ -111,7 +111,7 @@ export default class App extends Component {
     
     render1() {
         return (
-            <View style={[{ flex: 1 }]} ref={this.ref}>
+            <View style={[{ flex: 1, maxWidth: this.state.width }]} ref={this.ref}>
                 <SectionList
                     scrollEnabled
                     renderItem={({ item, index, section }) => this.renderItem(item)}
@@ -142,8 +142,8 @@ export default class App extends Component {
 
     render0() {
         return (
-            <View style={[{ flex: 1, backgroundColor: 'pink' }, styles.flexContainer, styles.centerContent]}>
-                {this.state.tag && React.cloneElement(this.renderFlexItem(this.state.tag), { style: [{backgroundColor:'blue'}]})}
+            <View style={[{ backgroundColor: 'pink' }, styles.flexContainer, styles.centerContent]}>
+                {this.state.tag && React.cloneElement(this.renderFlexItem(this.state.tag), { style: [{ backgroundColor: 'blue', flex: 1, minHeight: 35}]})}
             </View>
         );
     }
@@ -181,14 +181,20 @@ const styles = StyleSheet.create({
         flexDirection: 'row',//styleUtil.row,
         flexWrap: 'wrap',
         justifyContent: 'flex-start',
-        alignItems: 'center'
+        alignItems: 'center',
+        
+    },
+    mathWrapper: {
+        backgroundColor: 'red',
+        borderRadius: 50,
+        //margin: 5,
     },
     mathContainer: {
-        borderRadius: 50,
         margin: 5,
         padding: 10,
         justifyContent: 'center',
-        backgroundColor: 'red'
+        backgroundColor: 'orange',
+        
     },
     mathInner: {
         height: 35,

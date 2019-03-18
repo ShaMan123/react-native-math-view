@@ -25,7 +25,6 @@ class MathView extends React.Component {
     static propTypes = {
         style: ViewPropTypes.style,
         math: PropTypes.string.isRequired,
-       
         onLayout: PropTypes.func,
         initialOpacity: function (props, propName, componentName) {
             const propValue = props[propName];
@@ -37,7 +36,6 @@ class MathView extends React.Component {
             }
         },
         initialScale: PropTypes.number,
-        layoutProvider: PropTypes.any,
         ...MathViewBase.propTypes
     };
 
@@ -70,6 +68,7 @@ class MathView extends React.Component {
         this.scaleAnimation = new Animated.Value(props.initialScale);
 
         this._onStubLayout = this._onStubLayout.bind(this);
+        this._onStubContainerLayout = this._onStubContainerLayout.bind(this);
         this._onSizeChanged = this._onSizeChanged.bind(this);
 
         this.mathRefs = {};
@@ -118,15 +117,24 @@ class MathView extends React.Component {
         return scale;
     }
 
-    _onStubLayout(e) {
-        const { layout } = e.nativeEvent;
-        const { width, height } = layout;
-        const containerLayout = { width, height };
+    measureStub(containerLayout) {
         const scale = this.getScale({ containerLayout });
-        
+
         this.setState({
             containerLayout,
             scale
+        });
+    }
+
+    _onStubLayout(e) {
+        const { layout } = e.nativeEvent;
+        const { width, height } = layout;
+        this.measureStub({ width, height });
+    }
+
+    _onStubContainerLayout(e) {
+        this.stub && this.stub.measure((ox, oy, width, height, a, b) => {
+            this.measureStub({ width, height });
         });
     }
 
@@ -179,21 +187,24 @@ class MathView extends React.Component {
 
     render() {
         const { style, containerStyle } = this.props;
-        const members = this.state.lastMeasured === this.state.math ? [this.state.math] : [this.state.prevMath, this.state.math];
+        const members = [this.state.math];
+        if (this.state.lastMeasured === this.state.prevMath) members.unshift(this.state.prevMath);
         return (
             <View style={containerStyle}>
                 <View
                     style={style}
                 >
                     <View
+                        ref={(ref) => this.stub = ref}
                         style={[StyleSheet.absoluteFill]}
                         onLayout={this._onStubLayout}
+                    //onLayout={this._onStubLayout}
                     />
-
                     <FlatList
                         keyExtractor={(math) => `${this.key}:${math}`}
                         data={members}
                         renderItem={({ item }) => this.renderBaseView(item, members)}
+                        style={StyleSheet.absoluteFill}
                     />
 
                 </View>

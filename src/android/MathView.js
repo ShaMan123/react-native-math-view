@@ -64,7 +64,7 @@ class MathView extends React.Component {
         stubContainerStyle: null,
         stubStyle: null,
         math: null,
-        initialOpacity: 0.2,
+        initialOpacity: 0,
         initialScale: 0,
         extraData: null,
 
@@ -156,12 +156,12 @@ class MathView extends React.Component {
                     //duration: initialized? 100: 500
                 }),
                 Animated.spring(this.opacityAnimation, {
-                    toValue: contentLayout && contentContainerLayout ? 1 : 0,
+                    toValue: 1,
                     useNativeDriver: true
                 })
             ];
 
-            Animated.stagger(250, animations)
+            Animated.sequence(animations)
                 .start(() => {
                     //completedUpdateCycle && this._fireLayoutEvent();
                 });
@@ -312,6 +312,7 @@ class MathView extends React.Component {
                 keyExtractor={(mathStr) => `${this.key}:${mathStr}`}
                 data={members}
                 renderItem={({ item }) => this.renderBaseView(item)}
+                listKey={this.key}
                 //style={styles.default}
                 //contentContainerStyle={[styles.centerContent]}
             />
@@ -326,7 +327,7 @@ class MathView extends React.Component {
         return (
             <Animated.View
                 style={[styles.default, styles.centerContent, {
-                    opacity: this.opacityAnimation,
+                    //opacity: this.opacityAnimation,
                     transform: [{ scale }, { perspective: 1000 }]
                 }]}
             >
@@ -397,13 +398,13 @@ class MathView extends React.Component {
                 onLayout={this._onContainerLayout}
             >
                 <View
-                    style={[stubContainerStyle, StyleSheet.absoluteFill, scaling ? prevCycle.containerLayout : styles.invisible]}
+                    style={[stubContainerStyle, StyleSheet.absoluteFill, scaling && prevCycle.containerLayout /*: styles.invisible*/]}
                 />
                 <View
                     style={[style, this.stylable, /*styles.default,*/ hideMainViews && styles.transparent]}
                 >
                     <View
-                        style={[stubStyle, StyleSheet.absoluteFill, /*styles.default,*/ scaling ? this.prevStylable : styles.transparent]}
+                        style={[stubStyle, StyleSheet.absoluteFill, /*styles.default,*/ scaling && this.prevStylable /*: styles.transparent*/]}
                     />
                     <View style={[style, this.transitionStylable, StyleSheet.absoluteFill, styles.default, extraData && { maxWidth: extraData }, styles.transparent]}>
                         <View

@@ -27,7 +27,7 @@ export default class App extends Component {
             ],
             width: Dimensions.get('window').width,
             fontScale: 1,
-            state: 2,
+            state: 0,
             tag: MathStrings.calculus.filter((obj) => obj.math)[0],
             mip: false
         }
@@ -36,7 +36,7 @@ export default class App extends Component {
     
     componentDidMount() {
         let i = 0;
-        const interval = 5000;
+        const interval = 7000;
         const tags = MathStrings.calculus.filter((obj) => obj.math);
         
         this.t = setInterval(() => {
@@ -68,7 +68,7 @@ export default class App extends Component {
                 fallback={'frisck'}
                 onPress={() => Alert.alert(`LaTeX: ${string}`)}
                 extraData={this.state.width}
-                animated
+                //animated
                 onLayout={(e) => console.log(e.nativeEvent)}
             //onLayoutCompleted={(e)=>console.log(e.nativeEvent)}
             />
@@ -161,6 +161,7 @@ export default class App extends Component {
                             ]
                         })
                     }}
+                    keyExtractor={(item) => `math:flexWrap:${item.string}`}
                     refreshing={this.state.refreshing}
                     style={{ flex: 1 }}
                     extraData={this.state.width}
@@ -213,14 +214,27 @@ export default class App extends Component {
 
     render0() {
         return (
-            <View style={[{ backgroundColor: 'pink', flex:1 }, styles.centerContent]}>
-                <View style={styles.flexContainer}>
-                    {this.state.tag && React.cloneElement(this.renderFlexItem(this.state.tag), {
-                        stubContainerStyle: null,
-                        stubStyle: null,
-                        onLayout:(e)=>console.log(e.nativeEvent)
-                    })}
-                </View>
+            <View>
+                {React.cloneElement(this.renderFlexItem(this.state.tag), {
+                    containerStyle: [styles.mathContainer, styles.flexContainer,/* { flex: 1 }*/],
+                    style: [/*styles.mathInner,*/ { /*flex: 1,*/ backgroundColor: 'blue' }]
+                })}
+                {React.cloneElement(this.renderFlexItem(this.state.tag), {
+                    containerStyle: [styles.mathContainer],
+                    style: [/*styles.mathInner,*/ { /*flex: 1,*/ backgroundColor: 'blue' }]
+                })}
+                {React.cloneElement(this.renderFlexItem(this.state.tag), {
+                    containerStyle: [styles.mathContainer, styles.flexContainer,/* { flex: 1 }*/],
+                    style: [/*styles.mathInner,*/ { flex: 1, backgroundColor: 'blue' }]
+                })}
+                {React.cloneElement(this.renderFlexItem(this.state.tag), {
+                    containerStyle: [styles.mathContainer, styles.flexContainer,/* { flex: 1 }*/],
+                    style: [styles.mathInner, { flex: 1, backgroundColor: 'blue' }]
+                })}
+                {React.cloneElement(this.renderFlexItem(this.state.tag), {
+                    containerStyle: [styles.mathContainer],
+                    style: [styles.mathInner, { flex: 1, backgroundColor: 'blue' }]
+                })}
             </View>
         );
     }
@@ -231,7 +245,7 @@ export default class App extends Component {
             <View style={{ flex: 1 }}>
                 <View style={{ flex: 1 }}>
                     {this[`render${this.state.state}`]()}
-                    </View>
+                </View>
                 <Button
                     //style={{bottom: 0}}
                     onPress={() => this.setState((prev) => {
@@ -241,8 +255,8 @@ export default class App extends Component {
                 />
             </View>
         );
-        }
     }
+}
     
 const styles = StyleSheet.create({
     container: {
@@ -268,7 +282,7 @@ const styles = StyleSheet.create({
     mathContainer: {
         marginVertical: 15,
         marginHorizontal: 5,
-        //padding: 20,
+        minHeight: 40,
         justifyContent: 'center',
         backgroundColor: 'orange',
         
@@ -279,7 +293,7 @@ const styles = StyleSheet.create({
         //marginHorizontal: 35,
         padding: 5,
         justifyContent: 'center',
-        backgroundColor: 'green',
+        backgroundColor: 'blue',
     },
     centerContent: {
         justifyContent: 'center',

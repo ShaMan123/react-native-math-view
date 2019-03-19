@@ -31,8 +31,7 @@ export default class App extends Component {
             tag: MathStrings.calculus.filter((obj) => obj.math)[0],
             mip: false
         }
-
-        this.ref = React.createRef();
+        
     }
     
     componentDidMount() {
@@ -78,7 +77,7 @@ export default class App extends Component {
 
     renderItem(item) {
         return (
-            <View style={[styles.flexContainer, { flex: 1, backgroundColor: 'pink' }]}>
+            <View style={[styles.flexContainer, { flex: 1, backgroundColor: 'pink', marginVertical: 5 }]}>
                 {this.renderFlexItem(item)}
             </View>
         );
@@ -88,11 +87,10 @@ export default class App extends Component {
         const { string } = item;
         return (
             <MathView
-                containerStyle={[/*styles.flexContainer,*/ {backgroundColor:'red',margin:5}/* { flex: 1, maxHeight: 50 }/*{ maxWidth: this.state.width }*/]}
+                containerStyle={[/*styles.flexContainer,*/ {backgroundColor:'red',margin:15}/* { flex: 1, maxHeight: 50 }/*{ maxWidth: this.state.width }*/]}
                 style={[styles.mathInner, styles.flexContainer]}
                 math={string}
                 fontColor='white'
-                //layoutProvider={this.ref}
                 fallback={'frisck'}
                 onPress={() => Alert.alert(`LaTeX: ${string}`)}
                 
@@ -102,16 +100,28 @@ export default class App extends Component {
     }
 
     renderTestItem(item) {
+        const { string } = item;
         return (
-            <View style={[{ backgroundColor: 'red', flex:1 }]}>
-                {this.renderFlexItem(item)}
-            </View>
+            <MathView
+                containerStyle={[styles.mathContainer]}
+                style={[styles.mathInner]}
+                stubContainerStyle={{ backgroundColor: 'orange' }}
+                stubStyle={{ backgroundColor: 'blue' }}
+                math={string}
+                fontColor='white'
+                fallback={'frisck'}
+                onPress={() => Alert.alert(`LaTeX: ${string}`)}
+                extraData={this.state.width}
+                animated
+                onLayout={(e) => console.log(e.nativeEvent)}
+            //onLayoutCompleted={(e)=>console.log(e.nativeEvent)}
+            />
         );
     }
 
     render222() {
         return (
-            <View style={[styles.container, { maxWidth: this.state.width }]} ref={this.ref}>
+            <View style={[styles.container, { maxWidth: this.state.width }]}>
                 <FlatList
                     scrollEnabled
                     renderItem={({ item, index, section }) => this.renderTestItem(item)}
@@ -147,7 +157,7 @@ export default class App extends Component {
             <View style={[{ flex: 1, maxWidth: this.state.width }]}>
                 <FlatList
                     scrollEnabled
-                    renderItem={({ item, index, section }) => this.renderItem(item)}
+                    renderItem={({ item, index, section }) => this.renderTestItem(item)}
                     renderSectionHeader={({ section: { title } }) => <Text>{title}</Text>}
                     data={_.flatten(this.state.sections.map(s => s.data))}
                     onRefresh={() => {
@@ -178,7 +188,7 @@ export default class App extends Component {
     
     render1() {
         return (
-            <View style={[{ flex: 1, maxWidth: this.state.width }]} ref={this.ref}>
+            <View style={[{ flex: 1, maxWidth: this.state.width }]}>
                 <SectionList
                     scrollEnabled
                     renderItem={({ item, index, section }) => this.renderItem(item)}
@@ -272,8 +282,9 @@ const styles = StyleSheet.create({
         //margin: 5,
     },
     mathContainer: {
-        //margin: 5,
-        padding: 50,
+        marginVertical: 15,
+        marginHorizontal: 5,
+        //padding: 20,
         justifyContent: 'center',
         backgroundColor: 'orange',
         
@@ -281,6 +292,8 @@ const styles = StyleSheet.create({
     mathInner: {
         height: 35,
         minWidth: 35,
+        marginHorizontal: 35,
+        padding: 5,
         justifyContent: 'center',
         backgroundColor: 'blue',
     },

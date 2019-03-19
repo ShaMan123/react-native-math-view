@@ -336,9 +336,9 @@ class MathView extends React.Component {
                     <View
                         style={[stubStyle, StyleSheet.absoluteFill, scaling ? prevContainerLayout : styles.transparent]}
                     />
-                    <View style={[StyleSheet.absoluteFill, contentLayout,styles.default, mip, {backgroundColor:'red'}]}>
+                    <View style={[style, StyleSheet.absoluteFill, contentLayout/*,styles.default*/, mip, {backgroundColor:'red'}]}>
                     <View
-                        style={[style, styles.default]}
+                        style={[/*style,*/ styles.default]}
                         onLayout={this._onContentContainerLayout}
                         />
                         </View>

@@ -27,9 +27,10 @@ export default class App extends Component {
             ],
             width: Dimensions.get('window').width,
             fontScale: 1,
-            state: 3,
+            state: 0,
             tag: MathStrings.calculus.filter((obj) => obj.math)[0],
-            mip: false
+            mip: false,
+            singleton: false
         }
         
     }
@@ -83,13 +84,14 @@ export default class App extends Component {
     }
 
     render2() {
+        const data = _.flatten(this.state.sections.map(s => s.data));
         return (
             <View style={[{ flex: 1, maxWidth: this.state.width }]}>
                 <FlatList
                     scrollEnabled
                     renderItem={({ item, index, section }) => this.renderItem(item)}
                     renderSectionHeader={({ section: { title } }) => <Text>{title}</Text>}
-                    data={_.flatten(this.state.sections.map(s => s.data))}
+                    data={this.state.singleton ? [data.shift()] : data}
                     onRefresh={() => {
                         this.setState({
                             sections: [
@@ -124,14 +126,14 @@ export default class App extends Component {
                     scrollEnabled
                     renderItem={({ item, index, section }) => this.renderItem(item)}
                     renderSectionHeader={({ section: { title } }) => <Text>{title}</Text>}
-                    sections={[
+                    sections={this.state.singleton? [
                         {
                             title: 'calculus',
                             data: [this.state.sections[0].data[0]],
                             keyExtractor: (item) => `calculus:${item.string}`
                         }
-                    ]}
-                    sections={this.state.sections}
+                    ] : this.state.sections}
+                    //sections={this.state.sections}
                     onRefresh={() => {
                         this.setState({
                             sections: [
@@ -159,36 +161,43 @@ export default class App extends Component {
 
     render3() {
         return React.cloneElement(this.renderFlexItem(this.state.tag), {
-            containerStyle: [styles.mathContainer, { flex: 1 }],
-            style: [/*styles.mathInner,*/ { flex: 1 }]
+            containerStyle: [styles.mathContainer,styles.flexContainer, { flex: 1 }],
+            style: [/*styles.mathInner,*/ { flex: 1 }],
+            //extraData: this.state.width
         })
     }
 
     render0() {
         return (
             <View>
-                {React.cloneElement(this.renderFlexItem(this.state.tag), {
-                    containerStyle: [styles.mathContainer, styles.flexContainer,/* { flex: 1 }*/],
-                    style: [/*styles.mathInner,*/ { /*flex: 1,*/ backgroundColor: 'blue' }]
-                })}
-                {React.cloneElement(this.renderFlexItem(this.state.tag), {
-                    containerStyle: [styles.mathContainer],
-                    style: [/*styles.mathInner,*/ { /*flex: 1,*/ backgroundColor: 'blue' }]
-                })}
-                {React.cloneElement(this.renderFlexItem(this.state.tag), {
-                    containerStyle: [styles.mathContainer, styles.flexContainer,/* { flex: 1 }*/],
-                    style: [/*styles.mathInner,*/ { flex: 1, backgroundColor: 'blue' }]
-                })}
-                {React.cloneElement(this.renderFlexItem(this.state.tag), {
-                    containerStyle: [styles.mathContainer, styles.flexContainer,/* { flex: 1 }*/],
-                    style: [styles.mathInner, { flex: 1, backgroundColor: 'blue' }]
-                })}
-                {React.cloneElement(this.renderFlexItem(this.state.tag), {
-                    containerStyle: [styles.mathContainer],
-                    style: [styles.mathInner, { flex: 1, backgroundColor: 'blue' }]
-                })}
+                {this.renderStandalones()}
             </View>
         );
+    }
+
+    renderStandalones() {
+        return [
+            React.cloneElement(this.renderFlexItem(this.state.tag), {
+                containerStyle: [styles.mathContainer, styles.flexContainer,/* { flex: 1 }*/],
+                style: [/*styles.mathInner,*/ { /*flex: 1,*/ backgroundColor: 'blue' }]
+            }),
+            React.cloneElement(this.renderFlexItem(this.state.tag), {
+                containerStyle: [styles.mathContainer],
+                style: [/*styles.mathInner,*/ { /*flex: 1,*/ backgroundColor: 'blue' }]
+            }),
+            React.cloneElement(this.renderFlexItem(this.state.tag), {
+                containerStyle: [styles.mathContainer, styles.flexContainer,/* { flex: 1 }*/],
+                style: [/*styles.mathInner,*/ { flex: 1, backgroundColor: 'blue' }]
+            }),
+            React.cloneElement(this.renderFlexItem(this.state.tag), {
+                containerStyle: [styles.mathContainer, styles.flexContainer,/* { flex: 1 }*/],
+                style: [styles.mathInner, { flex: 1, backgroundColor: 'blue' }]
+            }),
+            React.cloneElement(this.renderFlexItem(this.state.tag), {
+                containerStyle: [styles.mathContainer],
+                style: [styles.mathInner, { flex: 1, backgroundColor: 'blue' }]
+            })
+        ];
     }
     
 

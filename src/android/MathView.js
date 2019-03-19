@@ -22,8 +22,17 @@ import memoize from 'lodash/memoize';
 import uniqueId from 'lodash/uniqueId';
 import isNil from 'lodash/isNil';
 import omit from 'lodash/omit';
+import assign from 'lodash/assign';
 
 import MathViewBase, { MATH_ENGINES } from './MathViewBase';
+
+const actions = {
+    contentLayout: 'contentLayout',
+    contentContainerLayout: 'contentContainerLayout',
+    containerLayout: 'containerLayout',
+    changeMath: 'changeMath',
+    extraData: 'extraData'
+};
 
 class MathView extends React.Component {
     static propTypes = {
@@ -55,8 +64,6 @@ class MathView extends React.Component {
         stubContainerStyle: null,
         stubStyle: null,
         math: null,
-        
-        onLayoutCompleted: () => { },
         initialOpacity: 0.2,
         initialScale: 0,
         extraData: null,
@@ -81,11 +88,11 @@ class MathView extends React.Component {
             prevMath: null,
             lastMeasured: null,
             scale: props.initialScale,
-            prevContentContainerLayout: null,
             containerLayout: null,
             extraData: props.extraData,
             prevCycle: null,
-            lastUpdated: null
+            action: null,
+            actions: []
         };
 
         this.opacityAnimation = new Animated.Value(props.initialOpacity);
@@ -103,59 +110,45 @@ class MathView extends React.Component {
 
     static getDerivedStateFromProps(nextProps, prevState) {
         const common = {
+            //initialized: false,
             //containerLayout: null,
-            contentContainerLayout: null,
-            prevContentContainerLayout: prevState.contentContainerLayout,
-            scale: nextProps.initialScale,
+            //contentContainerLayout: null,
+            //scale: nextProps.initialScale,
             extraData: nextProps.extraData,
-            prevCycle: omit(prevState, 'prevCycle'),
-            lastUpdated: null
+            prevCycle: omit(prevState, 'prevCycle')
+            
         };
 
         if (nextProps.math !== prevState.math) {
             return {
+                ...common,
                 initialized: false,
                 math: nextProps.math,
                 prevMath: prevState.math,
                 contentLayout: null,
-                ...common
+                action: actions.changeMath,
+                actions: [actions.changeMath]
             };
         }
 
         if (nextProps.extraData !== prevState.extraData) {
-            return common;
+            return {
+                ...common,
+                action: actions.extraData,
+                actions: [actions.extraData]
+            };
         }
 
         return null;
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { contentLayout, contentContainerLayout, scale, initialized, prevCycle, lastUpdated } = this.state;
+        const { contentLayout, contentContainerLayout, scale, initialized, prevCycle } = this.state;
         const measuringContent = isNil(contentLayout);
         const measuringContainer = isNil(contentContainerLayout);
         const measuring = measuringContainer || measuringContent;
 
-
-        this.updated = true;
-        const animations = [
-            Animated.spring(this.opacityAnimation, {
-                toValue: contentLayout && contentContainerLayout ? 1 : 0,
-                useNativeDriver: true
-            }),
-            Animated.spring(this.scaleAnimation, {
-                toValue: scale,
-                useNativeDriver: true
-            })
-        ];
-
-
-
-        Animated.parallel(animations)
-            .start(() => {
-                //completedUpdateCycle && this._fireLayoutEvent();
-            });
-
-
+        
 
         if (prevCycle) {
             const changedLayoutByScaling = this.state.initialized && prevCycle.initialized && scale !== prevCycle.scale;
@@ -166,56 +159,100 @@ class MathView extends React.Component {
         }
         
 
-
-        //this._layoutEvent && console.log(lastUpdated, this._layoutEvent.nativeEvent);
-
         if (!measuring) {
-            
+
+            this.updated = true;
+            const animations = [
+                Animated.spring(this.opacityAnimation, {
+                    toValue: contentLayout && contentContainerLayout ? 1 : 0,
+                    useNativeDriver: true
+                }),
+                Animated.spring(this.scaleAnimation, {
+                    toValue: scale,
+                    useNativeDriver: true
+                })
+            ];
+
+
+
+            Animated.parallel(animations)
+                .start(() => {
+                    //completedUpdateCycle && this._fireLayoutEvent();
+                });
         }
         
     }
+
+    scaleReducer() {
+
+    }
     
-    getScale({ contentContainerLayout = this.state.contentContainerLayout, contentLayout = this.state.contentLayout }) {
-        //const currentScale = this.state.scale;
-        let initialized, scale;
-
-        const measuringContent = isNil(contentLayout);
-        const measuringContainer = isNil(contentContainerLayout);
-
-        if (measuringContent || measuringContainer) {
-            scale = 0;
-            if (measuringContent && measuringContainer) {
-                initialized = false;
-            }
-            else {
-                initialized = this.state.initialized;
-            }
+    layoutReducer(action, layout) {
+        if (!actions[action]) {
+            console.error('unknown action', action);
         }
         else {
-            scale = Math.min(contentContainerLayout.width / contentLayout.width, contentContainerLayout.height / contentLayout.height, 1);
-            initialized = true;
-            if (scale < this.state.scale) {
-                this.opacityAnimation.setValue(0);
-                this.scaleAnimation.setValue(0);
+            const actionFlow = this.state.actions;
+            let initialized, scale, state;
+            const contentLayout = action === actions.contentLayout ? layout : this.state.contentLayout;
+            const contentContainerLayout = action === actions.contentContainerLayout ? layout : this.state.contentContainerLayout;
+            const containerLayout = action === actions.containerLayout ? layout : this.state.containerLayout;
+
+            const measuringContent = isNil(contentLayout);
+            const measuringContainer = isNil(contentContainerLayout);
+
+            actionFlow.push(action);
+
+            if (measuringContent || measuringContainer) {
+                scale = 0;
+                if (measuringContent && measuringContainer) {
+                    initialized = false;
+                }
+                else {
+                    initialized = this.state.initialized;
+                }
             }
+            else {
+                scale = Math.min(contentContainerLayout.width / contentLayout.width, contentContainerLayout.height / contentLayout.height, 1);
+                initialized = true;
+                if (scale < this.state.scale) {
+                    this.opacityAnimation.setValue(0);
+                    this.scaleAnimation.setValue(0);
+                }
+            }
+
+            const baseState = {
+                action,
+                actions: actionFlow,
+                [action]: layout
+            };
+
+            const scaleReducer = {
+                scale,
+                initialized
+            };
+
+            
+            switch (action) {
+                case actions.contentLayout:
+                    state = assign(baseState, scaleReducer);
+                    break;
+                case actions.contentContainerLayout:
+                    state = assign(baseState, scaleReducer);
+                    break;
+                case actions.containerLayout:
+                    state = baseState;
+                    break;
+            }
+            
+            return state;
         }
-        
-        return {
-            scale,
-            initialized
-        };
+       
     }
 
     _onContentLayout(math, contentLayout) {
-        const { scale, initialized } = this.getScale({ contentLayout });
-
-        this.setState({
-            contentLayout,
-            lastMeasured: math,
-            scale,
-            initialized,
-            lastUpdated: 'contentLayout'
-        });
+        const state = this.layoutReducer(actions.contentLayout, contentLayout);
+        this.setState(assign(state, { lastMeasured: math }));
         /*
         if (math === this.state.math) {
             
@@ -224,35 +261,28 @@ class MathView extends React.Component {
     }
 
     _onContentContainerLayout(e) {
-        const { layout } = e.nativeEvent;
-        const { width, height } = layout;
-        const contentContainerLayout = { width, height };
-        const { scale, initialized } = this.getScale({ contentContainerLayout });
-        //console.log('@#@#@#', width, height)
-        this.setState({
-            contentContainerLayout,
-            scale,
-            initialized,
-            lastUpdated: 'contentContainerLayout'
-        });
+        const { width, height } = e.nativeEvent.layout;
+        const state = this.layoutReducer(actions.contentContainerLayout, { width, height });
+
+        this.setState(state);
     }
 
     _onContainerLayout(e) {
-        const measuringContainer = isNil(this.state.contentContainerLayout);
-        this._layoutEvent = null;
-        //console.log('!!!!!', this.stylable)
-
         e.persist();
         this._layoutEvent = e;
-        const { width, height } = e.nativeEvent.layout;
-        this.setState({
-            containerLayout: { width, height },
-            lastUpdated: 'containerLayout'
-        });
 
+        const { width, height } = e.nativeEvent.layout;
+        const state = this.layoutReducer(actions.containerLayout, { width, height });
+
+        this.setState(state);
+
+        /*const measuringContainer = isNil(this.state.contentContainerLayout);
+
+         *  this._layoutEvent = null;
         if (!measuringContainer) {
             
         }
+        */
     }
 
     _fireLayoutEvent() {
@@ -265,6 +295,16 @@ class MathView extends React.Component {
 
     get stylable() {
         const { contentLayout, scale } = this.state;
+
+        return contentLayout && scale ? {
+            minWidth: contentLayout.width * scale,
+            minHeight: contentLayout.height * scale
+        } : null;
+    }
+
+    get transitionStylable() {
+        const { contentLayout } = this.state;
+        const scale = 1;
 
         return contentLayout && scale ? {
             minWidth: contentLayout.width * scale,
@@ -323,7 +363,7 @@ class MathView extends React.Component {
     /**self-measuring flex view */
     measureFromOutsideIn() {
         const { style, containerStyle, stubContainerStyle, stubStyle } = this.props;
-        const { prevContentContainerLayout, containerLayout, contentContainerLayout, math, contentLayout, scale, initialized } = this.state;
+        const { containerLayout, contentContainerLayout, math, contentLayout, scale, initialized, prevCycle } = this.state;
 
         const measuringContent = isNil(contentLayout);
         const measuringContainer = isNil(contentContainerLayout);
@@ -343,7 +383,7 @@ class MathView extends React.Component {
                     style={[style, this.stylable, hideMainViews && styles.transparent]}
                 >
                     <View
-                        style={[stubStyle, StyleSheet.absoluteFill, scaling ? prevContentContainerLayout : styles.transparent]}
+                        style={[stubStyle, StyleSheet.absoluteFill, scaling ? prevCycle && prevCycle.contentContainerLayout : styles.transparent]}
                     />
                     <View
                         style={[StyleSheet.absoluteFill, styles.default]}
@@ -361,7 +401,7 @@ class MathView extends React.Component {
     measureFromInsideOut() {
 
         const { style, containerStyle, stubContainerStyle, stubStyle, extraData } = this.props;
-        const { prevContentContainerLayout, containerLayout, contentContainerLayout, math, contentLayout, scale, initialized, prevCycle } = this.state;
+        const { containerLayout, contentContainerLayout, math, contentLayout, scale, initialized, prevCycle } = this.state;
 
         const measuringContent = isNil(contentLayout);
         const measuringContainer = isNil(contentContainerLayout);
@@ -383,9 +423,9 @@ class MathView extends React.Component {
                     <View
                         style={[stubStyle, StyleSheet.absoluteFill, /*styles.default,*/ scaling ? this.prevStylable : styles.transparent]}
                     />
-                    <View style={[style, StyleSheet.absoluteFill, contentLayout, styles.default, extraData && { maxWidth: extraData }, styles.transparent]}>
+                    <View style={[style, this.transitionStylable, StyleSheet.absoluteFill, styles.default, extraData && { maxWidth: extraData }, styles.transparent]}>
                         <View
-                            style={[/*style,*/ styles.default]}
+                            style={[/*style,*/ styles.default, {backgroundColor:'red'}]}
                             onLayout={this._onContentContainerLayout}
                         />
                     </View>
@@ -400,6 +440,9 @@ class MathView extends React.Component {
     }
 
     render() {
+        console.log(this.state);
+        console.log(this.stylable);
+        console.log('___________________________________________________')
         return this.measureFromInsideOut();
     }
 }

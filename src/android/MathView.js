@@ -17,10 +17,12 @@ import ReactNative, {
     findNodeHandle, 
     FlatList
 } from 'react-native';
+
 import memoize from 'lodash/memoize';
 import uniqueId from 'lodash/uniqueId';
 import isNil from 'lodash/isNil';
-import * as _ from 'lodash';
+import omit from 'lodash/omit';
+
 import MathViewBase, { MATH_ENGINES } from './MathViewBase';
 import ViewOverflow from 'react-native-view-overflow';
 
@@ -101,31 +103,28 @@ class MathView extends React.Component {
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
+        const common = {
+            //containerLayout: null,
+            contentContainerLayout: null,
+            prevContentContainerLayout: prevState.contentContainerLayout,
+            scale: nextProps.initialScale,
+            extraData: nextProps.extraData,
+            prevCycle: omit(prevState, 'prevCycle'),
+            lastUpdated: null
+        };
+
         if (nextProps.math !== prevState.math) {
             return {
                 initialized: false,
                 math: nextProps.math,
                 prevMath: prevState.math,
                 contentLayout: null,
-                contentContainerLayout: null,
-                prevContentContainerLayout: prevState.contentContainerLayout,
-                scale: nextProps.initialScale,
-                extraData: nextProps.extraData,
-                prevCycle: _.omit(prevState, 'prevCycle'),
-                lastUpdated: null
+                ...common
             };
         }
 
         if (nextProps.extraData !== prevState.extraData) {
-            return {
-                //containerLayout: null,
-                contentContainerLayout: null,
-                prevContentContainerLayout: prevState.contentContainerLayout,
-                scale: nextProps.initialScale,
-                extraData: nextProps.extraData,
-                prevCycle: _.omit(prevState, 'prevCycle'),
-                lastUpdated: null
-            };
+            return common;
         }
 
         return null;
@@ -323,7 +322,7 @@ class MathView extends React.Component {
     }
 
     /**self-measuring flex view */
-    render10() {
+    measureFromOutsideIn() {
         const { style, containerStyle, stubContainerStyle, stubStyle } = this.props;
         const { prevContentContainerLayout, containerLayout, contentContainerLayout, math, contentLayout, scale, initialized } = this.state;
 
@@ -360,7 +359,7 @@ class MathView extends React.Component {
     }
 
     /**flexWrap */
-    render() {
+    measureFromInsideOut() {
 
         const { style, containerStyle, stubContainerStyle, stubStyle, extraData } = this.props;
         const { prevContentContainerLayout, containerLayout, contentContainerLayout, math, contentLayout, scale, initialized, prevCycle } = this.state;
@@ -399,6 +398,10 @@ class MathView extends React.Component {
                 </View>
             </View>
         );
+    }
+
+    render() {
+        return this.measureFromInsideOut();
     }
 }
 

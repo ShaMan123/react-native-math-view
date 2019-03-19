@@ -27,17 +27,17 @@ export default class App extends Component {
             ],
             width: Dimensions.get('window').width,
             fontScale: 1,
-            state: 0,
+            state: 1,
             tag: MathStrings.calculus.filter((obj) => obj.math)[0],
             mip: false,
-            singleton: false
+            singleton: true
         }
         
     }
     
     componentDidMount() {
         let i = 0;
-        const interval = 7000;
+        const interval = 4000;
         const tags = MathStrings.calculus.filter((obj) => obj.math);
         
         this.t = setInterval(() => {
@@ -70,7 +70,8 @@ export default class App extends Component {
                 onPress={() => Alert.alert(`LaTeX: ${string}`)}
                 extraData={this.state.width}
                 animated
-                onLayout={(e) => console.log(e.nativeEvent)}
+                onContainerLayout={(e) => console.log('onContainerLayout', e.nativeEvent)}
+                onLayout={(e) => console.log('onLayout', e.nativeEvent)}
             />
         );
     }
@@ -161,21 +162,58 @@ export default class App extends Component {
 
     render3() {
         return React.cloneElement(this.renderFlexItem(this.state.tag), {
-            containerStyle: [styles.mathContainer,styles.flexContainer, { flex: 1 }],
-            style: [/*styles.mathInner,*/ { flex: 1 }],
+            containerStyle: [styles.mathContainer, styles.flexContainer, { flex: 1 }, { minWidth: 200, minHeight: 150 }],
+            style: [styles.mathInner, { flex: 1 }],
             //extraData: this.state.width
         })
     }
 
     render0() {
+        const data = [
+            {
+                containerStyle: [styles.mathContainer, styles.flexContainer,/* { flex: 1 }*/],
+                style: [/*styles.mathInner,*/ { /*flex: 1,*/ backgroundColor: 'blue' }]
+            },
+            {
+                containerStyle: [styles.mathContainer],
+                style: [/*styles.mathInner,*/ { /*flex: 1,*/ backgroundColor: 'blue' }]
+            },
+            {
+                containerStyle: [styles.mathContainer, styles.flexContainer,/* { flex: 1 }*/],
+                style: [/*styles.mathInner,*/ { flex: 1, backgroundColor: 'blue' }]
+            },
+            {
+                containerStyle: [styles.mathContainer, styles.flexContainer,/* { flex: 1 }*/],
+                style: [styles.mathInner, { flex: 1, backgroundColor: 'blue' }]
+            },
+            {
+                containerStyle: [styles.mathContainer, {minWidth: 200, minHeight: 150}],
+                style: [styles.mathInner, { flex: 1, backgroundColor: 'blue', minWidth: 200, minHeight:50 }]
+            }
+        ];
+
         return (
-            <View>
-                {this.renderStandalones()}
-            </View>
+            <FlatList
+                scrollEnabled
+                renderItem={({ item, index }) => React.cloneElement(this.renderFlexItem(this.state.tag), item)}
+                data={this.state.singleton ? [data[0]] : data}
+                onRefresh={() => {
+                    this.setState((prevState) => {
+                        return {
+                            singleton: !prevState.singleton
+                        };
+                    });
+                }}
+                keyExtractor={(item, index) => `math:standalone:${index}`}
+                refreshing={this.state.refreshing}
+                style={{ flex: 1 }}
+                extraData={this.state.width}
+            />
         );
+        
     }
 
-    renderStandalones() {
+    renderStandalones(index) {
         return [
             React.cloneElement(this.renderFlexItem(this.state.tag), {
                 containerStyle: [styles.mathContainer, styles.flexContainer,/* { flex: 1 }*/],
@@ -197,7 +235,7 @@ export default class App extends Component {
                 containerStyle: [styles.mathContainer],
                 style: [styles.mathInner, { flex: 1, backgroundColor: 'blue' }]
             })
-        ];
+        ][index];
     }
     
 

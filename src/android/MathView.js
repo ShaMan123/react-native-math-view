@@ -24,7 +24,6 @@ import isNil from 'lodash/isNil';
 import omit from 'lodash/omit';
 
 import MathViewBase, { MATH_ENGINES } from './MathViewBase';
-import ViewOverflow from 'react-native-view-overflow';
 
 class MathView extends React.Component {
     static propTypes = {

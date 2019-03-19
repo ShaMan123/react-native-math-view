@@ -5,6 +5,7 @@ import * as _ from 'lodash';
 import MathView from 'react-native-math-view';
 import * as MathStrings from './math';
 
+
 YellowBox.ignoreWarnings(['Warning: `flexWrap: `wrap`` is not supported with the `VirtualizedList` components.']);
 
 export default class App extends Component {
@@ -24,13 +25,14 @@ export default class App extends Component {
                     keyExtractor: (item) => `trig:${item.string}`
                 }
             ],
-            width: Dimensions.get('window').width - 50,
-            tag: null,
+            width: Dimensions.get('window').width,
             fontScale: 1,
-            state: 0
+            state: 1,
+            tag: MathStrings.calculus.filter((obj) => obj.math)[0],
+            mip: false,
+            singleton: true
         }
-
-        this.ref = React.createRef();
+        
     }
     
     componentDidMount() {
@@ -40,8 +42,9 @@ export default class App extends Component {
         
         this.t = setInterval(() => {
             this.setState({
-                width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width - 50),
-                tag: tags[i%tags.length]
+                width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
+                tag: tags[i % tags.length],
+                mip: true
             });
             i++;
         }, interval);
@@ -54,56 +57,64 @@ export default class App extends Component {
 
     renderFlexItem(item) {
         const { string } = item;
+
         return (
             <MathView
                 containerStyle={[styles.mathContainer]}
-                style={[styles.mathInner, { maxWidth: this.state.width }]}
+                style={[styles.mathInner]}
+                stubContainerStyle={{ backgroundColor: 'orange' }}
+                stubStyle={{ backgroundColor: 'blue' }}
                 math={string}
                 fontColor='white'
-                //layoutProvider={this.ref}
                 fallback={'frisck'}
                 onPress={() => Alert.alert(`LaTeX: ${string}`)}
-            //onLayoutCompleted={(e)=>console.log(e.nativeEvent)}
+                extraData={this.state.width}
+                animated
+                onContainerLayout={(e) => console.log('onContainerLayout', e.nativeEvent)}
+                onLayout={(e) => console.log('onLayout', e.nativeEvent)}
             />
         );
     }
 
     renderItem(item) {
         return (
-            <View style={[styles.flexContainer, { flex: 1, backgroundColor: 'pink', margin: 5 }]}>
+            <View style={[styles.flexContainer, { flex: 1, backgroundColor: 'pink', marginVertical: 5 }]}>
                 {this.renderFlexItem(item)}
             </View>
         );
     }
 
     render2() {
+        const data = _.flatten(this.state.sections.map(s => s.data));
         return (
-            <View style={[styles.container]} ref={this.ref}>
+            <View style={[{ flex: 1, maxWidth: this.state.width }]}>
                 <FlatList
                     scrollEnabled
-                    renderItem={({ item, index, section }) => this.renderFlexItem(item)}
+                    renderItem={({ item, index, section }) => this.renderItem(item)}
                     renderSectionHeader={({ section: { title } }) => <Text>{title}</Text>}
-                    data={_.flatten(this.state.sections.map(s => s.data))}
+                    data={this.state.singleton ? [data.shift()] : data}
                     onRefresh={() => {
                         this.setState({
                             sections: [
                                 {
                                     title: 'calculus',
-                                    data: MathStrings.calculus.filter((obj) => obj.math),
-                                    keyExtractor: (item) => `calculus:${item.string}` + new Date().valueOf()
+                                    data: this.state.sections[0].data.reverse(),
+                                    keyExtractor: (item) => `calculus:${item.string}`
                                 },
                                 {
                                     title: 'trig',
-                                    data: MathStrings.trig.filter((obj) => obj.math),
-                                    keyExtractor: (item) => `trig:${item.string}` + new Date().valueOf()
+                                    data: this.state.sections[1].data.reverse(),
+                                    keyExtractor: (item) => `trig:${item.string}`
                                 }
                             ]
                         })
                     }}
+                    keyExtractor={(item) => `math:flexWrap:${item.string}`}
                     refreshing={this.state.refreshing}
-                    contentContainerStyle={[styles.flexContainer]}
-                    keyExtractor={(item) => `${item.string}`}
-                    style={{flex:1, backgroundColor:'pink'}}
+                    style={{ flex: 1 }}
+                    extraData={this.state.width}
+                    //CellRendererComponent={()=><View style={{ flex: 1, minWidth: 30, margin: 10, minHeight: 35, backgroundColor: 'purple' }} />}
+                    contentContainerStyle={/*this.state.mip && */[{flexWrap:'wrap', display:'flex',flexDirection:'row'}]}
                 />
             </View>
         );
@@ -111,62 +122,140 @@ export default class App extends Component {
     
     render1() {
         return (
-            <View style={[{ flex: 1 }]} ref={this.ref}>
+            <View style={[{ flex: 1, maxWidth: this.state.width }]}>
                 <SectionList
                     scrollEnabled
                     renderItem={({ item, index, section }) => this.renderItem(item)}
                     renderSectionHeader={({ section: { title } }) => <Text>{title}</Text>}
-                    sections={this.state.sections}
+                    sections={this.state.singleton? [
+                        {
+                            title: 'calculus',
+                            data: [this.state.sections[0].data[0]],
+                            keyExtractor: (item) => `calculus:${item.string}`
+                        }
+                    ] : this.state.sections}
+                    //sections={this.state.sections}
                     onRefresh={() => {
                         this.setState({
                             sections: [
                                 {
                                     title: 'calculus',
-                                    data: MathStrings.calculus.filter((obj) => obj.math),
-                                    keyExtractor: (item) => `calculus:${item.string}` + new Date().valueOf()
+                                    data: this.state.sections[0].data.reverse(),
+                                    keyExtractor: (item) => `calculus:${item.string}`
                                 },
                                 {
                                     title: 'trig',
-                                    data: MathStrings.trig.filter((obj) => obj.math),
-                                    keyExtractor: (item) => `trig:${item.string}` + new Date().valueOf()
+                                    data: this.state.sections[1].data.reverse(),
+                                    keyExtractor: (item) => `trig:${item.string}`
                                 }
                             ]
                         })
                     }}
                     refreshing={this.state.refreshing}
-                    style={{flex:1}}
+                    style={{ flex: 1 }}
+                    extraData={this.state.width}
+                    //contentContainerStyle={this.state.mip && styles.flexContainer}
                 />
             </View>
         );
     }
 
+    render3() {
+        return React.cloneElement(this.renderFlexItem(this.state.tag), {
+            containerStyle: [styles.mathContainer, styles.flexContainer, { flex: 1 }, { minWidth: 200, minHeight: 150 }],
+            style: [styles.mathInner, { flex: 1 }],
+            //extraData: this.state.width
+        })
+    }
+
     render0() {
+        const data = [
+            {
+                containerStyle: [styles.mathContainer, styles.flexContainer,/* { flex: 1 }*/],
+                style: [/*styles.mathInner,*/ { /*flex: 1,*/ backgroundColor: 'blue' }]
+            },
+            {
+                containerStyle: [styles.mathContainer],
+                style: [/*styles.mathInner,*/ { /*flex: 1,*/ backgroundColor: 'blue' }]
+            },
+            {
+                containerStyle: [styles.mathContainer, styles.flexContainer,/* { flex: 1 }*/],
+                style: [/*styles.mathInner,*/ { flex: 1, backgroundColor: 'blue' }]
+            },
+            {
+                containerStyle: [styles.mathContainer, styles.flexContainer,/* { flex: 1 }*/],
+                style: [styles.mathInner, { flex: 1, backgroundColor: 'blue' }]
+            },
+            {
+                containerStyle: [styles.mathContainer, {minWidth: 200, minHeight: 150}],
+                style: [styles.mathInner, { flex: 1, backgroundColor: 'blue', minWidth: 200, minHeight:50 }]
+            }
+        ];
+
         return (
-            <View style={[{ flex: 1, backgroundColor: 'pink' }, styles.flexContainer, styles.centerContent]}>
-                {this.state.tag && React.cloneElement(this.renderFlexItem(this.state.tag), { style: [{backgroundColor:'blue'}]})}
-            </View>
+            <FlatList
+                scrollEnabled
+                renderItem={({ item, index }) => React.cloneElement(this.renderFlexItem(this.state.tag), item)}
+                data={this.state.singleton ? [data[0]] : data}
+                onRefresh={() => {
+                    this.setState((prevState) => {
+                        return {
+                            singleton: !prevState.singleton
+                        };
+                    });
+                }}
+                keyExtractor={(item, index) => `math:standalone:${index}`}
+                refreshing={this.state.refreshing}
+                style={{ flex: 1 }}
+                extraData={this.state.width}
+            />
         );
+        
+    }
+
+    renderStandalones(index) {
+        return [
+            React.cloneElement(this.renderFlexItem(this.state.tag), {
+                containerStyle: [styles.mathContainer, styles.flexContainer,/* { flex: 1 }*/],
+                style: [/*styles.mathInner,*/ { /*flex: 1,*/ backgroundColor: 'blue' }]
+            }),
+            React.cloneElement(this.renderFlexItem(this.state.tag), {
+                containerStyle: [styles.mathContainer],
+                style: [/*styles.mathInner,*/ { /*flex: 1,*/ backgroundColor: 'blue' }]
+            }),
+            React.cloneElement(this.renderFlexItem(this.state.tag), {
+                containerStyle: [styles.mathContainer, styles.flexContainer,/* { flex: 1 }*/],
+                style: [/*styles.mathInner,*/ { flex: 1, backgroundColor: 'blue' }]
+            }),
+            React.cloneElement(this.renderFlexItem(this.state.tag), {
+                containerStyle: [styles.mathContainer, styles.flexContainer,/* { flex: 1 }*/],
+                style: [styles.mathInner, { flex: 1, backgroundColor: 'blue' }]
+            }),
+            React.cloneElement(this.renderFlexItem(this.state.tag), {
+                containerStyle: [styles.mathContainer],
+                style: [styles.mathInner, { flex: 1, backgroundColor: 'blue' }]
+            })
+        ][index];
     }
     
 
     render() {
-        console.log(this.state.state)
         return (
             <View style={{ flex: 1 }}>
                 <View style={{ flex: 1 }}>
                     {this[`render${this.state.state}`]()}
-                    </View>
+                </View>
                 <Button
                     //style={{bottom: 0}}
                     onPress={() => this.setState((prev) => {
-                        return { state: (prev.state + 1) % 3 };
+                        return { state: (prev.state + 1) % 4 };
                     })}
                     title="press to change view"
                 />
             </View>
         );
-        }
     }
+}
     
 const styles = StyleSheet.create({
     container: {
@@ -181,20 +270,30 @@ const styles = StyleSheet.create({
         flexDirection: 'row',//styleUtil.row,
         flexWrap: 'wrap',
         justifyContent: 'flex-start',
-        alignItems: 'center'
+        alignItems: 'center',
+        
+    },
+    mathWrapper: {
+        backgroundColor: 'red',
+        borderRadius: 50,
+        //margin: 5,
     },
     mathContainer: {
-        borderRadius: 50,
-        margin: 5,
-        padding: 10,
+        
+        marginVertical: 15,
+        marginHorizontal: 5,
+        minHeight: 40,
         justifyContent: 'center',
-        backgroundColor: 'red'
+        backgroundColor: 'orange',
+        
     },
     mathInner: {
         height: 35,
         minWidth: 35,
+        //marginHorizontal: 35,
+        padding: 5,
         justifyContent: 'center',
-        backgroundColor: 'blue'
+        backgroundColor: 'blue',
     },
     centerContent: {
         justifyContent: 'center',

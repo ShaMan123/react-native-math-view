@@ -27,8 +27,9 @@ export default class App extends Component {
             ],
             width: Dimensions.get('window').width,
             fontScale: 1,
-            state: 0,
-            tag: MathStrings.calculus.filter((obj) => obj.math)[0]
+            state: 2,
+            tag: MathStrings.calculus.filter((obj) => obj.math)[0],
+            mip: false
         }
 
         this.ref = React.createRef();
@@ -36,13 +37,14 @@ export default class App extends Component {
     
     componentDidMount() {
         let i = 0;
-        const interval = 3000;
+        const interval = 5000;
         const tags = MathStrings.calculus.filter((obj) => obj.math);
         
         this.t = setInterval(() => {
             this.setState({
                 //width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
-                tag: tags[i%tags.length]
+                tag: tags[i % tags.length],
+                mip: true
             });
             i++;
         }, interval);
@@ -58,8 +60,8 @@ export default class App extends Component {
 
         return (
             <MathView
-                containerStyle={styles.mathContainer}
-                style={styles.mathInner}
+                containerStyle={[styles.mathContainer]}
+                style={[styles.mathInner]}
                 stubContainerStyle={{ backgroundColor: 'orange' }}
                 stubStyle={{ backgroundColor: 'blue' }}
                 math={string}
@@ -107,7 +109,7 @@ export default class App extends Component {
         );
     }
 
-    render2() {
+    render222() {
         return (
             <View style={[styles.container, { maxWidth: this.state.width }]} ref={this.ref}>
                 <FlatList
@@ -140,9 +142,9 @@ export default class App extends Component {
         );
     }
 
-    render1() {
+    render2() {
         return (
-            <View style={[{ flex: 1, maxWidth: this.state.width }]} ref={this.ref}>
+            <View style={[{ flex: 1, maxWidth: this.state.width }]}>
                 <FlatList
                     scrollEnabled
                     renderItem={({ item, index, section }) => this.renderItem(item)}
@@ -167,13 +169,14 @@ export default class App extends Component {
                     refreshing={this.state.refreshing}
                     style={{ flex: 1 }}
                     extraData={this.state.width}
-                    contentContainerStyle={[{flexWrap:'wrap', display:'flex',flexDirection:'row'}]}
+                    //CellRendererComponent={()=><View style={{ flex: 1, minWidth: 30, margin: 10, minHeight: 35, backgroundColor: 'purple' }} />}
+                    contentContainerStyle={/*this.state.mip && */[{flexWrap:'wrap', display:'flex',flexDirection:'row'}]}
                 />
             </View>
         );
     }
     
-    render100() {
+    render1() {
         return (
             <View style={[{ flex: 1, maxWidth: this.state.width }]} ref={this.ref}>
                 <SectionList
@@ -207,7 +210,7 @@ export default class App extends Component {
                     refreshing={this.state.refreshing}
                     style={{ flex: 1 }}
                     extraData={this.state.width}
-
+                    //contentContainerStyle={this.state.mip && styles.flexContainer}
                 />
             </View>
         );
@@ -269,8 +272,8 @@ const styles = StyleSheet.create({
         //margin: 5,
     },
     mathContainer: {
-        margin: 5,
-        padding: 10,
+        //margin: 5,
+        padding: 50,
         justifyContent: 'center',
         backgroundColor: 'orange',
         

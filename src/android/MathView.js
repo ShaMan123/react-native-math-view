@@ -149,7 +149,7 @@ class MathView extends React.Component {
         
 
 
-        this._layoutEvent && console.log(lastUpdated, this._layoutEvent.nativeEvent);
+        //this._layoutEvent && console.log(lastUpdated, this._layoutEvent.nativeEvent);
 
         if (!measuring) {
             this.updated = true;
@@ -229,7 +229,7 @@ class MathView extends React.Component {
         const { width, height } = layout;
         const contentContainerLayout = { width, height };
         const { scale, prevScale, initialized } = this.getScale({ contentContainerLayout });
-
+        //console.log('@#@#@#', width, height)
         this.setState({
             contentContainerLayout,
             scale,
@@ -310,6 +310,42 @@ class MathView extends React.Component {
     }
 
     render() {
+        const { style, containerStyle, stubContainerStyle, stubStyle, extraData } = this.props;
+        const { prevContainerLayout, containerLayout, contentContainerLayout, math, contentLayout, scale, initialized } = this.state;
+
+        const measuringContent = isNil(contentLayout);
+        const measuringContainer = isNil(contentContainerLayout);
+        const scaling = measuringContainer && !measuringContent && initialized;
+        const measuring = measuringContainer || measuringContent;
+        const hideMainViews = initialized ? measuringContainer : measuring;
+
+        return (
+            <View
+                style={[containerStyle, ...([contentLayout, extraData && {maxWidth:extraData}]), hideMainViews && styles.transparent]}
+                onLayout={this._onContainerLayout}
+            >
+                <View
+                    style={[stubContainerStyle, StyleSheet.absoluteFill, scaling ? containerLayout : styles.transparent]}
+                />
+                <View
+                    style={[style, this.stylable, hideMainViews && styles.transparent]}
+                >
+                    <View
+                        style={[stubStyle, StyleSheet.absoluteFill, scaling ? prevContainerLayout : styles.transparent]}
+                    />
+                    <View
+                        style={[StyleSheet.absoluteFill, styles.default]}
+                        onLayout={this._onContentContainerLayout}
+                    />
+                    <View style={[StyleSheet.absoluteFill, styles.default, styles.centerContent, hideMainViews && styles.invisible]}>
+                        {this.renderChangeHandler()}
+                    </View>
+                </View>
+            </View>
+        );
+    }
+
+    render10() {
         const { style, containerStyle, stubContainerStyle, stubStyle } = this.props;
         const { prevContainerLayout, containerLayout, contentContainerLayout, math, contentLayout, scale, initialized } = this.state;
 

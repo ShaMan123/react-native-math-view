@@ -148,34 +148,20 @@ class MathView extends React.Component {
         const measuringContainer = isNil(contentContainerLayout);
         const measuring = measuringContainer || measuringContent;
 
-        
-
-        if (prevCycle) {
-            const changedLayoutByScaling = this.state.initialized && prevCycle.initialized && scale !== prevCycle.scale;
-            const changeLayoutByChanging = !this.state.prevMath || this.state.math !== prevCycle.math;
-            const completedUpdateCycle = initialized /*&& scale === prevScale;*/
-
-            const shouldFireLayoutEvent = completedUpdateCycle && (changedLayoutByScaling || changeLayoutByChanging);
-        }
-        
-
-        if (!measuring) {
-
-            this.updated = true;
+        if (!measuring && initialized) {
             const animations = [
-                Animated.spring(this.opacityAnimation, {
-                    toValue: contentLayout && contentContainerLayout ? 1 : 0,
-                    useNativeDriver: true
-                }),
                 Animated.spring(this.scaleAnimation, {
                     toValue: scale,
+                    useNativeDriver: true
+                    //duration: initialized? 100: 500
+                }),
+                Animated.spring(this.opacityAnimation, {
+                    toValue: contentLayout && contentContainerLayout ? 1 : 0,
                     useNativeDriver: true
                 })
             ];
 
-
-
-            Animated.parallel(animations)
+            Animated.stagger(250, animations)
                 .start(() => {
                     //completedUpdateCycle && this._fireLayoutEvent();
                 });
@@ -183,10 +169,6 @@ class MathView extends React.Component {
         
     }
 
-    scaleReducer() {
-
-    }
-    
     layoutReducer(action, layout) {
         if (!actions[action]) {
             console.error('unknown action', action);
@@ -410,8 +392,8 @@ class MathView extends React.Component {
         const hideMainViews = initialized ? measuringContainer : measuring;
 
         return (
-            <View
-                style={[containerStyle, /*contentLayout,*/ hideMainViews && styles.transparent]}
+            <Animated.View
+                style={[containerStyle, /*contentLayout,*/ hideMainViews && styles.transparent, {opacity: this.opacityAnimation}]}
                 onLayout={this._onContainerLayout}
             >
                 <View
@@ -425,7 +407,7 @@ class MathView extends React.Component {
                     />
                     <View style={[style, this.transitionStylable, StyleSheet.absoluteFill, styles.default, extraData && { maxWidth: extraData }, styles.transparent]}>
                         <View
-                            style={[/*style,*/ styles.default, {backgroundColor:'red'}]}
+                            style={[/*style,*/ styles.default]}
                             onLayout={this._onContentContainerLayout}
                         />
                     </View>
@@ -435,7 +417,7 @@ class MathView extends React.Component {
                         </View>
                     </View>
                 </View>
-            </View>
+            </Animated.View>
         );
     }
 
@@ -463,7 +445,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent'
     },
     invisible: {
-        //opacity: 0
+        opacity: 0
     }
 });
 

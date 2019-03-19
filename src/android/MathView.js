@@ -336,12 +336,13 @@ class MathView extends React.Component {
                     <View
                         style={[stubStyle, StyleSheet.absoluteFill, scaling ? prevContainerLayout : styles.transparent]}
                     />
-                    <View style={[style, StyleSheet.absoluteFill, contentLayout/*,styles.default*/, mip, {backgroundColor:'red'}]}>
-                    <View
-                        style={[/*style,*/ styles.default]}
-                        onLayout={this._onContentContainerLayout}
+                    <View style={[style, StyleSheet.absoluteFill, contentLayout, styles.default, mip, styles.transparent]}>
+                        <View
+                            style={[/*style,*/ styles.default]}
+                            onLayout={this._onContentContainerLayout}
                         />
-                        </View>
+
+                    </View>
                     <View style={[StyleSheet.absoluteFill, styles.default, styles.centerContent, hideMainViews && styles.invisible]}>
                         {this.renderChangeHandler()}
                     </View>

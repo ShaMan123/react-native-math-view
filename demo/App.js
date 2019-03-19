@@ -41,7 +41,7 @@ export default class App extends Component {
         
         this.t = setInterval(() => {
             this.setState({
-                //width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
+                width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
                 tag: tags[i % tags.length],
                 mip: true
             });
@@ -82,22 +82,7 @@ export default class App extends Component {
             </View>
         );
     }
-
-    renderTestFlexItem(item) {
-        const { string } = item;
-        return (
-            <MathView
-                containerStyle={[/*styles.flexContainer,*/ {backgroundColor:'red',margin:15}/* { flex: 1, maxHeight: 50 }/*{ maxWidth: this.state.width }*/]}
-                style={[styles.mathInner, styles.flexContainer]}
-                math={string}
-                fontColor='white'
-                fallback={'frisck'}
-                onPress={() => Alert.alert(`LaTeX: ${string}`)}
-                
-            //onLayoutCompleted={(e)=>console.log(e.nativeEvent)}
-            />
-        );
-    }
+    /*
 
     renderTestItem(item) {
         const { string } = item;
@@ -151,13 +136,13 @@ export default class App extends Component {
             </View>
         );
     }
-
+    */
     render2() {
         return (
             <View style={[{ flex: 1, maxWidth: this.state.width }]}>
                 <FlatList
                     scrollEnabled
-                    renderItem={({ item, index, section }) => this.renderTestItem(item)}
+                    renderItem={({ item, index, section }) => this.renderItem(item)}
                     renderSectionHeader={({ section: { title } }) => <Text>{title}</Text>}
                     data={_.flatten(this.state.sections.map(s => s.data))}
                     onRefresh={() => {
@@ -228,7 +213,7 @@ export default class App extends Component {
 
     render0() {
         return (
-            <View style={[{ backgroundColor: 'pink' }, styles.centerContent]}>
+            <View style={[{ backgroundColor: 'pink', flex:1 }, styles.centerContent]}>
                 <View style={styles.flexContainer}>
                     {this.state.tag && React.cloneElement(this.renderFlexItem(this.state.tag), {
                         stubContainerStyle: null,
@@ -242,7 +227,6 @@ export default class App extends Component {
     
 
     render() {
-        console.log(this.state.state)
         return (
             <View style={{ flex: 1 }}>
                 <View style={{ flex: 1 }}>
@@ -292,10 +276,10 @@ const styles = StyleSheet.create({
     mathInner: {
         height: 35,
         minWidth: 35,
-        marginHorizontal: 35,
+        //marginHorizontal: 35,
         padding: 5,
         justifyContent: 'center',
-        backgroundColor: 'blue',
+        backgroundColor: 'green',
     },
     centerContent: {
         justifyContent: 'center',

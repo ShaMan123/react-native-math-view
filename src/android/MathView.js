@@ -81,7 +81,7 @@ class MathView extends React.Component {
             lastMeasured: null,
             scale: props.initialScale,
             prevScale: null,
-            prevContainerLayout: null,
+            prevContentContainerLayout: null,
             containerLayout: null,
             extraData: props.extraData,
             prevCycle: null,
@@ -109,7 +109,7 @@ class MathView extends React.Component {
                 prevMath: prevState.math,
                 contentLayout: null,
                 contentContainerLayout: null,
-                prevContainerLayout: prevState.contentContainerLayout,
+                prevContentContainerLayout: prevState.contentContainerLayout,
                 scale: nextProps.initialScale,
                 prevScale: prevState.scale,
                 extraData: nextProps.extraData,
@@ -120,8 +120,9 @@ class MathView extends React.Component {
 
         if (nextProps.extraData !== prevState.extraData) {
             return {
+                //containerLayout: null,
                 contentContainerLayout: null,
-                prevContainerLayout: prevState.contentContainerLayout,
+                prevContentContainerLayout: prevState.contentContainerLayout,
                 scale: nextProps.initialScale,
                 prevScale: prevState.scale,
                 extraData: nextProps.extraData,
@@ -175,7 +176,7 @@ class MathView extends React.Component {
     }
     
     getScale({ contentContainerLayout = this.state.contentContainerLayout, contentLayout = this.state.contentLayout }) {
-        const currentScale = this.state.scale;
+        //const currentScale = this.state.scale;
         let initialized, scale;
 
         const measuringContent = isNil(contentLayout);
@@ -201,19 +202,17 @@ class MathView extends React.Component {
         
         return {
             scale,
-            prevScale: currentScale,
             initialized
         };
     }
 
     _onContentLayout(math, contentLayout) {
-        const { scale, prevScale, initialized } = this.getScale({ contentLayout });
+        const { scale, initialized } = this.getScale({ contentLayout });
 
         this.setState({
             contentLayout,
             lastMeasured: math,
             scale,
-            prevScale,
             initialized,
             lastUpdated: 'contentLayout'
         });
@@ -228,12 +227,11 @@ class MathView extends React.Component {
         const { layout } = e.nativeEvent;
         const { width, height } = layout;
         const contentContainerLayout = { width, height };
-        const { scale, prevScale, initialized } = this.getScale({ contentContainerLayout });
+        const { scale, initialized } = this.getScale({ contentContainerLayout });
         //console.log('@#@#@#', width, height)
         this.setState({
             contentContainerLayout,
             scale,
-            prevScale,
             initialized,
             lastUpdated: 'contentContainerLayout'
         });
@@ -244,14 +242,16 @@ class MathView extends React.Component {
         this._layoutEvent = null;
         //console.log('!!!!!', this.stylable)
 
+        e.persist();
+        this._layoutEvent = e;
+        const { width, height } = e.nativeEvent.layout;
+        this.setState({
+            containerLayout: { width, height },
+            lastUpdated: 'containerLayout'
+        });
+
         if (!measuringContainer) {
-            e.persist();
-            this._layoutEvent = e;
-            const { width, height } = e.nativeEvent.layout;
-            this.setState({
-                containerLayout: { width, height },
-                lastUpdated: 'containerLayout'
-            });
+            
         }
     }
 
@@ -266,6 +266,15 @@ class MathView extends React.Component {
     get stylable() {
         const { contentLayout, scale } = this.state;
 
+        return contentLayout && scale ? {
+            minWidth: contentLayout.width * scale,
+            minHeight: contentLayout.height * scale
+        } : null;
+    }
+
+    get prevStylable() {
+        const { prevCycle } = this.state;
+        const { scale, contentLayout } = prevCycle;
         return contentLayout && scale ? {
             minWidth: contentLayout.width * scale,
             minHeight: contentLayout.height * scale
@@ -313,14 +322,13 @@ class MathView extends React.Component {
     render() {
 
         const { style, containerStyle, stubContainerStyle, stubStyle, extraData } = this.props;
-        const { prevContainerLayout, containerLayout, contentContainerLayout, math, contentLayout, scale, initialized } = this.state;
+        const { prevContentContainerLayout, containerLayout, contentContainerLayout, math, contentLayout, scale, initialized, prevCycle } = this.state;
 
         const measuringContent = isNil(contentLayout);
         const measuringContainer = isNil(contentContainerLayout);
         const scaling = measuringContainer && !measuringContent && initialized;
         const measuring = measuringContainer || measuringContent;
         const hideMainViews = initialized ? measuringContainer : measuring;
-        const mip = extraData && { maxWidth: extraData }
 
         return (
             <View
@@ -328,20 +336,19 @@ class MathView extends React.Component {
                 onLayout={this._onContainerLayout}
             >
                 <View
-                    style={[stubContainerStyle, StyleSheet.absoluteFill, scaling ? containerLayout : styles.transparent]}
+                    style={[stubContainerStyle, StyleSheet.absoluteFill, scaling ? prevCycle.containerLayout : styles.invisible]}
                 />
                 <View
                     style={[style, this.stylable, /*styles.default,*/ hideMainViews && styles.transparent]}
                 >
                     <View
-                        style={[stubStyle, StyleSheet.absoluteFill, scaling ? prevContainerLayout : styles.transparent]}
+                        style={[stubStyle, StyleSheet.absoluteFill, /*styles.default,*/ scaling ? this.prevStylable : styles.transparent]}
                     />
-                    <View style={[style, StyleSheet.absoluteFill, contentLayout, styles.default, mip, styles.transparent]}>
+                    <View style={[style, StyleSheet.absoluteFill, contentLayout, styles.default, extraData && { maxWidth: extraData }, styles.transparent]}>
                         <View
                             style={[/*style,*/ styles.default]}
                             onLayout={this._onContentContainerLayout}
                         />
-
                     </View>
                     <View style={[StyleSheet.absoluteFill, styles.default, styles.centerContent, hideMainViews && styles.invisible]}>
                         {this.renderChangeHandler()}
@@ -354,7 +361,7 @@ class MathView extends React.Component {
     /**flex self-measuring */
     render10() {
         const { style, containerStyle, stubContainerStyle, stubStyle } = this.props;
-        const { prevContainerLayout, containerLayout, contentContainerLayout, math, contentLayout, scale, initialized } = this.state;
+        const { prevContentContainerLayout, containerLayout, contentContainerLayout, math, contentLayout, scale, initialized } = this.state;
 
         const measuringContent = isNil(contentLayout);
         const measuringContainer = isNil(contentContainerLayout);
@@ -374,7 +381,7 @@ class MathView extends React.Component {
                     style={[style, this.stylable, hideMainViews && styles.transparent]}
                 >
                     <View
-                        style={[stubStyle, StyleSheet.absoluteFill, scaling ? prevContainerLayout : styles.transparent]}
+                        style={[stubStyle, StyleSheet.absoluteFill, scaling ? prevContentContainerLayout : styles.transparent]}
                     />
                     <View
                         style={[StyleSheet.absoluteFill, styles.default]}

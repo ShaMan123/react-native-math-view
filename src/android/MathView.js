@@ -80,7 +80,6 @@ class MathView extends React.Component {
             prevMath: null,
             lastMeasured: null,
             scale: props.initialScale,
-            prevScale: null,
             prevContentContainerLayout: null,
             containerLayout: null,
             extraData: props.extraData,
@@ -111,7 +110,6 @@ class MathView extends React.Component {
                 contentContainerLayout: null,
                 prevContentContainerLayout: prevState.contentContainerLayout,
                 scale: nextProps.initialScale,
-                prevScale: prevState.scale,
                 extraData: nextProps.extraData,
                 prevCycle: _.omit(prevState, 'prevCycle'),
                 lastUpdated: null
@@ -124,7 +122,6 @@ class MathView extends React.Component {
                 contentContainerLayout: null,
                 prevContentContainerLayout: prevState.contentContainerLayout,
                 scale: nextProps.initialScale,
-                prevScale: prevState.scale,
                 extraData: nextProps.extraData,
                 prevCycle: _.omit(prevState, 'prevCycle'),
                 lastUpdated: null
@@ -135,7 +132,7 @@ class MathView extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { contentLayout, contentContainerLayout, scale, prevScale, initialized, prevCycle, lastUpdated } = this.state;
+        const { contentLayout, contentContainerLayout, scale, initialized, prevCycle, lastUpdated } = this.state;
         const measuringContent = isNil(contentLayout);
         const measuringContainer = isNil(contentContainerLayout);
         const measuring = measuringContainer || measuringContent;
@@ -143,7 +140,7 @@ class MathView extends React.Component {
         if (prevCycle) {
             const changedLayoutByScaling = this.state.initialized && prevCycle.initialized && scale !== prevCycle.scale;
             const changeLayoutByChanging = !this.state.prevMath || this.state.math !== prevCycle.math;
-            const completedUpdateCycle = initialized && scale === prevScale;
+            const completedUpdateCycle = initialized /*&& scale === prevScale;*/
 
             const shouldFireLayoutEvent = completedUpdateCycle && (changedLayoutByScaling || changeLayoutByChanging);
         }
@@ -301,7 +298,7 @@ class MathView extends React.Component {
 
         return (
             <Animated.View
-                style={[styles.centerContent, {
+                style={[styles.default, styles.centerContent, {
                     opacity: this.opacityAnimation,
                     transform: [{ scale }, { perspective: 1000 }]
                 }]}
@@ -318,47 +315,7 @@ class MathView extends React.Component {
         );
     }
 
-    /**flexWrap */
-    render() {
-
-        const { style, containerStyle, stubContainerStyle, stubStyle, extraData } = this.props;
-        const { prevContentContainerLayout, containerLayout, contentContainerLayout, math, contentLayout, scale, initialized, prevCycle } = this.state;
-
-        const measuringContent = isNil(contentLayout);
-        const measuringContainer = isNil(contentContainerLayout);
-        const scaling = measuringContainer && !measuringContent && initialized;
-        const measuring = measuringContainer || measuringContent;
-        const hideMainViews = initialized ? measuringContainer : measuring;
-
-        return (
-            <View
-                style={[containerStyle, /*contentLayout,*/ hideMainViews && styles.transparent]}
-                onLayout={this._onContainerLayout}
-            >
-                <View
-                    style={[stubContainerStyle, StyleSheet.absoluteFill, scaling ? prevCycle.containerLayout : styles.invisible]}
-                />
-                <View
-                    style={[style, this.stylable, /*styles.default,*/ hideMainViews && styles.transparent]}
-                >
-                    <View
-                        style={[stubStyle, StyleSheet.absoluteFill, /*styles.default,*/ scaling ? this.prevStylable : styles.transparent]}
-                    />
-                    <View style={[style, StyleSheet.absoluteFill, contentLayout, styles.default, extraData && { maxWidth: extraData }, styles.transparent]}>
-                        <View
-                            style={[/*style,*/ styles.default]}
-                            onLayout={this._onContentContainerLayout}
-                        />
-                    </View>
-                    <View style={[StyleSheet.absoluteFill, styles.default, styles.centerContent, hideMainViews && styles.invisible]}>
-                        {this.renderChangeHandler()}
-                    </View>
-                </View>
-            </View>
-        );
-    }
-
-    /**flex self-measuring */
+    /**self-measuring flex view */
     render10() {
         const { style, containerStyle, stubContainerStyle, stubStyle } = this.props;
         const { prevContentContainerLayout, containerLayout, contentContainerLayout, math, contentLayout, scale, initialized } = this.state;
@@ -394,6 +351,48 @@ class MathView extends React.Component {
             </View>
         );
     }
+
+    /**flexWrap */
+    render() {
+
+        const { style, containerStyle, stubContainerStyle, stubStyle, extraData } = this.props;
+        const { prevContentContainerLayout, containerLayout, contentContainerLayout, math, contentLayout, scale, initialized, prevCycle } = this.state;
+
+        const measuringContent = isNil(contentLayout);
+        const measuringContainer = isNil(contentContainerLayout);
+        const scaling = measuringContainer && !measuringContent && initialized;
+        const measuring = measuringContainer || measuringContent;
+        const hideMainViews = initialized ? measuringContainer : measuring;
+
+        return (
+            <View
+                style={[containerStyle, /*contentLayout,*/ hideMainViews && styles.transparent]}
+                onLayout={this._onContainerLayout}
+            >
+                <View
+                    style={[stubContainerStyle, StyleSheet.absoluteFill, scaling ? prevCycle.containerLayout : styles.invisible]}
+                />
+                <View
+                    style={[style, this.stylable, /*styles.default,*/ hideMainViews && styles.transparent]}
+                >
+                    <View
+                        style={[stubStyle, StyleSheet.absoluteFill, /*styles.default,*/ scaling ? this.prevStylable : styles.transparent]}
+                    />
+                    <View style={[style, StyleSheet.absoluteFill, contentLayout, styles.default, extraData && { maxWidth: extraData }, styles.transparent]}>
+                        <View
+                            style={[/*style,*/ styles.default]}
+                            onLayout={this._onContentContainerLayout}
+                        />
+                    </View>
+                    <View style={[StyleSheet.absoluteFill, styles.default, hideMainViews && styles.invisible, {backgroundColor:'red'}]}>
+                        <View style={[{ flex: 1, justifyContent:'center' }]}>
+                            {this.renderBaseView(math)}
+                        </View>
+                    </View>
+                </View>
+            </View>
+        );
+    }
 }
 
 const styles = StyleSheet.create({
@@ -408,7 +407,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent'
     },
     invisible: {
-        opacity: 0
+        //opacity: 0
     }
 });
 

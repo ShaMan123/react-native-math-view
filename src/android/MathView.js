@@ -287,6 +287,8 @@ class MathView extends React.Component {
                 keyExtractor={(mathStr) => `${this.key}:${mathStr}`}
                 data={members}
                 renderItem={({ item }) => this.renderBaseView(item)}
+                //style={styles.default}
+                contentContainerStyle={[styles.centerContent]}
             />
         );
     }
@@ -384,9 +386,9 @@ class MathView extends React.Component {
                             onLayout={this._onContentContainerLayout}
                         />
                     </View>
-                    <View style={[StyleSheet.absoluteFill, styles.default, hideMainViews && styles.invisible, {backgroundColor:'red'}]}>
-                        <View style={[{ flex: 1, justifyContent:'center' }]}>
-                            {this.renderBaseView(math)}
+                    <View style={[StyleSheet.absoluteFill, styles.default,styles.centerContent, hideMainViews && styles.invisible, {backgroundColor:'red'}]}>
+                        <View style={[{ flex: 1, justifyContent: 'center', flexDirection: 'row' }, styles.centerContent]}>
+                            {this.renderChangeHandler()}
                         </View>
                     </View>
                 </View>

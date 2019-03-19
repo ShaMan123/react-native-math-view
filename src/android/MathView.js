@@ -20,6 +20,7 @@ import ReactNative, {
 import memoize from 'lodash/memoize';
 import uniqueId from 'lodash/uniqueId';
 import isNil from 'lodash/isNil';
+import * as _ from 'lodash';
 import MathViewBase, { MATH_ENGINES } from './MathViewBase';
 import ViewOverflow from 'react-native-view-overflow';
 
@@ -73,26 +74,30 @@ class MathView extends React.Component {
 
         this.state = {
             initialized: false,
-            containerLayout: null,
-            webViewLayout: null,
+            contentContainerLayout: null,
+            contentLayout: null,
             math: props.math,
             prevMath: null,
             lastMeasured: null,
             scale: props.initialScale,
             prevScale: null,
             prevContainerLayout: null,
-            outerContainerLayout: null,
-            extraData: props.extraData
+            containerLayout: null,
+            extraData: props.extraData,
+            prevCycle: null,
+            lastUpdated: null
         };
 
         this.opacityAnimation = new Animated.Value(props.initialOpacity);
         this.scaleAnimation = new Animated.Value(props.initialScale);
 
-        this._onStubLayout = this._onStubLayout.bind(this);
+        this._onContentContainerLayout = this._onContentContainerLayout.bind(this);
         this._onContainerLayout = this._onContainerLayout.bind(this);
-        this._onSizeChanged = this._onSizeChanged.bind(this);
+        this._onContentLayout = this._onContentLayout.bind(this);
 
         this.mathRefs = {};
+        this._layoutEvent = null;
+        this._nativeDidLayout = false;
         
     }
 
@@ -102,22 +107,26 @@ class MathView extends React.Component {
                 initialized: false,
                 math: nextProps.math,
                 prevMath: prevState.math,
-                webViewLayout: null,
-                containerLayout: null,
-                prevContainerLayout: prevState.containerLayout,
+                contentLayout: null,
+                contentContainerLayout: null,
+                prevContainerLayout: prevState.contentContainerLayout,
                 scale: nextProps.initialScale,
                 prevScale: prevState.scale,
-                extraData: nextProps.extraData
+                extraData: nextProps.extraData,
+                prevCycle: _.omit(prevState, 'prevCycle'),
+                lastUpdated: null
             };
         }
 
         if (nextProps.extraData !== prevState.extraData) {
             return {
-                containerLayout: null,
-                prevContainerLayout: prevState.containerLayout,
+                contentContainerLayout: null,
+                prevContainerLayout: prevState.contentContainerLayout,
                 scale: nextProps.initialScale,
                 prevScale: prevState.scale,
-                extraData: nextProps.extraData
+                extraData: nextProps.extraData,
+                prevCycle: _.omit(prevState, 'prevCycle'),
+                lastUpdated: null
             };
         }
 
@@ -125,13 +134,28 @@ class MathView extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        const { webViewLayout, containerLayout, scale } = this.state;
+        const { contentLayout, contentContainerLayout, scale, prevScale, initialized, prevCycle, lastUpdated } = this.state;
+        const measuringContent = isNil(contentLayout);
+        const measuringContainer = isNil(contentContainerLayout);
+        const measuring = measuringContainer || measuringContent;
 
-        if (webViewLayout && containerLayout) {
+        if (prevCycle) {
+            const changedLayoutByScaling = this.state.initialized && prevCycle.initialized && scale !== prevCycle.scale;
+            const changeLayoutByChanging = !this.state.prevMath || this.state.math !== prevCycle.math;
+            const completedUpdateCycle = initialized && scale === prevScale;
+
+            const shouldFireLayoutEvent = completedUpdateCycle && (changedLayoutByScaling || changeLayoutByChanging);
+        }
+        
+
+
+        this._layoutEvent && console.log(lastUpdated, this._layoutEvent.nativeEvent);
+
+        if (!measuring) {
             this.updated = true;
             const animations = [
                 Animated.spring(this.opacityAnimation, {
-                    toValue: webViewLayout && containerLayout ? 1 : 0,
+                    toValue: contentLayout && contentContainerLayout ? 1 : 0,
                     useNativeDriver: true
                 }),
                 Animated.spring(this.scaleAnimation, {
@@ -140,17 +164,22 @@ class MathView extends React.Component {
                 })
             ];
 
-            Animated.parallel(animations).start();
+            
+
+            Animated.parallel(animations)
+                .start(() => {
+                    //completedUpdateCycle && this._fireLayoutEvent();
+                });
         }
         
     }
     
-    getScale({ containerLayout = this.state.containerLayout, webViewLayout = this.state.webViewLayout }) {
+    getScale({ contentContainerLayout = this.state.contentContainerLayout, contentLayout = this.state.contentLayout }) {
         const currentScale = this.state.scale;
         let initialized, scale;
 
-        const measuringContent = isNil(webViewLayout);
-        const measuringContainer = isNil(containerLayout);
+        const measuringContent = isNil(contentLayout);
+        const measuringContainer = isNil(contentContainerLayout);
 
         if (measuringContent || measuringContainer) {
             scale = 0;
@@ -162,7 +191,7 @@ class MathView extends React.Component {
             }
         }
         else {
-            scale = Math.min(containerLayout.width / webViewLayout.width, containerLayout.height / webViewLayout.height, 1);
+            scale = Math.min(contentContainerLayout.width / contentLayout.width, contentContainerLayout.height / contentLayout.height, 1);
             initialized = true;
             if (scale < this.state.scale) {
                 this.opacityAnimation.setValue(0);
@@ -177,36 +206,16 @@ class MathView extends React.Component {
         };
     }
 
-    _onStubLayout(e) {
-        const { layout } = e.nativeEvent;
-        const { width, height } = layout;
-        const containerLayout = { width, height };
-        const { scale, prevScale, initialized } = this.getScale({ containerLayout });
+    _onContentLayout(math, contentLayout) {
+        const { scale, prevScale, initialized } = this.getScale({ contentLayout });
 
         this.setState({
-            containerLayout,
-            scale,
-            prevScale,
-            initialized
-        });
-    }
-
-    _onContainerLayout(e) {
-        const measuringContainer = isNil(this.state.containerLayout);
-        if (measuringContainer) return;
-        const { width, height } = e.nativeEvent.layout;
-        this.setState({ outerContainerLayout: { width, height } });
-    }
-
-    _onSizeChanged(math, webViewLayout) {
-        const { scale, prevScale, initialized } = this.getScale({ webViewLayout });
-       
-        this.setState({
-            webViewLayout,
+            contentLayout,
             lastMeasured: math,
             scale,
             prevScale,
-            initialized
+            initialized,
+            lastUpdated: 'contentLayout'
         });
         /*
         if (math === this.state.math) {
@@ -215,12 +224,51 @@ class MathView extends React.Component {
         */
     }
 
-    get stylable() {
-        const { webViewLayout, scale } = this.state;
+    _onContentContainerLayout(e) {
+        const { layout } = e.nativeEvent;
+        const { width, height } = layout;
+        const contentContainerLayout = { width, height };
+        const { scale, prevScale, initialized } = this.getScale({ contentContainerLayout });
 
-        return webViewLayout && scale ? {
-            minWidth: webViewLayout.width * scale,
-            minHeight: webViewLayout.height * scale
+        this.setState({
+            contentContainerLayout,
+            scale,
+            prevScale,
+            initialized,
+            lastUpdated: 'contentContainerLayout'
+        });
+    }
+
+    _onContainerLayout(e) {
+        const measuringContainer = isNil(this.state.contentContainerLayout);
+        this._layoutEvent = null;
+        //console.log('!!!!!', this.stylable)
+
+        if (!measuringContainer) {
+            e.persist();
+            this._layoutEvent = e;
+            const { width, height } = e.nativeEvent.layout;
+            this.setState({
+                containerLayout: { width, height },
+                lastUpdated: 'containerLayout'
+            });
+        }
+    }
+
+    _fireLayoutEvent() {
+        const { onLayout } = this.props;
+        if (!isNil(this._layoutEvent) && !isNil(onLayout) && this._nativeDidLayout) {
+            onLayout(this._layoutEvent);
+            this._layoutEvent = null;
+        }
+    }
+
+    get stylable() {
+        const { contentLayout, scale } = this.state;
+
+        return contentLayout && scale ? {
+            minWidth: contentLayout.width * scale,
+            minHeight: contentLayout.height * scale
         } : null;
     }
 
@@ -254,8 +302,8 @@ class MathView extends React.Component {
                     {...props}
                     math={math}
                     style={[StyleSheet.absoluteFill]}
-                    onSizeChanged={this._onSizeChanged.bind(this, math)}
-                    onLayout={(e) => onLayout && onLayout(e)}
+                    onSizeChanged={this._onContentLayout.bind(this, math)}
+                    onLayout={() => this._nativeDidLayout = true}
                 />
             </Animated.View>
         );
@@ -263,10 +311,10 @@ class MathView extends React.Component {
 
     render() {
         const { style, containerStyle, stubContainerStyle, stubStyle } = this.props;
-        const { prevContainerLayout, outerContainerLayout, containerLayout, math, webViewLayout, scale, initialized } = this.state;
+        const { prevContainerLayout, containerLayout, contentContainerLayout, math, contentLayout, scale, initialized } = this.state;
 
-        const measuringContent = isNil(webViewLayout);
-        const measuringContainer = isNil(containerLayout);
+        const measuringContent = isNil(contentLayout);
+        const measuringContainer = isNil(contentContainerLayout);
         const scaling = measuringContainer && !measuringContent && initialized;
         const measuring = measuringContainer || measuringContent;
         const hideMainViews = initialized ? measuringContainer : measuring;
@@ -277,7 +325,7 @@ class MathView extends React.Component {
                 onLayout={this._onContainerLayout}
             >
                 <View
-                    style={[stubContainerStyle, StyleSheet.absoluteFill, scaling ? outerContainerLayout : styles.transparent]}
+                    style={[stubContainerStyle, StyleSheet.absoluteFill, scaling ? containerLayout : styles.transparent]}
                 />
                 <View
                     style={[style, this.stylable, hideMainViews && styles.transparent]}
@@ -287,7 +335,7 @@ class MathView extends React.Component {
                     />
                     <View
                         style={[StyleSheet.absoluteFill, styles.default]}
-                        onLayout={this._onStubLayout}
+                        onLayout={this._onContentContainerLayout}
                     />
                     <View style={[StyleSheet.absoluteFill, styles.default, styles.centerContent, hideMainViews && styles.invisible]}>
                         {this.renderChangeHandler()}

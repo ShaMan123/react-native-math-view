@@ -27,7 +27,7 @@ export default class App extends Component {
             ],
             width: Dimensions.get('window').width,
             fontScale: 1,
-            state: 1,
+            state: 0,
             tag: MathStrings.calculus.filter((obj) => obj.math)[0]
         }
 
@@ -36,7 +36,7 @@ export default class App extends Component {
     
     componentDidMount() {
         let i = 0;
-        const interval = 4000;
+        const interval = 3000;
         const tags = MathStrings.calculus.filter((obj) => obj.math);
         
         this.t = setInterval(() => {
@@ -68,6 +68,7 @@ export default class App extends Component {
                 onPress={() => Alert.alert(`LaTeX: ${string}`)}
                 extraData={this.state.width}
                 animated
+                onLayout={(e) => console.log(e.nativeEvent)}
             //onLayoutCompleted={(e)=>console.log(e.nativeEvent)}
             />
         );
@@ -100,7 +101,7 @@ export default class App extends Component {
 
     renderTestItem(item) {
         return (
-            <View style={[{ backgroundColor: 'red' }]}>
+            <View style={[{ backgroundColor: 'red', flex:1 }]}>
                 {this.renderFlexItem(item)}
             </View>
         );
@@ -131,21 +132,61 @@ export default class App extends Component {
                         })
                     }}
                     refreshing={this.state.refreshing}
-                    //contentContainerStyle={[styles.flexContainer, { maxWidth: 200 }]}
+                    contentContainerStyle={[styles.flexContainer]}
                     keyExtractor={(item) => `${item.string}`}
                     style={{flex:1, backgroundColor:'pink'}}
                 />
             </View>
         );
     }
-    
+
     render1() {
+        return (
+            <View style={[{ flex: 1, maxWidth: this.state.width }]} ref={this.ref}>
+                <FlatList
+                    scrollEnabled
+                    renderItem={({ item, index, section }) => this.renderItem(item)}
+                    renderSectionHeader={({ section: { title } }) => <Text>{title}</Text>}
+                    data={_.flatten(this.state.sections.map(s => s.data))}
+                    onRefresh={() => {
+                        this.setState({
+                            sections: [
+                                {
+                                    title: 'calculus',
+                                    data: this.state.sections[0].data.reverse(),
+                                    keyExtractor: (item) => `calculus:${item.string}`
+                                },
+                                {
+                                    title: 'trig',
+                                    data: this.state.sections[1].data.reverse(),
+                                    keyExtractor: (item) => `trig:${item.string}`
+                                }
+                            ]
+                        })
+                    }}
+                    refreshing={this.state.refreshing}
+                    style={{ flex: 1 }}
+                    extraData={this.state.width}
+                    contentContainerStyle={[{flexWrap:'wrap', display:'flex',flexDirection:'row'}]}
+                />
+            </View>
+        );
+    }
+    
+    render100() {
         return (
             <View style={[{ flex: 1, maxWidth: this.state.width }]} ref={this.ref}>
                 <SectionList
                     scrollEnabled
                     renderItem={({ item, index, section }) => this.renderItem(item)}
                     renderSectionHeader={({ section: { title } }) => <Text>{title}</Text>}
+                    sections={[
+                        {
+                            title: 'calculus',
+                            data: [this.state.sections[0].data[0]],
+                            keyExtractor: (item) => `calculus:${item.string}`
+                        }
+                    ]}
                     sections={this.state.sections}
                     onRefresh={() => {
                         this.setState({
@@ -166,6 +207,7 @@ export default class App extends Component {
                     refreshing={this.state.refreshing}
                     style={{ flex: 1 }}
                     extraData={this.state.width}
+
                 />
             </View>
         );
@@ -175,7 +217,11 @@ export default class App extends Component {
         return (
             <View style={[{ backgroundColor: 'pink' }, styles.centerContent]}>
                 <View style={styles.flexContainer}>
-                    {this.state.tag && React.cloneElement(this.renderFlexItem(this.state.tag), {stubContainerStyle:null,stubStyle:null})}
+                    {this.state.tag && React.cloneElement(this.renderFlexItem(this.state.tag), {
+                        stubContainerStyle: null,
+                        stubStyle: null,
+                        onLayout:(e)=>console.log(e.nativeEvent)
+                    })}
                 </View>
             </View>
         );

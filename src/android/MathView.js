@@ -137,6 +137,28 @@ class MathView extends React.Component {
         const measuringContainer = isNil(contentContainerLayout);
         const measuring = measuringContainer || measuringContent;
 
+
+        this.updated = true;
+        const animations = [
+            Animated.spring(this.opacityAnimation, {
+                toValue: contentLayout && contentContainerLayout ? 1 : 0,
+                useNativeDriver: true
+            }),
+            Animated.spring(this.scaleAnimation, {
+                toValue: scale,
+                useNativeDriver: true
+            })
+        ];
+
+
+
+        Animated.parallel(animations)
+            .start(() => {
+                //completedUpdateCycle && this._fireLayoutEvent();
+            });
+
+
+
         if (prevCycle) {
             const changedLayoutByScaling = this.state.initialized && prevCycle.initialized && scale !== prevCycle.scale;
             const changeLayoutByChanging = !this.state.prevMath || this.state.math !== prevCycle.math;
@@ -150,24 +172,7 @@ class MathView extends React.Component {
         //this._layoutEvent && console.log(lastUpdated, this._layoutEvent.nativeEvent);
 
         if (!measuring) {
-            this.updated = true;
-            const animations = [
-                Animated.spring(this.opacityAnimation, {
-                    toValue: contentLayout && contentContainerLayout ? 1 : 0,
-                    useNativeDriver: true
-                }),
-                Animated.spring(this.scaleAnimation, {
-                    toValue: scale,
-                    useNativeDriver: true
-                })
-            ];
-
             
-
-            Animated.parallel(animations)
-                .start(() => {
-                    //completedUpdateCycle && this._fireLayoutEvent();
-                });
         }
         
     }
@@ -288,7 +293,7 @@ class MathView extends React.Component {
                 data={members}
                 renderItem={({ item }) => this.renderBaseView(item)}
                 //style={styles.default}
-                contentContainerStyle={[styles.centerContent]}
+                //contentContainerStyle={[styles.centerContent]}
             />
         );
     }
@@ -386,8 +391,8 @@ class MathView extends React.Component {
                             onLayout={this._onContentContainerLayout}
                         />
                     </View>
-                    <View style={[StyleSheet.absoluteFill, styles.default,styles.centerContent, hideMainViews && styles.invisible, {backgroundColor:'red'}]}>
-                        <View style={[{ flex: 1, justifyContent: 'center', flexDirection: 'row' }, styles.centerContent]}>
+                    <View style={[StyleSheet.absoluteFill, styles.default,styles.centerContent, hideMainViews && styles.invisible]}>
+                        <View style={[styles.default, styles.centerContent]}>
                             {this.renderChangeHandler()}
                         </View>
                     </View>
@@ -400,7 +405,11 @@ class MathView extends React.Component {
 const styles = StyleSheet.create({
     centerContent: {
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        flexDirection: 'row'
+    },
+    adjustDirection: {
+        flexDirection: 'row'
     },
     default: {
         flex: 1

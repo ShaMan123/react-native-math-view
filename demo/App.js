@@ -27,7 +27,7 @@ export default class App extends Component {
             ],
             width: Dimensions.get('window').width,
             fontScale: 1,
-            state: 0,
+            state: 3,
             tag: MathStrings.calculus.filter((obj) => obj.math)[0],
             mip: false
         }
@@ -68,9 +68,8 @@ export default class App extends Component {
                 fallback={'frisck'}
                 onPress={() => Alert.alert(`LaTeX: ${string}`)}
                 extraData={this.state.width}
-                //animated
+                animated
                 onLayout={(e) => console.log(e.nativeEvent)}
-            //onLayoutCompleted={(e)=>console.log(e.nativeEvent)}
             />
         );
     }
@@ -82,61 +81,7 @@ export default class App extends Component {
             </View>
         );
     }
-    /*
 
-    renderTestItem(item) {
-        const { string } = item;
-        return (
-            <MathView
-                containerStyle={[styles.mathContainer]}
-                style={[styles.mathInner]}
-                stubContainerStyle={{ backgroundColor: 'orange' }}
-                stubStyle={{ backgroundColor: 'blue' }}
-                math={string}
-                fontColor='white'
-                fallback={'frisck'}
-                onPress={() => Alert.alert(`LaTeX: ${string}`)}
-                extraData={this.state.width}
-                animated
-                onLayout={(e) => console.log(e.nativeEvent)}
-            //onLayoutCompleted={(e)=>console.log(e.nativeEvent)}
-            />
-        );
-    }
-
-    render222() {
-        return (
-            <View style={[styles.container, { maxWidth: this.state.width }]}>
-                <FlatList
-                    scrollEnabled
-                    renderItem={({ item, index, section }) => this.renderTestItem(item)}
-                    renderSectionHeader={({ section: { title } }) => <Text>{title}</Text>}
-                    data={_.flatten(this.state.sections.map(s => s.data))}
-                    onRefresh={() => {
-                        this.setState({
-                            sections: [
-                                {
-                                    title: 'calculus',
-                                    data: MathStrings.calculus.filter((obj) => obj.math).reverse(),
-                                    keyExtractor: (item) => `calculus:${item.string}`
-                                },
-                                {
-                                    title: 'trig',
-                                    data: MathStrings.trig.filter((obj) => obj.math).reverse(),
-                                    keyExtractor: (item) => `trig:${item.string}`
-                                }
-                            ]
-                        })
-                    }}
-                    refreshing={this.state.refreshing}
-                    contentContainerStyle={[styles.flexContainer]}
-                    keyExtractor={(item) => `${item.string}`}
-                    style={{flex:1, backgroundColor:'pink'}}
-                />
-            </View>
-        );
-    }
-    */
     render2() {
         return (
             <View style={[{ flex: 1, maxWidth: this.state.width }]}>
@@ -212,6 +157,13 @@ export default class App extends Component {
         );
     }
 
+    render3() {
+        return React.cloneElement(this.renderFlexItem(this.state.tag), {
+            containerStyle: [styles.mathContainer, { flex: 1 }],
+            style: [/*styles.mathInner,*/ { flex: 1 }]
+        })
+    }
+
     render0() {
         return (
             <View>
@@ -249,7 +201,7 @@ export default class App extends Component {
                 <Button
                     //style={{bottom: 0}}
                     onPress={() => this.setState((prev) => {
-                        return { state: (prev.state + 1) % 3 };
+                        return { state: (prev.state + 1) % 4 };
                     })}
                     title="press to change view"
                 />
@@ -280,6 +232,7 @@ const styles = StyleSheet.create({
         //margin: 5,
     },
     mathContainer: {
+        
         marginVertical: 15,
         marginHorizontal: 5,
         minHeight: 40,

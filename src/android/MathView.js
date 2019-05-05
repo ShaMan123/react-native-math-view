@@ -459,10 +459,8 @@ class MathView extends React.Component {
                             onLayout={this._onContentContainerLayout}
                         />
                     </View>
-                    <View style={[StyleSheet.absoluteFill, styles.default,styles.centerContent, hideMainViews && styles.invisible]}>
-                        <View style={[styles.default, styles.centerContent]}>
-                            {this.renderChangeHandler()}
-                        </View>
+                    <View style={[StyleSheet.absoluteFill, hideMainViews && styles.invisible]}>
+                        {this.renderBaseView(this.state.math)}
                     </View>
                 </View>
             </Animated.View>

@@ -31,8 +31,5 @@
   "dependencies": {
     "react-native-svg": "^9.2.4",
     "react-native-svg-uri": "^1.2.3"
-  },
-  "devDependencies": {
-    "react-native": "^0.58.5"
   }
 }

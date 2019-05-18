@@ -6,8 +6,6 @@ def safeExtGet(prop, fallback) {
 
 android {
     compileSdkVersion safeExtGet("compileSdkVersion", 23)
-    //buildToolsVersion safeExtGet("minSdkVersion", "23.0.1")
-
     defaultConfig {
         minSdkVersion safeExtGet("minSdkVersion", 19)
         targetSdkVersion safeExtGet("targetSdkVersion", 22)
@@ -46,7 +44,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.2'
+        classpath 'com.android.tools.build:gradle:3.4.1'
     }
 }
 
@@ -68,9 +66,10 @@ allprojects {
 }
 
 dependencies {
-    implementation 'com.facebook.react:react-native:+'
-    implementation 'io.github.kexanie.library:MathView:0.0.6'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    compileOnly 'com.facebook.react:react-native:+'
+    compileOnly 'io.github.kexanie.library:MathView:0.0.6'
+    compileOnly 'com.android.support.constraint:constraint-layout:1.1.3'
+    compileOnly 'com.android.support:support-v4:28.0.0'
 }
 
 

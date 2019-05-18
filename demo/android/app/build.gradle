@@ -93,9 +93,10 @@ def enableSeparateBuildPerCPUArchitecture = false
  */
 def enableProguardInReleaseBuilds = false
 
+def generateUniversalApk = true
+
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
         applicationId "com.demo"
@@ -103,16 +104,13 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
-        ndk {
-            abiFilters "armeabi-v7a", "x86"
-        }
     }
     splits {
         abi {
-            reset()
             enable enableSeparateBuildPerCPUArchitecture
-            universalApk false  // If true, also generate a universal APK
-            include "armeabi-v7a", "x86"
+            universalApk generateUniversalApk  // If true, also generate a universal APK
+            reset()
+            include "armeabi-v7a", "x86", "x86_64", "arm64-v8a"
         }
     }
     buildTypes {
@@ -121,6 +119,7 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
+    /*
     // applicationVariants are e.g. debug, release
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
@@ -134,7 +133,13 @@ android {
             }
         }
     }
+    */
 }
+
+configurations.all {
+    resolutionStrategy {
+        force 'com.android.support:support-v4:28.0.0'
+    }}
 
 dependencies {
     implementation project(':react-native-math-view')

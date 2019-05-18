@@ -1,11 +1,13 @@
 package io.autodidact.rnmathview;
 
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.RelativeLayout;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
@@ -72,12 +74,16 @@ public class RNMathView extends MathView {
         size.putDouble("height", webViewHeight);
         event.putBoolean("onSizeChanged", true);
         event.putMap("size", size);
-
+        float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PT, webViewWidth, mContext.getResources().getDisplayMetrics());
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        params.width = (int) px;
+        setLayoutParams(params);
+/*
         mContext.getJSModule(RCTEventEmitter.class).receiveEvent(
                 getId(),
                 "topChange",
                 event);
-
+*/
     }
 
     public void loadScript(String script){

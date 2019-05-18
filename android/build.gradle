@@ -67,9 +67,8 @@ allprojects {
 
 dependencies {
     compileOnly 'com.facebook.react:react-native:+'
+    compileOnly "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
     compileOnly 'io.github.kexanie.library:MathView:0.0.6'
-    compileOnly 'com.android.support.constraint:constraint-layout:1.1.3'
-    compileOnly 'com.android.support:support-v4:28.0.0'
 }
 
 

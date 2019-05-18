@@ -1,18 +1,1 @@
-
-<resources>
-    <!--
-    <declare-styleable name="MathViewAttrs">
-        <attr name="android:layout_width" format="string">match_parent</attr>
-        <attr name="android:layout_height" format="string">wrap_content</attr>
-        <attr name="text" format="string" />
-        <attr name="engine" format="string" />
-    </declare-styleable>
-
-    <style name="MathViewStyle">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="app:text"></item>
-        <item name="app:engine"></item>
-    </style>
--->
-</resources>
+<resources></resources>

@@ -1,2 +1,2 @@
-import MathView from './MathView';
+import MathView from './MathViewBase';
 export default MathView;

@@ -33,8 +33,9 @@ export const MATH_ENGINES = {
     MATHJAX: 'MATHJAX'
 };
 
-class MathViewBase extends Component {
+export default class MathViewBase extends Component {
     static propTypes = {
+        math: PropTypes.string.isRequired,
         mathEngine: PropTypes.oneOf(Object.keys(MATH_ENGINES).map((key) => MATH_ENGINES[key])),
         horizontalScroll: PropTypes.bool,
         verticalScroll: PropTypes.bool
@@ -52,88 +53,34 @@ class MathViewBase extends Component {
         return `\\(${math.replace(/\\\\/g, '\\')}\\)`;
     }
 
-    constructor(props) {
-        super(props);
-        this._onChange = this._onChange.bind(this);
-        const math = MathViewBase.pasreMath(props.math);
-        this.state = {
-            width: null,
-            height: null,
-            ...MathViewBase.measure(math),
-            math
-        };
-
-        this.updated = false;
-        
+    state = {
+        size: MathViewBase.measure(this.math)
     }
 
-    static getDerivedStateFromProps(nextProps, prevState) {
-        if (nextProps.math !== prevState.math) {
-            const math = MathViewBase.pasreMath(nextProps.math);
-            const measured = MathViewBase.measure(math);
-            return {
-                width: null,
-                height: null,
-                math,
-                ...measured
-            };
-        }
-
-        return null;
+    get math() {
+        return MathViewBase.pasreMath(this.props.math);
     }
 
-
-    componentDidUpdate(prevProps, prevState) {
-        if ((prevState.width !== this.state.width || prevState.math !== this.state.math || !this.updated) && this.computedStyle && this.props.onSizeChanged) {
-            this.updated = true;
-            
-            this.props.onSizeChanged(this.computedStyle);
-        }
-    }
-
-    _onChange(e) {
-        if (e.nativeEvent.hasOwnProperty('onSizeChanged')) {
-            const sizeObj = e.nativeEvent.size;
-            const width = Math.round(sizeObj.width);
-            const height = Math.round(sizeObj.height);
-
-            if (!this.computedStyle) {
-                MathViewBase.measure.cache.set(this.state.math, { width, height });
-                this.setState({
-                    width,
-                    height
-                });
-            }
-            
-        }
-        else if (e.nativeEvent.hasOwnProperty('touchEvent')) {
-            this.props.onPress(e.nativeEvent.touchEvent);
-        }
-    }
-
-    get computedStyle() {
-        const { width, height } = this.state;
-
-        return width &&  height ? {
-            width,
-            height
-        } : null;
+    onChange = (e) => {
+        const size = e.nativeEvent;
+        MathViewBase.measure.cache.set(this.props.math, size);
+        console.log(size)
+        this.setState({ size });
     }
 
     render() {
-        const { forwardedRef, ...props } = this.props;
-        
+        const { size } = this.state;
         return (
             <RNMathView
-                {...props}
-                style={this.computedStyle}
-                ref={forwardedRef}
-                onChange={this._onChange}
-                text={this.state.math}
+                {...this.props}
+                style={[/*StyleSheet.absoluteFill,*/{ backgroundColor: 'pink' }, size]}
+                text={this.math}
+                onLayout={(e) => console.log(e.nativeEvent)}
+                onChange={this.onChange}
             />
         );
     }
 }
 
-export default React.forwardRef((props, ref) => <MathViewBase {...props} forwardedRef={ref} />);
+//export default React.forwardRef((props, ref) => <MathViewBase {...props} forwardedRef={ref} />);
 

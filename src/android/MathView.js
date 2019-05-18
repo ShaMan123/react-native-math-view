@@ -18,7 +18,6 @@ import ReactNative, {
     FlatList
 } from 'react-native';
 
-import memoize from 'lodash/memoize';
 import uniqueId from 'lodash/uniqueId';
 import isNil from 'lodash/isNil';
 import omit from 'lodash/omit';
@@ -470,7 +469,7 @@ class MathView extends React.Component {
     }
 
     render() {
-        return this.measureFromInsideOut();
+        return <MathViewBase {...this.props} />;
     }
 }
 

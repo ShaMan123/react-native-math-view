@@ -1,11 +1,13 @@
 package com.autodidact.rnmathview;
 
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.RelativeLayout;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
@@ -18,6 +20,8 @@ import java.util.Collection;
 import io.github.kexanie.library.MathView;
 
 public class RNMathView extends MathView {
+    public final String TAG = "RNMathView";
+
     private ThemedReactContext mContext;
     //private ReactContext reactContext;
     private boolean didSetEngine = false;
@@ -45,6 +49,8 @@ public class RNMathView extends MathView {
         mScrollBarFadeDuration = getScrollBarFadeDuration();
         //setBackgroundColor(Color.TRANSPARENT);
 
+        getSettings().setLoadWithOverviewMode(true);
+
         setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView webView, String url) {
@@ -67,17 +73,29 @@ public class RNMathView extends MathView {
         webViewHeight = Float.parseFloat(height);
 
         WritableMap event = Arguments.createMap();
-        WritableMap size = Arguments.createMap();
-        size.putDouble("width", webViewWidth);
-        size.putDouble("height", webViewHeight);
-        event.putBoolean("onSizeChanged", true);
-        event.putMap("size", size);
-
+        event.putInt("width", (int) webViewWidth);
+        event.putInt("height", (int) webViewHeight);
+/*
         mContext.getJSModule(RCTEventEmitter.class).receiveEvent(
                 getId(),
                 "topChange",
                 event);
-
+*/
+        new Thread(new Runnable() {
+            public void run() {
+                post(new Runnable() {
+                    public void run() {
+                        float pxWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, webViewWidth + 10, mContext.getResources().getDisplayMetrics());
+                        float pxHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, webViewHeight + 10, mContext.getResources().getDisplayMetrics());
+                        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                        params.width = (int) pxWidth;
+                        params.height = (int) pxHeight;
+                        setLayoutParams(params);
+                        invalidate();
+                    }
+                });
+            }
+        }).start();
     }
 
     public void loadScript(String script){

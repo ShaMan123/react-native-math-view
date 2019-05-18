@@ -24,12 +24,11 @@
     "react": "*",
     "react-native": "*"
   },
+  "dependencies": {
+    "prop-types": "15.7.2"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/ShaMan123/react-native-math-view.git"
-  },
-  "dependencies": {
-    "react-native-svg": "^9.2.4",
-    "react-native-svg-uri": "^1.2.3"
   }
 }

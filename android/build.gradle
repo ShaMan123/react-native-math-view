@@ -5,10 +5,10 @@ def safeExtGet(prop, fallback) {
 }
 
 android {
-    compileSdkVersion safeExtGet("compileSdkVersion", 23)
+    compileSdkVersion safeExtGet("compileSdkVersion", 28)
     defaultConfig {
         minSdkVersion safeExtGet("minSdkVersion", 19)
-        targetSdkVersion safeExtGet("targetSdkVersion", 22)
+        targetSdkVersion safeExtGet("targetSdkVersion", 28)
         versionCode 1
         versionName "1.0"
     }
@@ -16,16 +16,7 @@ android {
         abortOnError false
     }
 }
-/*
-repositories {
-    mavenCentral()
-    jcenter()
-    google()
-    maven {
-        url "https://dl.bintray.com/kexanie/maven"
-    }
-}
-*/
+
 buildscript {
     repositories {
         maven { url "https://maven.google.com" }

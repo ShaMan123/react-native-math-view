@@ -23,5 +23,10 @@
   },
   "jest": {
     "preset": "react-native"
+  },
+  "resolutions": {
+    "@babel/runtime": "*",
+    "metro-react-native-babel-preset": "*",
+    "metro-babel7-plugin-react-transform": "*"
   }
 }

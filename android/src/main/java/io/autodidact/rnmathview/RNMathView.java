@@ -1,4 +1,4 @@
-package com.autodidact.rnmathview;
+package io.autodidact.rnmathview;
 
 import android.util.Log;
 import android.view.MotionEvent;

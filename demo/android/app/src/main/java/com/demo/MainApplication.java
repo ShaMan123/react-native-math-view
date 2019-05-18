@@ -2,7 +2,7 @@ package com.demo;
 
 import android.app.Application;
 
-import com.autodidact.rnmathview.RNMathViewPackage;
+import io.autodidact.rnmathview.RNMathViewPackage;
 
 import com.facebook.react.ReactApplication;
 import com.facebook.react.ReactNativeHost;

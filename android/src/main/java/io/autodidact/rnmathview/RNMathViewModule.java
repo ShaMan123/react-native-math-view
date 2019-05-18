@@ -1,4 +1,4 @@
-package com.autodidact.rnmathview;
+package io.autodidact.rnmathview;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;

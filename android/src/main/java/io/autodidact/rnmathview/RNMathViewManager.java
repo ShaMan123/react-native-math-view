@@ -1,4 +1,4 @@
-package com.autodidact.rnmathview;
+package io.autodidact.rnmathview;
 
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.MapBuilder;

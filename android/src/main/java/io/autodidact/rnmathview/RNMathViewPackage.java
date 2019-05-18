@@ -1,5 +1,5 @@
 
-package com.autodidact.rnmathview;
+package io.autodidact.rnmathview;
 
 import java.util.Arrays;
 import java.util.Collections;

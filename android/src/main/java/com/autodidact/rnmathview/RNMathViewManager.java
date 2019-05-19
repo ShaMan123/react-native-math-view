@@ -89,7 +89,6 @@ public class RNMathViewManager extends SimpleViewManager<RNMathView> {
     @ReactProp(name = PROPS_SCAELS_TO_FIT)
     public void setPropsScalesToFit(RNMathView viewContainer, boolean fit) {
         viewContainer.setScalesToFit(fit);
-        if(!fit) viewContainer.setHorizontalScrollBarEnabled(true);
     }
 
     public Map getExportedCustomBubblingEventTypeConstants() {

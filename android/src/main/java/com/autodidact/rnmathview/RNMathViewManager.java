@@ -1,5 +1,7 @@
 package com.autodidact.rnmathview;
 
+import android.view.View;
+
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.SimpleViewManager;
@@ -23,7 +25,7 @@ public class RNMathViewManager extends SimpleViewManager<RNMathView> {
     private static final String PROPS_FONT_COLOR = "fontColor";
     private static final String PROPS_FONT_SHRINK = "fontShrink";
     private static final String PROPS_FLEX_WRAP = "flexWrap";
-    private static final String PROPS_CONTAINER_LAYOUT = "containerLayout";
+    private static final String PROPS_SCAELS_TO_FIT = "scalesToFit";
 
     private static final String PROPS_MATH_ENGINE_KATEX = "KATEX";
     private static final String PROPS_MATH_ENGINE_MATHJAX = "MATHJAX";
@@ -82,6 +84,12 @@ public class RNMathViewManager extends SimpleViewManager<RNMathView> {
     @ReactProp(name = PROPS_FONT_SHRINK)
     public void setPropsFontShrink(RNMathView viewContainer, float scale) {
         viewContainer.shrinkFontScale(scale);
+    }
+
+    @ReactProp(name = PROPS_SCAELS_TO_FIT)
+    public void setPropsScalesToFit(RNMathView viewContainer, boolean fit) {
+        viewContainer.setScalesToFit(fit);
+        if(!fit) viewContainer.setHorizontalScrollBarEnabled(true);
     }
 
     public Map getExportedCustomBubblingEventTypeConstants() {

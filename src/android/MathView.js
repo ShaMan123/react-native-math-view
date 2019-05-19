@@ -69,17 +69,22 @@ export default class MathViewBase extends Component {
         this.setState({ size });
     }
 
+    onLayout = (e) => {
+        const { onLayout } = this.props;
+        const { size } = this.state;
+        onLayout && size && onLayout(e);
+    }
+
     render() {
         const { size } = this.state;
         return (
-            <View>
-                <RNMathView
-                    {...this.props}
-                    style={[this.props.style, styles.base, size]}
-                    text={this.math}
-                    onChange={this.onChange}
-                />
-            </View>
+            <RNMathView
+                {...this.props}
+                style={[this.props.style, styles.base, size]}
+                text={this.math}
+                onChange={this.onChange}
+                onLayout={this.onLayout}
+            />
         );
     }
 }

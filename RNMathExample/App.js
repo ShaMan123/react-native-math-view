@@ -62,6 +62,7 @@ export default class App extends Component {
         return (
             <View style={[styles.flexContainer, { flex: 1, backgroundColor: 'pink', /*alignItems:'center',justifyContent:'center'*/ }]}>
                 <MathView
+                    onLayout={e=>console.log(item.string, e.nativeEvent.layout)}
                     math={item.string}
                     style={{ maxWidth: this.state.width }}
                 />

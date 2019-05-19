@@ -38,13 +38,15 @@ export default class MathViewBase extends Component {
         math: PropTypes.string.isRequired,
         mathEngine: PropTypes.oneOf(Object.keys(MATH_ENGINES).map((key) => MATH_ENGINES[key])),
         horizontalScroll: PropTypes.bool,
-        verticalScroll: PropTypes.bool
+        verticalScroll: PropTypes.bool,
+        scalesToFit: PropTypes.bool
 
     }
     static defaultProps = {
         mathEngine: MATH_ENGINES.KATEX,
         horizontalScroll: false,
-        verticalScroll: false
+        verticalScroll: false,
+        scalesToFit: true
     }
 
     static measure = memoize((LaTex) => undefined);
@@ -64,23 +66,27 @@ export default class MathViewBase extends Component {
     onChange = (e) => {
         const size = e.nativeEvent;
         MathViewBase.measure.cache.set(this.props.math, size);
-        console.log(size)
         this.setState({ size });
     }
 
     render() {
         const { size } = this.state;
         return (
-            <RNMathView
-                {...this.props}
-                style={[/*StyleSheet.absoluteFill,*/{ backgroundColor: 'pink' }, size]}
-                text={this.math}
-                onLayout={(e) => console.log(e.nativeEvent)}
-                onChange={this.onChange}
-            />
+            <View>
+                <RNMathView
+                    {...this.props}
+                    style={[this.props.style, styles.base, size]}
+                    text={this.math}
+                    onChange={this.onChange}
+                />
+            </View>
         );
     }
 }
 
-//export default React.forwardRef((props, ref) => <MathViewBase {...props} forwardedRef={ref} />);
+const styles = StyleSheet.create({
+    base: {
+        alignItems: 'center', justifyContent: 'center', display: 'flex'
+    }
+});
 

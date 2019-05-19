@@ -84,16 +84,6 @@ public class RNMathViewManager extends SimpleViewManager<RNMathView> {
         viewContainer.shrinkFontScale(scale);
     }
 
-    @ReactProp(name = PROPS_FLEX_WRAP)
-    public void setPropsFlexWrap(RNMathView viewContainer, String value) {
-        viewContainer.setFlexWrap(value == PROPS_FLEX_WRAP_WRAP);
-    }
-
-    @ReactProp(name = PROPS_CONTAINER_LAYOUT)
-    public void setPropsContainerLayout(RNMathView viewContainer, ReadableMap layout) {
-        viewContainer.setContainerDimensions(layout.getInt("width"), layout.getInt("height"));
-    }
-
     public Map getExportedCustomBubblingEventTypeConstants() {
         return MapBuilder.builder()
                 .put(

@@ -58,20 +58,13 @@ export default class App extends Component {
         clearInterval(this.t);
     }
 
-    renderFlexItem(item) {
-        const { string } = item;
-        return (
-            <MathView
-                math={string}
-                style={{maxWidth:this.state.width}}
-            />
-        );
-    }
-
     renderItem(item) {
         return (
             <View style={[styles.flexContainer, { flex: 1, backgroundColor: 'pink', /*alignItems:'center',justifyContent:'center'*/ }]}>
-                {this.renderFlexItem(item)}
+                <MathView
+                    math={item.string}
+                    style={{ maxWidth: this.state.width }}
+                />
             </View>
         );
     }
@@ -126,57 +119,9 @@ export default class App extends Component {
 
     render0() {
         return this.renderItem(this.state.tag);
-        return (
-            <FlatList
-                scrollEnabled
-                renderItem={({ item, index }) => this.renderFlexItem(this.state.tag)}
-                data={Array(5).fill(0)}
-                keyExtractor={(item, index) => `math:standalone:${index}`}
-                refreshing={this.state.refreshing}
-                style={{ flex: 1 }}
-                extraData={this.state.width}
-            />
-        );
-        
-    }
-
-    renderStandalones(index) {
-        return [
-            React.cloneElement(this.renderFlexItem(this.state.tag), {
-                containerStyle: [styles.mathContainer, styles.flexContainer,/* { flex: 1 }*/],
-                style: [/*styles.mathInner,*/ { /*flex: 1,*/ backgroundColor: 'blue' }]
-            }),
-            React.cloneElement(this.renderFlexItem(this.state.tag), {
-                containerStyle: [styles.mathContainer],
-                style: [/*styles.mathInner,*/ { /*flex: 1,*/ backgroundColor: 'blue' }]
-            }),
-            React.cloneElement(this.renderFlexItem(this.state.tag), {
-                containerStyle: [styles.mathContainer, styles.flexContainer,/* { flex: 1 }*/],
-                style: [/*styles.mathInner,*/ { flex: 1, backgroundColor: 'blue' }]
-            }),
-            React.cloneElement(this.renderFlexItem(this.state.tag), {
-                containerStyle: [styles.mathContainer, styles.flexContainer,/* { flex: 1 }*/],
-                style: [styles.mathInner, { flex: 1, backgroundColor: 'blue' }]
-            }),
-            React.cloneElement(this.renderFlexItem(this.state.tag), {
-                containerStyle: [styles.mathContainer],
-                style: [styles.mathInner, { flex: 1, backgroundColor: 'blue' }]
-            })
-        ][index];
-    }
-
-    __________render() {
-        return (
-            <ScrollView style={{flex:1, backgroundColor:'red'}}>
-                {this.renderFlexItem(MathStrings.calculus[0])}
-                {this.renderFlexItem(MathStrings.calculus[1])}
-                {this.renderFlexItem(MathStrings.calculus[2])}
-            </ScrollView>
-        );
     }
 
     render() {
-        console.log('STATE:', this.state.state);
         return (
             <View style={{ flex: 1 }}>
                 <View style={{ flex: 1 }}>

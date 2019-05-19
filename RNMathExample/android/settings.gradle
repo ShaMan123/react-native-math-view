@@ -1,0 +1,4 @@
+rootProject.name = 'RNMathExample'
+include ':react-native-math-view'
+project(':react-native-math-view').projectDir = new File(rootProject.projectDir, '../../android')
+include ':app'

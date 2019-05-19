@@ -1,5 +1,7 @@
 package com.autodidact.rnmathview;
 
+import android.view.View;
+
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.SimpleViewManager;
@@ -23,7 +25,7 @@ public class RNMathViewManager extends SimpleViewManager<RNMathView> {
     private static final String PROPS_FONT_COLOR = "fontColor";
     private static final String PROPS_FONT_SHRINK = "fontShrink";
     private static final String PROPS_FLEX_WRAP = "flexWrap";
-    private static final String PROPS_CONTAINER_LAYOUT = "containerLayout";
+    private static final String PROPS_SCAELS_TO_FIT = "scalesToFit";
 
     private static final String PROPS_MATH_ENGINE_KATEX = "KATEX";
     private static final String PROPS_MATH_ENGINE_MATHJAX = "MATHJAX";
@@ -84,14 +86,9 @@ public class RNMathViewManager extends SimpleViewManager<RNMathView> {
         viewContainer.shrinkFontScale(scale);
     }
 
-    @ReactProp(name = PROPS_FLEX_WRAP)
-    public void setPropsFlexWrap(RNMathView viewContainer, String value) {
-        viewContainer.setFlexWrap(value == PROPS_FLEX_WRAP_WRAP);
-    }
-
-    @ReactProp(name = PROPS_CONTAINER_LAYOUT)
-    public void setPropsContainerLayout(RNMathView viewContainer, ReadableMap layout) {
-        viewContainer.setContainerDimensions(layout.getInt("width"), layout.getInt("height"));
+    @ReactProp(name = PROPS_SCAELS_TO_FIT)
+    public void setPropsScalesToFit(RNMathView viewContainer, boolean fit) {
+        viewContainer.setScalesToFit(fit);
     }
 
     public Map getExportedCustomBubblingEventTypeConstants() {

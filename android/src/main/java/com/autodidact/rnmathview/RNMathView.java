@@ -1,60 +1,79 @@
 package com.autodidact.rnmathview;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Canvas;
+import android.graphics.Picture;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.RelativeLayout;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.ThemedReactContext;
+import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
+import com.facebook.react.views.view.*;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import io.github.kexanie.library.MathView;
 
 public class RNMathView extends MathView {
+    public final String TAG = "RNMathView";
+    //private MathView mathView;
     private ThemedReactContext mContext;
     //private ReactContext reactContext;
     private boolean didSetEngine = false;
     private boolean didSetText = false;
     private String mText = "";
     private boolean pendingText = false;
+    private boolean scalesToFit = true;
     private int mEngine;
     private float webViewHeight = -1, webViewWidth = -1;
-    private int containerHeight, containerWidth;
+    float pxWidth, pxHeight;
     private int mScrollBarDefaultDelayBeforeFade;
     private int mScrollBarFadeDuration;
     private String mFontColor;
     private float mFontScale = 1;
     private boolean isFlexWrap = false;
+    private JavaScriptUtility jsUtil;
 
     public RNMathView(ThemedReactContext context) {
         super(context, null);
         mContext = context;
         setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        jsUtil = new JavaScriptUtility(this);
+        this.getSettings().setJavaScriptEnabled(true);
+        this.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ONLY);
+        this.addJavascriptInterface(this, "WebViewJS");
+        mScrollBarDefaultDelayBeforeFade = this.getScrollBarDefaultDelayBeforeFade();
+        mScrollBarFadeDuration = this.getScrollBarFadeDuration();
+        setVisibility(INVISIBLE);
 
-        getSettings().setJavaScriptEnabled(true);
-        addJavascriptInterface(this, "WebViewJS");
-
-        mScrollBarDefaultDelayBeforeFade = getScrollBarDefaultDelayBeforeFade();
-        mScrollBarFadeDuration = getScrollBarFadeDuration();
-        //setBackgroundColor(Color.TRANSPARENT);
-
-        setWebViewClient(new WebViewClient() {
+        this.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView webView, String url) {
-                runSetFontColorJS();
-                if(isFlexWrap) loadScript(flexWrapStyle());
-                loadScript(resizeObserverScript());
-                //loadScript(getSizeJSFormula());
+                jsUtil.runSetFontColorJS(mFontColor);
+                jsUtil.addResizeObserver();
                 super.onPageFinished(webView, url);
             }
         });
+    }
+
+    public static int getScreenWidth() {
+        return Resources.getSystem().getDisplayMetrics().widthPixels;
     }
 
     @JavascriptInterface
@@ -66,63 +85,50 @@ public class RNMathView extends MathView {
         webViewWidth = Float.parseFloat(width);
         webViewHeight = Float.parseFloat(height);
 
-        WritableMap event = Arguments.createMap();
-        WritableMap size = Arguments.createMap();
-        size.putDouble("width", webViewWidth);
-        size.putDouble("height", webViewHeight);
-        event.putBoolean("onSizeChanged", true);
-        event.putMap("size", size);
+        if(webViewWidth == 0 || webViewHeight == 0) Log.e(TAG, "Possible LaTeX error");
 
-        mContext.getJSModule(RCTEventEmitter.class).receiveEvent(
-                getId(),
-                "topChange",
-                event);
+        new Thread(new Runnable() {
+            public void run() {
+                post(new Runnable() {
+                    public void run() {
+                        DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
+                        int padding = 0;
+                        pxWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, webViewWidth + padding, displayMetrics);
+                        pxHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, webViewHeight + padding, displayMetrics);
+                        ViewGroup.LayoutParams params = getLayoutParams();
+                        int maxWidth = getWidth() > 0 ? getWidth(): getScreenWidth();
+                        float scale = pxWidth / maxWidth;
 
+                        if(scale >= 1 && scalesToFit) {
+                            shrinkFontScale(1 / scale);
+                            pxWidth /= scale;
+                            pxHeight /= scale;
+                        }
+                        params.width = (int) pxWidth;
+                        params.height = (int) pxHeight;
+                        setLayoutParams(params);
+
+                        setVisibility(VISIBLE);
+
+                        WritableMap event = Arguments.createMap();
+                        event.putInt("width", (int)(params.width / displayMetrics.density));
+                        event.putInt("height", (int)(params.height / displayMetrics.density));
+
+                        mContext.getJSModule(RCTEventEmitter.class).receiveEvent(
+                                getId(),
+                                "topChange",
+                                event);
+                    }
+                });
+            }
+        }).start();
     }
 
-    public void loadScript(String script){
-        loadUrl("javascript:(function(){" + script + "})();");
-    }
-
-    private String getSizeJSFormula(){
-        return "window.WebViewJS.getSize(document.querySelector('body').firstElementChild.getBoundingClientRect().width, document.querySelector('body').offsetHeight);";
-    }
-
-    private String setFontColorJSFormula(){
-        return "document.querySelector('body').style.color = \"" + mFontColor + "\";";
-    }
-
-    private String resizeObserverScript(){
-        return "window.resizeObserver = new ResizeObserver(entries => {\n" +
-                getSizeJSFormula() +
-                "});\n" +
-                "resizeObserver.observe(document.querySelector(\"body\"));\n" +
-                "resizeObserver.observe(document.querySelector(\"body\").firstElementChild);";
-    }
-
-    private String flexWrapStyle(){
-        String body = "document.querySelector(\"body\")";
-        String el = "document.querySelector(\"body\").firstElementChild";
-        String script =
-                setStyleString("width", containerWidth+"px", body) +
-                setStyleString("overflow", "hidden", body) +
-                        setStyleString("color", "white", body) +
-        setStyleString("flexWrap", "wrap", el) +
-        setStyleString("flexDirection", "row", el) +
-        setStyleString("alignItems", "center", el);
-        return script;
-    }
-
-    private String setStyleString(String key, String value, String elementProvider){
-        return elementProvider + ".style." + key + " = \"" + value + "\";";
-    }
-
-    public void measureWebView(){
-        loadScript(getSizeJSFormula());
-    }
-
-    public void runSetFontColorJS(){
-        loadScript(setFontColorJSFormula());
+    private void setProps(){
+        if(didSetEngine && didSetText){
+            super.setEngine(mEngine);
+            super.setText(mText);
+        }
     }
 
     @Override
@@ -139,35 +145,16 @@ public class RNMathView extends MathView {
         setProps();
     }
 
-    private void setProps(){
-        if(didSetEngine && didSetText){
-            super.setEngine(mEngine);
-            super.setText(mText);
-        }
-    }
-
     public void shrinkFontScale(float scale) {
         mFontScale = scale;
-        getSettings().setTextZoom((int)Math.min(scale*100, 100));
+        this.getSettings().setTextZoom((int)Math.min(scale*100, 100));
     }
 
     public void setFontColor(String fontColor) {
         mFontColor = fontColor;
-        if(getProgress() == 100){
-            runSetFontColorJS();
+        if(this.getProgress() == 100){
+            jsUtil.runSetFontColorJS(mFontColor);
         }
-    }
-
-    public void setFlexWrap(boolean flexWrap){
-        isFlexWrap = flexWrap;
-        if(getProgress() == 100){
-            loadScript(flexWrapStyle());
-        }
-    }
-
-    public void setContainerDimensions(int w, int h){
-        containerWidth = w;
-        containerHeight = h;
     }
 
     public void setScrollBarFadeOptions(int defaultDelayBeforeFade, int fadeDuration){
@@ -177,5 +164,9 @@ public class RNMathView extends MathView {
 
     public void restoreScrollBarFadeOptionsToDefault(){
         setScrollBarFadeOptions(mScrollBarDefaultDelayBeforeFade, mScrollBarFadeDuration);
+    }
+
+    public void setScalesToFit(boolean fit){
+        scalesToFit = fit;
     }
 }

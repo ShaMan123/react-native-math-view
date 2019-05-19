@@ -27,8 +27,5 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/ShaMan123/react-native-math-view.git"
-  },
-  "devDependencies": {
-    "react-native": "*"
   }
 }

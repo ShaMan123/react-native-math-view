@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import ReactNative, {
+import {
     requireNativeComponent,
     NativeModules,
     UIManager,
@@ -16,40 +16,39 @@ import ReactNative, {
     StyleSheet,
     findNodeHandle
 } from 'react-native';
-import memoize from 'lodash/memoize';
 
 
-const RNMathView = requireNativeComponent('RNSVGMathView', MathViewBase, {
+const RNMathView = requireNativeComponent('RNSVGMathView', SVGMathView, {
     nativeOnly: {
-        nativeID: true,
-        onChange: true
+        nativeID: true
     }
 });
 
 const MathViewManager = NativeModules.RNMathViewManager || {};
 
-export const MATH_ENGINES = {
-    KATEX: 'KATEX',
-    MATHJAX: 'MATHJAX'
-};
+const styles = StyleSheet.create({
+    base: {
+        flex: 1,
+        minHeight: 35
+    }
+});
 
-export default class MathViewBase extends Component {
+export default class SVGMathView extends Component {
+    static propTypes = {
+        style: ViewPropTypes.style
+    }
+    static defaultProps = {
+        style: styles.base
+    }
 
     render() {
         return (
             <RNMathView
-                //style={{height:1,width:1}}
-                style={{flex:1,minWidth:35,minHeight: 35,backgroundColor:'red'}}
-                onLayout={(e) => console.log('laying out canvas', e.nativeEvent)}
-                pointerEvents="none"
+                {...this.props}
             />
         );
     }
 }
 
-const styles = StyleSheet.create({
-    base: {
-        alignItems: 'center', justifyContent: 'center', display: 'flex'
-    }
-});
+
 

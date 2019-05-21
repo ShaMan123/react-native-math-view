@@ -40,16 +40,14 @@ export default class App extends Component {
         const interval = 5000;
         const tags = MathStrings.calculus.filter((obj) => obj.math);
 
-        setTimeout(() => {
-            this.t = setInterval(() => {
-                this.setState({
-                    width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
-                    tag: tags[i % tags.length],
-                    mip: true
-                });
-                i++;
-            }, interval);
-        }, interval)
+        this.t = setInterval(() => {
+            this.setState({
+                width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
+                tag: tags[i % tags.length],
+                mip: true
+            });
+            i++;
+        }, interval);
     
         
     }
@@ -60,11 +58,10 @@ export default class App extends Component {
 
     renderItem(item) {
         return (
-            <View style={[styles.flexContainer, { flex: 1, backgroundColor: 'pink', /*alignItems:'center',justifyContent:'center'*/ }]}>
+            <View style={styles.flexContainer}>
                 <MathView
-                    onLayout={e=>console.log(item.string, e.nativeEvent.layout)}
+                    onLayout={e => console.log(item.string, e.nativeEvent.layout)}
                     math={item.string}
-                    style={{ maxWidth: this.state.width }}
                 />
             </View>
         );
@@ -72,7 +69,20 @@ export default class App extends Component {
 
     render2() {
         return React.cloneElement(this.render1(), {
-            contentContainerStyle: { flexWrap: 'wrap', display: 'flex', flexDirection: 'row' }
+            style: {flex:1},
+            contentContainerStyle: { flexWrap: 'wrap', display: 'flex', flexDirection: 'row' },
+            renderSectionHeader: ({ section: { title } }) => (<Text style={[styles.sectionHeader,{ minWidth: Dimensions.get('window').width}]}>{title}</Text>),
+            renderItem: ({ item }) => {
+                return (
+                    <View style={[styles.flexContainer,{ margin: 5}]}>
+                        <MathView
+                            onLayout={e => console.log(item.string, e.nativeEvent.layout)}
+                            math={item.string}
+                            style={{flex:1,minHeight:35,flexBasis:this.state.width, maxWidth: Dimensions.get('window').width -10}}
+                        />
+                    </View>
+                );
+            }
         });
     }
     
@@ -81,7 +91,7 @@ export default class App extends Component {
             <SectionList
                 scrollEnabled
                 renderItem={({ item, index, section }) => this.renderItem(item)}
-                renderSectionHeader={({ section: { title } }) => <Text>{title}</Text>}
+                renderSectionHeader={({ section: { title } }) => <Text style={styles.sectionHeader}>{title}</Text>}
                 sections={this.state.singleton ? [
                     {
                         title: 'calculus',
@@ -114,12 +124,17 @@ export default class App extends Component {
         );
     }
 
-    render3() {
-        return this.renderFlexItem(this.state.tag);
-    }
-
     render0() {
         return this.renderItem(this.state.tag);
+    }
+
+    get title() {
+        const m = (this.state.state + 1) % 3;
+        switch (m) {
+            case 0: return 'Stanalone View';
+            case 1: return 'Flex SectionList';
+            case 2: return 'FlexWrap SectionList';
+        }
     }
 
     render() {
@@ -131,9 +146,9 @@ export default class App extends Component {
                 <Button
                     //style={{bottom: 0}}
                     onPress={() => this.setState((prev) => {
-                        return { state: (prev.state + 1) % 4 };
+                        return { state: (prev.state + 1) % 3 };
                     })}
-                    title="press to change view"
+                    title={`change to ${this.title}`}
                 />
             </View>
         );
@@ -141,45 +156,16 @@ export default class App extends Component {
 }
     
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        //flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#F5FCFF',
-    },
     flexContainer: {
+        flex: 1,
         display: 'flex',
-        flexDirection: 'row',//styleUtil.row,
+        flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'flex-start',
         alignItems: 'center',
         
     },
-    mathWrapper: {
-        backgroundColor: 'red',
-        borderRadius: 50,
-        //margin: 5,
-    },
-    mathContainer: {
-        
-        marginVertical: 15,
-        marginHorizontal: 5,
-        minHeight: 40,
-        justifyContent: 'center',
-        backgroundColor: 'orange',
-        
-    },
-    mathInner: {
-        height: 35,
-        minWidth: 35,
-        //marginHorizontal: 35,
-        padding: 5,
-        justifyContent: 'center',
-        backgroundColor: 'blue',
-    },
-    centerContent: {
-        justifyContent: 'center',
-        alignItems: 'center',
+    sectionHeader: {
+        backgroundColor: 'blue', color: 'white', flex: 1
     }
 });

@@ -17,14 +17,14 @@ import {
     findNodeHandle
 } from 'react-native';
 
-
-const RNMathView = requireNativeComponent('RNSVGMathView', SVGMathView, {
+const nativeViewName = 'RNSVGMathView';
+const RNMathView = requireNativeComponent(nativeViewName, SVGMathView, {
     nativeOnly: {
         nativeID: true
     }
 });
-
 const MathViewManager = NativeModules.RNMathViewManager || {};
+export const { Constants } = UIManager.getViewManagerConfig ? UIManager.getViewManagerConfig(nativeViewName) : UIManager[nativeViewName];
 
 const styles = StyleSheet.create({
     base: {
@@ -41,6 +41,8 @@ export default class SVGMathView extends Component {
     static defaultProps = {
         style: styles.base
     }
+
+    static Constants = Constants;
 
     ref = React.createRef();
 

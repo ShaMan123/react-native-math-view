@@ -14,8 +14,12 @@ import com.caverock.androidsvg.SVGImageView;
 import com.caverock.androidsvg.SVGParseException;
 import com.facebook.react.uimanager.ThemedReactContext;
 
+import javax.annotation.Nullable;
+
 public class SVGMathView extends SVGImageView {
     private static String TAG = "RNSVGMathView";
+    private SVG mSVG;
+    private PreserveAspectRatio mPreserveAspectRatio = PreserveAspectRatio.LETTERBOX;
 
     public SVGMathView(ThemedReactContext context){
         super(context);
@@ -25,9 +29,9 @@ public class SVGMathView extends SVGImageView {
 
     public void loadSVG(String svg){
         try{
-            SVG mSVG = SVG.getFromString(svg);
+            mSVG = SVG.getFromString(svg);
             mSVG.setRenderDPI(getResources().getDisplayMetrics().xdpi);
-            mSVG.setDocumentPreserveAspectRatio(PreserveAspectRatio.LETTERBOX);
+            mSVG.setDocumentPreserveAspectRatio(mPreserveAspectRatio);
             mSVG.setDocumentWidth("100%");
             mSVG.setDocumentHeight("100%");
 
@@ -40,6 +44,12 @@ public class SVGMathView extends SVGImageView {
     }
 
     public void setColor(String color){
-        setCSS("path { fill: ${color}; }");
+        String css = "* { fill: " + color + "; stroke: " + color + "; } ";
+        setCSS(css);
+    }
+
+    public void setPreserveAspectRatio(String preserveAspectRatio){
+        mPreserveAspectRatio = PreserveAspectRatio.of(preserveAspectRatio);
+        if(mSVG != null) mSVG.setDocumentPreserveAspectRatio(mPreserveAspectRatio);
     }
 }

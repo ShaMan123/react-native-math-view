@@ -4,14 +4,16 @@ const mode = process.argv[2] === '--watch' ? 'development' : 'production';
 const base = path.resolve(__dirname, 'MathJaxProvider');
 module.exports = {
     mode,        //'production'|'development'
-    entry: path.resolve(base, 'index.tsx'),
+    entry: path.resolve(base, 'index.web.tsx'),
     devtool: 'inline-source-map',
     module: {
         rules: [
             {
-                test: /\.tsx?$/,
-                use: 'ts-loader',
-                exclude: /node_modules/
+                test: /\.web.tsx?$/,
+                use: ['ts-loader',/*'babel-loader'*/],
+                exclude:/node_modules/
+                //exclude: [path.resolve('./node_modules'), path.resolve('./RNMathExample')],
+                //include: [path.resolve('./MathJaxProvider')]
             }
         ]
     },

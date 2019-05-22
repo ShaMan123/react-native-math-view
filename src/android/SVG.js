@@ -35,7 +35,8 @@ const styles = StyleSheet.create({
 
 export default class SVGMathView extends Component {
     static propTypes = {
-        style: ViewPropTypes.style
+        style: ViewPropTypes.style,
+        svg: PropTypes.string.isRequired
     }
     static defaultProps = {
         style: styles.base

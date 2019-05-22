@@ -20,10 +20,9 @@ public class SVGMathView extends SVGImageView {
     public SVGMathView(ThemedReactContext context){
         super(context);
         //setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        load(svg);
     }
 
-    private void load(String svg){
+    public void loadSVG(String svg){
         try{
             SVG mSVG = SVG.getFromString(svg);
             mSVG.setRenderDPI(getResources().getDisplayMetrics().xdpi);

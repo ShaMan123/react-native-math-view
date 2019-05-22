@@ -4,9 +4,11 @@ import { Platform, StyleSheet, Text, View, TextInput, SectionList, FlatList, UIM
 import * as _ from 'lodash';
 import MathView from 'react-native-math-view';
 import * as MathStrings from './math';
-
+import WebView from 'react-native-webview';
 
 YellowBox.ignoreWarnings(['Warning: `flexWrap: `wrap`` is not supported with the `VirtualizedList` components.']);
+
+const data = require('./tags.json');
 
 export default class App extends Component {
     constructor(props) {
@@ -48,20 +50,24 @@ export default class App extends Component {
             });
             i++;
         }, interval);
-    
-        
     }
 
     componentWillUnmount() {
         clearInterval(this.t);
     }
 
-    renderItem(item) {
+    renderItem(item, props) {
+        const tag = data.find((tag) => tag.math === item.string);
+        if (!tag) return null;
+        const svg = tag.renderingData.svg;
+        console.log(svg)
         return (
             <View style={styles.flexContainer}>
                 <MathView
-                    onLayout={e => console.log(item.string, e.nativeEvent.layout)}
+                    //onLayout={e => console.log(item.string, e.nativeEvent.layout)}
+                    {...props}
                     math={item.string}
+                    svg={svg}
                 />
             </View>
         );
@@ -73,15 +79,7 @@ export default class App extends Component {
             contentContainerStyle: { flexWrap: 'wrap', display: 'flex', flexDirection: 'row' },
             renderSectionHeader: ({ section: { title } }) => (<Text style={[styles.sectionHeader,{ minWidth: Dimensions.get('window').width}]}>{title}</Text>),
             renderItem: ({ item }) => {
-                return (
-                    <View style={[styles.flexContainer,{ margin: 5}]}>
-                        <MathView
-                            onLayout={e => console.log(item.string, e.nativeEvent.layout)}
-                            math={item.string}
-                            style={{flex:1,minHeight:35,flexBasis:this.state.width, maxWidth: Dimensions.get('window').width -10}}
-                        />
-                    </View>
-                );
+                return React.cloneElement(this.renderItem(item, { style: { flex: 1, minHeight: 35, flexBasis: this.state.width, maxWidth: Dimensions.get('window').width - 10 } }), { style: [styles.flexContainer,{margin:5}]});
             }
         });
     }
@@ -137,9 +135,53 @@ export default class App extends Component {
         }
     }
 
+    postMessage(data) {
+        if (!this.webView) return;
+        this.webView.injectJavaScript(`(function(){window.postMessage(JSON.stringify(${JSON.stringify(data)}));true;}());`);
+        //this.webView.injectJavaScript(`(function(){window.ReactNativeWebView.postMessage(JSON.stringify(${JSON.stringify(data)}));}());`);
+    }
+
+    tar(math) {
+        this.webView.injectJavaScript(`(function(){window.MathJaxProvider(${JSON.stringify({ math: data.data[0] })});}());`);
+        
+        this.webView.injectJavaScript(`(function(){window.ReactNativeMathView.postMessage("${JSON.stringify({ math })}");}());`);
+    }
+
     render() {
         return (
             <View style={{ flex: 1 }}>
+                <View>
+                    <WebView
+                        javaScriptEnabled
+                        originWhiteList={['*']}
+                        ref={ref => {
+                            this.webView = ref;                            
+                        }}
+                        onLoadEnd={() => {
+                            setTimeout(() => this.postMessage({
+                                data: [
+                                    'E = mc^2',
+                                    'x^{199}',
+                                    "S_{\\triangle }=\\frac{ab\\sin \\left(\\gamma \\right)}{2}",
+                                    "\\cos \\left(x\\right)",
+                                    "\\frac{a}{\\sin \\left(\\alpha \\right)}=\\frac{b}{\\sin \\left(\\beta \\right)}=\\frac{c}{\\sin \\left(\\gamma \\right)}=2R",
+                                    "\\sin \\left(x\\right)",
+                                    "\\tan \\left(x\\right)",
+                                    "c^2=a^2+b^2-2ab\\cos \\left(\\gamma \\right)",
+                                ],
+                                options: {}
+                            }),2000);
+                        }}
+                        cacheEnabled={false}
+                        source={{ uri: 'file:///android_asset/index.html', baseUrl: 'file:///android_asset' }}
+                        onMessage={(e) => console.log(JSON.parse(e.nativeEvent.data))}
+                        onError={syntheticEvent => {
+                            const { nativeEvent } = syntheticEvent;
+                            console.warn('WebView error: ', nativeEvent);
+                        }}
+                        //style={{ display: 'none', width: 0, height: 0 }}
+                    />
+                </View>
                 <View style={{ flex: 1 }}>
                     {this[`render${this.state.state}`]()}
                 </View>

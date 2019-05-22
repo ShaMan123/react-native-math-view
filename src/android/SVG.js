@@ -44,6 +44,8 @@ export default class SVGMathView extends Component {
 
     static Constants = Constants;
 
+    static getPreserveAspectRatio = (alignment, scale) => `${alignment} ${scale}`;
+
     ref = React.createRef();
 
     setNativeProps(props) {

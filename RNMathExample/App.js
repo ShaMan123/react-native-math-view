@@ -5,6 +5,8 @@ import * as _ from 'lodash';
 import MathView from 'react-native-math-view';
 import * as MathStrings from './math';
 
+console.log(MathView.Constants)
+
 YellowBox.ignoreWarnings(['Warning: `flexWrap: `wrap`` is not supported with the `VirtualizedList` components.']);
 
 const data = require('./tags.json');
@@ -43,7 +45,7 @@ export default class App extends Component {
 
         this.t = setInterval(() => {
             this.setState({
-                width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
+                //width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
                 tag: tags[i % tags.length],
                 mip: true
             });
@@ -70,27 +72,30 @@ export default class App extends Component {
         const getColor = () => Math.round(Math.random() * 255);
         const getPixel = () => [getColor(), getColor(), getColor()].join(',');
         const parsedColor = () => `rgb(${getPixel()})`;
-        
-        const width = tag.renderingData.apprxWidth * Math.min(this.state.width / (Dimensions.get('window').width - 20), 1);
+
+        const scale = Math.min(this.state.width / (Dimensions.get('window').width - 20), 1);
+        const width = tag.renderingData.apprxWidth * scale;
+
         const innerStyle = {
             minWidth: 35,
             minHeight: 35,
             flexBasis: Math.max(width, 35),
             maxWidth: Dimensions.get('window').width - 20,
             display: 'flex',
-            backgroundColor: 'pink',
-            flexWrap: 'wrap'
+            //backgroundColor: 'transparent',
+            //right: -vAlign,
+            elevation: 5
+            //flexWrap: 'wrap'
         };
         return (
             <TouchableOpacity style={[styles.flexContainer]}>
                 <MathView
-                    //onLayout={e => console.log(item.string, e.nativeEvent.layout)}
+                    onLayout={e => console.log(item.string, e.nativeEvent.layout)}
                     
                     math={item.string}
                     svg={svg}
-                    style={{flex:1,minHeight:35}}
+                    style={innerStyle}
                     color={parsedColor()}
-                    //ref={ref => ref && ref.setNativeProps({ color: parsedColor(), css: `svg {${tag.renderingData.style} width: ${tag.renderingData.width}; height: ${tag.renderingData.height}}` })}
                     {...props}
                 />
             </TouchableOpacity>
@@ -109,7 +114,7 @@ export default class App extends Component {
             renderItem: ({ item }) => {
                 const width = this.findData(item.string).apprxWidth * this.state.width / Dimensions.get('window').width;
                 const innerStyle = { flex: 1, minWidth: 35, minHeight: 35, flexBasis: Math.max(width, 35), maxWidth: Dimensions.get('window').width - 20 };
-                return React.cloneElement(this.renderItem(item, { style: innerStyle }), { style: [styles.flexContainer, { margin: 5, paddingHorizontal: 5, backgroundColor: 'pink', borderRadius: 50 }] });
+                return React.cloneElement(this.renderItem(item, { style: innerStyle }), { style: [styles.flexContainer, { margin: 5, elevation:2, paddingHorizontal: 5, backgroundColor: 'pink', borderRadius: 50 }] });
             }
         });
     }
@@ -189,11 +194,12 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         //flexWrap: 'wrap',
-        //justifyContent: 'flex-start',
+        //justifyContent: 'center',
         //alignItems: 'center',
+        margin: 5
         
     },
     sectionHeader: {
-        backgroundColor: 'blue', color: 'white', flex: 1
+        backgroundColor: 'blue', color: 'white', flex: 1, elevation: 5
     }
 });

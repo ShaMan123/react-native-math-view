@@ -20,6 +20,9 @@ public class SVGMathView extends SVGImageView {
     private static String TAG = "RNSVGMathView";
     private SVG mSVG;
     private PreserveAspectRatio mPreserveAspectRatio = PreserveAspectRatio.LETTERBOX;
+    private String mCSS = "";
+    private String mColor;
+    private String mColorCSS = "";
 
     public SVGMathView(ThemedReactContext context){
         super(context);
@@ -44,8 +47,25 @@ public class SVGMathView extends SVGImageView {
     }
 
     public void setColor(String color){
-        String css = "* { fill: " + color + "; stroke: " + color + "; } ";
+        mColor = color;
+        mColorCSS = "* { fill: " + color + "; stroke: " + color + "; } ";
+        super.setCSS(mColorCSS);
+    }
+
+    @Override
+    public void setCSS(String css) {
+        css += mColorCSS;
+        super.setCSS(css);
+    }
+
+    public void addCSS(String css) {
+        mCSS += css;
         setCSS(css);
+    }
+
+    public void clearCSS(){
+        mCSS = "";
+        setColor(mColor);
     }
 
     public void setPreserveAspectRatio(String preserveAspectRatio){

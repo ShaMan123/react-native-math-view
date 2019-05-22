@@ -6,6 +6,7 @@ import android.widget.ImageView;
 
 import com.caverock.androidsvg.SVG;
 import com.caverock.androidsvg.PreserveAspectRatio;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
@@ -16,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class RNSVGMathViewManager extends SimpleViewManager<SVGMathView> {
@@ -65,6 +67,23 @@ public class RNSVGMathViewManager extends SimpleViewManager<SVGMathView> {
         viewContainer.setScaleType(ImageView.ScaleType.valueOf(value));
     }
 
+    @Override
+    public void receiveCommand(@Nonnull SVGMathView root, int commandId, @Nullable ReadableArray args) {
+        super.receiveCommand(root, commandId, args);
+        switch (commandId){
+            case 0:
+                root.setCSS(args.getString(0));
+                break;
+            case 1:
+                root.addCSS(args.getString(0));
+                break;
+            case 2:
+                root.clearCSS();
+                break;
+        }
+
+    }
+
     @Nullable
     @Override
     public Map<String, Object> getExportedViewConstants() {
@@ -99,6 +118,16 @@ public class RNSVGMathViewManager extends SimpleViewManager<SVGMathView> {
         map.put("PreserveAspectRatio", preserveAspectRatio);
         map.put("ScaleType", scaleType);
         return map;
+    }
+
+    @Nullable
+    @Override
+    public Map<String, Integer> getCommandsMap() {
+        Map<String, Integer> map = new HashMap<>();
+        map.put("setCSS", 0);
+        map.put("addCSS", 1);
+        map.put("clearCSS", 2);
+        return  map;
     }
 
     public Map getExportedCustomBubblingEventTypeConstants() {

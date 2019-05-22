@@ -90,7 +90,7 @@ export default class App extends Component {
         return (
             <TouchableOpacity style={[styles.flexContainer]}>
                 <MathView
-                    onLayout={e => console.log(item.string, e.nativeEvent.layout)}
+                    //onLayout={e => console.log(item.string, e.nativeEvent.layout)}
                     
                     math={item.string}
                     svg={svg}

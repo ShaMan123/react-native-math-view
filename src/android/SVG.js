@@ -42,10 +42,17 @@ export default class SVGMathView extends Component {
         style: styles.base
     }
 
+    ref = React.createRef();
+
+    setNativeProps(props) {
+        this.ref.current && this.ref.current.setNativeProps(props);
+    }
+
     render() {
         return (
             <RNMathView
                 {...this.props}
+                ref={this.ref}
             />
         );
     }

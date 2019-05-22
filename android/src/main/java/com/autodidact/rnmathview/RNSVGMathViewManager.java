@@ -11,6 +11,8 @@ import java.util.Map;
 
 public class RNSVGMathViewManager extends SimpleViewManager<SVGMathView> {
     public final String PROPS_SVG_STRING = "svg";
+    public final String PROPS_COLOR = "color";
+    public final String PROPS_CSS = "css";
 
     public RNSVGMathViewManager(){
 
@@ -30,6 +32,16 @@ public class RNSVGMathViewManager extends SimpleViewManager<SVGMathView> {
     @ReactProp(name = PROPS_SVG_STRING)
     public void setSVG(SVGMathView viewContainer, String svg) {
         viewContainer.loadSVG(svg);
+    }
+
+    @ReactProp(name = PROPS_COLOR)
+    public void setSVG(SVGMathView viewContainer, String color) {
+        viewContainer.setColor(color);
+    }
+
+    @ReactProp(name = PROPS_CSS)
+    public void setSVG(SVGMathView viewContainer, String css) {
+        viewContainer.setCSS(css);
     }
 
     public Map getExportedCustomBubblingEventTypeConstants() {

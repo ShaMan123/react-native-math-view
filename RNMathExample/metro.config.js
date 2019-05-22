@@ -11,13 +11,16 @@ const { mergeConfig } = require("metro-config");
 const path = require('path');
 const pkg = require('./package.json');
 
-
 module.exports = {
     resolver: {
+        blacklistRE: blacklist([
+            path.resolve(__dirname, '../node_modules'),
+        ]),
         providesModuleNodeModules: Object.keys(pkg.dependencies),
         extraNodeModules: {
             '@babel/runtime': path.resolve(__dirname,'node_modules/@babel/runtime'),
-            'lodash': path.resolve(__dirname,'node_modules/lodash')
+            'lodash': path.resolve(__dirname, 'node_modules/lodash'),
+            'prop-types': path.resolve(__dirname, 'node_modules/prop-types')
         }
     },
     watchFolders: [path.resolve(__dirname, '..')],

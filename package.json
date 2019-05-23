@@ -21,7 +21,7 @@
     "math-view",
     "rn"
   ],
-  "author": "ShaMan123 (github.com/ShaMan123)",
+  "author": "ShaMan123 (https://github.com/ShaMan123)",
   "license": "",
   "peerDependencies": {
     "lodash": "*",

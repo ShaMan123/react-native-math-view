@@ -2,7 +2,7 @@
   "name": "react-native-math-view",
   "version": "2.0.0",
   "description": "Math view for react-native",
-  "main": "index.js",
+  "main": "src",
   "nativePackage": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

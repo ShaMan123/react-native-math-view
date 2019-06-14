@@ -1,6 +1,14 @@
 package com.rnmathexample;
 
+import android.content.Context;
+import android.os.Bundle;
+import android.util.AttributeSet;
+import android.util.Log;
+import android.view.View;
+
 import com.facebook.react.ReactActivity;
+import com.facebook.react.ReactActivityDelegate;
+import com.facebook.react.ReactRootView;
 
 public class MainActivity extends ReactActivity {
 
@@ -12,4 +20,5 @@ public class MainActivity extends ReactActivity {
     protected String getMainComponentName() {
         return "RNMathExample";
     }
+
 }

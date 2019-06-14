@@ -1,8 +1,11 @@
 package com.rnmathexample;
 
 import android.app.Application;
+import android.support.v7.app.AppCompatActivity;
 
+import com.autodidact.rnmathview.MathJaxProviderManager;
 import com.facebook.react.ReactApplication;
+import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
@@ -14,6 +17,7 @@ import java.util.List;
 import com.autodidact.rnmathview.RNMathViewPackage;
 
 public class MainApplication extends Application implements ReactApplication {
+    private AppCompatActivity currentActivity;
 
     private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
         @Override
@@ -25,6 +29,7 @@ public class MainApplication extends Application implements ReactApplication {
         protected List<ReactPackage> getPackages() {
             return Arrays.<ReactPackage>asList(
                     new MainReactPackage(),
+                    new AsyncStoragePackage(),
                     new RNMathViewPackage()
             );
         }
@@ -45,4 +50,5 @@ public class MainApplication extends Application implements ReactApplication {
         super.onCreate();
         SoLoader.init(this, /* native exopackage */ false);
     }
+
 }

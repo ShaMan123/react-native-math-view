@@ -40,18 +40,19 @@ export default class App extends Component {
     
     async componentDidMount() {
         let i = 0;
-        const interval = 5000;
+        const interval = 3000;
         const tags = MathStrings.calculus.filter((obj) => obj.math);
-        console.log('getMathJax1', await MathJaxProvider.getMathJax([tags[i % tags.length].string]));
+        console.log('getMathJax1', await MathJaxProvider.getMathJax('\\sin\\left(2\\alpha\\right)=2\\sin\\left(\\alpha\\right)\\cos\\left(\\alpha\\right)'));
 
         this.t = setInterval(async () => {
+            const data = await MathJaxProvider.getMathJax(tags[i % tags.length].string);
             this.setState({
                 //width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
-                tag: tags[i % tags.length],
+                tag: { ...tags[i % tags.length], renderingData:data },
                 mip: true
             });
             i++;
-            console.log('getMathJax1', await MathJaxProvider.getMathJax([tags[i % tags.length].string]));
+            //console.log('getMathJax1', await MathJaxProvider.getMathJax(tags[i % tags.length].string));
             //console.log('getMathJaxAll', await MathJaxProvider.getMathJax(tags.map(t => t.string)));
         }, interval);
     }
@@ -69,17 +70,18 @@ export default class App extends Component {
     renderItem(item, props = {}) {
         const tag = data.find((tag) => tag.math === item.string);
         if (!tag) return null;
-        const svg = tag.renderingData.svg;
-        
+        const svg = (item.renderingData || tag.renderingData).svg;
         const getColor = () => Math.round(Math.random() * 255);
         const getPixel = () => [getColor(), getColor(), getColor()].join(',');
         const parsedColor = () => `rgb(${getPixel()})`;
 
-
-        const scale = Math.min(this.state.width / (Dimensions.get('window').width - 20), 1);
+        const scaleWidth = Math.min(this.state.width / (Dimensions.get('window').width - 20), 1);
+        const scaleHeight = Math.min(Math.min(35 / tag.renderingData.apprxHeight), 1);
+        const scale = Math.min(scaleWidth, scaleHeight);
         const width = tag.renderingData.apprxWidth * scale;
 
         const innerStyle = {
+            /*
             minWidth: 35,
             minHeight: 35,
             flexBasis: Math.max(width, 35),
@@ -87,17 +89,20 @@ export default class App extends Component {
             display: 'flex',
             //backgroundColor: 'transparent',
             //right: -vAlign,
-            elevation: 5
+            */
+           // elevation: 5,
+            marginVertical: 10
             //flexWrap: 'wrap'
         };
+
         return (
             <TouchableOpacity style={[styles.flexContainer]}>
                 <MathView
                     //onLayout={e => console.log(item.string, e.nativeEvent.layout)}
-                    
-                    math={item.string}
-                    svg={svg}
-                    style={innerStyle}
+                    //svg={svg}
+                    source={{math:item.string}}
+                    //style={{maxHeight: 20, maxWidth: 200}}
+                    style={null}
                     color={parsedColor()}
                     {...props}
                 />

@@ -6,8 +6,8 @@
   "nativePackage": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "webpack --watch",
-    "build": "webpack --progress",
+    "watch": "node_modules/.bin/webpack --watch",
+    "build": "node_modules/.bin/webpack --progress",
     "link": "node MathJaxProvider/link.js",
     "publish": ""
   },
@@ -26,7 +26,8 @@
   "peerDependencies": {
     "lodash": "*",
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "@react-native-community/async-storage": "*"
   },
   "repository": {
     "type": "git",

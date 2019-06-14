@@ -14,6 +14,7 @@ import android.webkit.WebViewClient;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.ThemedReactContext;
+import com.facebook.react.views.view.ReactViewGroup;
 import com.facebook.react.views.webview.ReactWebViewManager;
 
 import org.json.JSONException;
@@ -39,6 +40,7 @@ public class MathJaxProvider extends WebView {
         mContext = context;
         String html = evaluteFile("index.html");
         final String javascript = evaluteFile("dist/bundle.js");
+
         if(html != null){
             getSettings().setJavaScriptEnabled(true);
             loadDataWithBaseURL("file://", html,"text/html",null, null);
@@ -115,11 +117,13 @@ public class MathJaxProvider extends WebView {
         try{
             JSONObject o = new JSONObject(message);
             String math = o.getString("speakText");
-            String svg = o.getString("svg");
+            String svg = o.getString("svg").replaceAll("xlink:xlink", "xlink");
             Double width = o.getDouble("measuredWidth");
             Double height = o.getDouble("measuredHeight");
+            Double apprxWidth = o.getDouble("apprxWidth");
+            Double apprxHeight = o.getDouble("apprxHeight");
             for(OnMessageListener listener: messageListeners){
-                listener.invoke(math, svg, width, height);
+                listener.invoke(math, svg, width, height, apprxWidth, apprxHeight);
             }
         }
         catch (JSONException err){
@@ -149,13 +153,13 @@ public class MathJaxProvider extends WebView {
     }
 
     public interface OnMessageListener {
-        public void invoke(String math, String svg, double width, double height);
+        public void invoke(String math, String svg, double width, double height, @Nullable double apprxWidth, @Nullable double apprxHeight);
         public void reject();
     }
 
     public class MathJaxOptions {
         public boolean excludeTitle = true;
-        public boolean parseSize = false;
+        public boolean parseSize = true;
         protected JSONObject toJSON(){
             JSONObject map = new JSONObject();
             try {

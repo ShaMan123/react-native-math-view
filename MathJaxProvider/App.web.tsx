@@ -57,11 +57,11 @@ export default class App extends React.Component {
 
     addMessageListener() {
         const listener = (e) => {
-            document.body.setAttribute("style", "background-color:red");
+            //document.body.setAttribute("style", "background-color:red");
             let { data, options } = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
-            document.body.setAttribute("style", "background-color:green");
+            //document.body.setAttribute("style", "background-color:green");
             let arr = Array.isArray(data) ? data : [data];
-            document.body.setAttribute("style", "background-color:yellow");
+            //document.body.setAttribute("style", "background-color:yellow");
             return Promise.all(arr.map((math) => this.mathjax({ ...options, math })))
                 .then(App.postMessage)
                 .catch(App.postMessage);
@@ -75,7 +75,7 @@ export default class App extends React.Component {
         /**
          * see https://github.com/react-native-community/react-native-webview/blob/master/docs/Reference.md#onmessage
          * */
-        document.body.setAttribute("style", "background-color:blue");
+        //document.body.setAttribute("style", "background-color:blue");
         window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify(data));
     }
 

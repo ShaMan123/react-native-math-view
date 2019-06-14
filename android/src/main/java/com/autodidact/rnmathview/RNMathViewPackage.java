@@ -13,7 +13,9 @@ import com.facebook.react.bridge.JavaScriptModule;
 
 public class RNMathViewPackage implements ReactPackage {
     public RNMathViewPackage() {
+        super();
     }
+
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         return Arrays.<NativeModule>asList(
@@ -25,7 +27,8 @@ public class RNMathViewPackage implements ReactPackage {
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
         return Arrays.<ViewManager>asList(
                 new RNMathViewManager(),
-                new RNSVGMathViewManager()
+                new RNSVGMathViewManager(),
+                new MathJaxProviderManager()
         );
     }
 

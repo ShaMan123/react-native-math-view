@@ -1,2 +1,2 @@
-import MathView from './android';
-export default MathView;
+import MathView, { MathJaxProvider } from './android';
+export { MathView as default, MathJaxProvider };

@@ -2,10 +2,10 @@
 import React, {Component} from 'react';
 import { Platform, StyleSheet, Text, View, TextInput, SectionList, FlatList, UIManager, Alert, Dimensions, ScrollView, YellowBox, Button, TouchableOpacity } from 'react-native';
 import * as _ from 'lodash';
-import MathView from 'react-native-math-view';
+import MathView, { MathViews } from 'react-native-math-view';
 import * as MathStrings from './math';
 
-console.log(MathView.Constants)
+const { MathJaxProvider } = MathViews;
 
 YellowBox.ignoreWarnings(['Warning: `flexWrap: `wrap`` is not supported with the `VirtualizedList` components.']);
 
@@ -38,19 +38,21 @@ export default class App extends Component {
         
     }
     
-    componentDidMount() {
+    async componentDidMount() {
         let i = 0;
         const interval = 5000;
         const tags = MathStrings.calculus.filter((obj) => obj.math);
+        console.log('getMathJax1', await MathJaxProvider.getMathJax([tags[i % tags.length].string]));
 
-        this.t = setInterval(() => {
+        this.t = setInterval(async () => {
             this.setState({
                 //width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
                 tag: tags[i % tags.length],
                 mip: true
             });
             i++;
-
+            console.log('getMathJax1', await MathJaxProvider.getMathJax([tags[i % tags.length].string]));
+            //console.log('getMathJaxAll', await MathJaxProvider.getMathJax(tags.map(t => t.string)));
         }, interval);
     }
 
@@ -63,7 +65,7 @@ export default class App extends Component {
         if (!tag) return null;
         return tag.renderingData;
     }
-
+    
     renderItem(item, props = {}) {
         const tag = data.find((tag) => tag.math === item.string);
         if (!tag) return null;
@@ -72,6 +74,7 @@ export default class App extends Component {
         const getColor = () => Math.round(Math.random() * 255);
         const getPixel = () => [getColor(), getColor(), getColor()].join(',');
         const parsedColor = () => `rgb(${getPixel()})`;
+
 
         const scale = Math.min(this.state.width / (Dimensions.get('window').width - 20), 1);
         const width = tag.renderingData.apprxWidth * scale;
@@ -173,6 +176,7 @@ export default class App extends Component {
     render() {
         return (
             <View style={{ flex: 1 }}>
+                <MathJaxProvider.Provider />
                 <View style={{ flex: 1 }}>
                     {this[`render${this.state.state}`]()}
                 </View>

@@ -1,6 +1,10 @@
 package com.autodidact.rnmathview;
 
+import android.util.Log;
+import android.webkit.JavascriptInterface;
+import android.webkit.ValueCallback;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 public class JavaScriptUtility {
     private WebView mWebView;
@@ -8,8 +12,9 @@ public class JavaScriptUtility {
         mWebView = webView;
     }
 
-    public void loadScript(String script){
-        mWebView.loadUrl("javascript:(function(){" + script + "})();");
+    public void loadScript(final String script){
+        mWebView.evaluateJavascript(script, null);
+        //mWebView.loadUrl("javascript:(function(){" + script + "})();");
     }
 
     private String getSizeJSFormula(){
@@ -43,4 +48,18 @@ public class JavaScriptUtility {
     public void addResizeObserver(){
         loadScript(getSizeJSFormula());
     }
+
+    public static class WebViewBridge {
+        MathJaxProvider mContext;
+        public WebViewBridge(MathJaxProvider view){
+            mContext = view;
+        }
+
+        @JavascriptInterface
+        public void postMessage(String message) {
+            mContext.onMessage(message);
+        }
+    }
+
+
 }

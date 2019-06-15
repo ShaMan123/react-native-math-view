@@ -16,6 +16,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.NativeViewHierarchyManager;
@@ -43,14 +44,14 @@ public class RNMathViewModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void getMathJax(final int tag, final ReadableArray strings, final Promise promise){
+    public void getMathJax(final int tag, final ReadableArray strings, @Nullable final ReadableMap options, final Promise promise){
         try {
             final ReactApplicationContext context = getReactApplicationContext();
             final UIManagerModule uiManager = context.getNativeModule(UIManagerModule.class);
             uiManager.addUIBlock(new UIBlock() {
                 public void execute(NativeViewHierarchyManager nvhm) {
                     MathJaxProvider view = (MathJaxProvider) nvhm.resolveView(tag);
-                    new MathJaxRequestHelper(view, strings, promise).run();
+                    new MathJaxRequestHelper(view, strings, options, promise).run();
                 }
             });
         } catch (Exception e) {

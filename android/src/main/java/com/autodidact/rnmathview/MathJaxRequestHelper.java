@@ -6,19 +6,31 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.PromiseImpl;
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 
 import java.util.ArrayList;
 
 import javax.annotation.Nullable;
-import javax.annotation.RegEx;
 
 public class MathJaxRequestHelper implements MathJaxProvider.OnMessageListener {
+    public final static String TAG = "MathJaxProvider";
     private MathJaxProvider mView;
     private WritableArray mathJaxResponse;
     private ArrayList<String> pendingStrings = new ArrayList<>();
     private Promise mPromise;
+    private Options mOptions;
+
+    public MathJaxRequestHelper(MathJaxProvider view, final ReadableArray strings, final ReadableMap options, final CompletionCallback promise) {
+        mPromise = promise;
+        init(view, strings, Options.getInstance(options));
+    }
+
+    public MathJaxRequestHelper(MathJaxProvider view, final ReadableArray strings, final ReadableMap options, final Promise promise) {
+        mPromise = promise;
+        init(view, strings, Options.getInstance(options));
+    }
 
     public MathJaxRequestHelper(MathJaxProvider view, final ReadableArray strings, final CompletionCallback promise) {
         mPromise = promise;
@@ -31,12 +43,18 @@ public class MathJaxRequestHelper implements MathJaxProvider.OnMessageListener {
     }
 
     private void init(MathJaxProvider view, final ReadableArray strings){
+        init(view, strings, new Options());
+    }
+
+    private void init(MathJaxProvider view, final ReadableArray strings, Options options){
         for(int i = 0; i < strings.size(); i++){
             pendingStrings.add(strings.getString(i));
         }
         mView = view;
         mathJaxResponse = Arguments.createArray();
         mView.addOnMessageListener(this);
+        mOptions = options;
+        Log.d(TAG, "timeout: " + options.timeout);
     }
 
     public void run(){
@@ -49,7 +67,7 @@ public class MathJaxRequestHelper implements MathJaxProvider.OnMessageListener {
             public void run() {
                 reject("timeout exceeded");
             }
-        }, 5000);
+        }, mOptions.timeout);
     }
 
     @Override
@@ -81,7 +99,7 @@ public class MathJaxRequestHelper implements MathJaxProvider.OnMessageListener {
     }
 
     public void reject(String message){
-        if(mPromise != null) mPromise.reject("aborted", message);
+        if(mPromise != null) mPromise.reject("aborted", TAG + ": " + message);
     }
 
     public void reject(Throwable err){
@@ -92,5 +110,15 @@ public class MathJaxRequestHelper implements MathJaxProvider.OnMessageListener {
         public void resolve(WritableArray response);
         public void reject(String code, String message);
         public void reject(Throwable err);
+    }
+
+    public static class Options {
+        int timeout = 10000;
+
+        public static Options getInstance(ReadableMap options){
+            Options mOptions = new Options();
+            if(options.hasKey("timeout")) mOptions.timeout = options.getInt("timeout");
+            return mOptions;
+        }
     }
 }

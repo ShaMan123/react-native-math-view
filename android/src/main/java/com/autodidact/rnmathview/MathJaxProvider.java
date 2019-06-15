@@ -85,8 +85,7 @@ public class MathJaxProvider extends WebView {
             return total.toString();
         }
         catch (IOException err){
-            err.printStackTrace();
-            Log.e(TAG, "MathJaxProvider: error loading file");
+            Log.e(TAG, "error loading file " + fileName);
             return null;
         }
     }
@@ -127,8 +126,7 @@ public class MathJaxProvider extends WebView {
             }
         }
         catch (JSONException err){
-            err.printStackTrace();
-            //Log.e(TAG, "onMessage: ", err);
+            Log.e(TAG, "Failed to parse message: " + message, err);
         }
 
     }

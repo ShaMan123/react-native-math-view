@@ -43,8 +43,7 @@ public class SVGMathView extends SVGImageView {
             setSVG(mSVG);
         }
         catch (SVGParseException err){
-            err.printStackTrace();
-            Log.e(TAG, "SVGMathView: Failed to parse svg");
+            Log.e(TAG, "Failed to parse svg", err);
         }
     }
 

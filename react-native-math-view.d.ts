@@ -18,8 +18,11 @@ declare module 'react-native-math-view' {
             private setCache(): Promise<void>
             public clearCache(): Promise<void>
             public isCached(key: string): boolean
+            public setMaxTimeout(timeout: number): void
+            protected fetch(math: Array<string>, timeout?: number): Array<MathJaxResponse>
+            protected fetch(math: string, timeout?: number): MathJaxResponse
         }
-        export const cacheHandler: CacheHandler;
+        export const CacheManager: CacheHandler;
 
         export interface MathJaxResponse {
             math: string,
@@ -29,13 +32,6 @@ declare module 'react-native-math-view' {
             apprxWidth: number,
             apprxHeight: number
         }
-
-        /**
-         * 
-         * @param math
-         */
-        export function getMathJax(math: Array<string>): Array<MathJaxResponse>;
-        export function getMathJax(math: string): MathJaxResponse;
 
         export interface MathJaxProviderProps {
             preload?: string | Array<string>
@@ -55,7 +51,17 @@ declare module 'react-native-math-view' {
          * iOS: pass `{ math: string }`
          * */
         source: { svg: string } | { math: string },
+
+        /**
+         * set text color
+         * can be set via `setNativeProps`
+         * */
         color?: string,
+
+        /**
+         * set to `true` to fit the view to it's parent
+         * defaults to `false`
+         * */
         scaleToFit?: boolean
     }
 

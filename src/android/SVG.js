@@ -18,7 +18,7 @@ import {
 } from 'react-native';
 import * as _ from 'lodash';
 
-import { getMathJax } from './MathJaxProvider';
+import { CacheManager } from './MathJaxProvider';
 
 const nativeViewName = 'RNSVGMathView';
 const RNMathView = requireNativeComponent(nativeViewName, SVGMathView, {
@@ -72,14 +72,14 @@ export default class SVGMathView extends Component {
     }
 
     async componentDidMount() {
-        this.data = await getMathJax(this.props.source.math);
+        this.data = await CacheManager.fetch(this.props.source.math);
         this.update(this.data.svg);
     }
 
     async componentDidUpdate(prevProps, prevState) {
         if (!_.isEqual(prevProps.source, this.props.source)) {
             if (this.props.source.math) {
-                this.data = await getMathJax(this.props.source.math);
+                this.data = await CacheManager.fetch(this.props.source.math);
                 this.update(this.data.svg);
             }
             else {

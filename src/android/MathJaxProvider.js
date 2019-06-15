@@ -30,99 +30,103 @@ const ViewManager = NativeModules.RNMathViewManager || {};
 export const { Constants } = UIManager.getViewManagerConfig ? UIManager.getViewManagerConfig(nativeViewName) : UIManager[nativeViewName];
 const ViewModule = Platform.OS === 'ios' ? ViewManager : NativeModules.RNMathViewModule;
 
-let viewTag = null;
-const storageKey = 'MathJaxProviderCache';
-const eventEmitter = new EventEmitter();
-eventEmitter.setMaxListeners(1000);
-
-async function getMathJaxNative(math) {
-    const request = Array.isArray(math) ? math : [math];
-    await new Promise((resolve, reject) => {
-        const callback = () => !_.isNil(viewTag) && resolve();
-        callback();
-        eventEmitter.once('provider', callback);
-        setTimeout(() => {
-            eventEmitter.removeListener('provider', callback);
-            reject('timeout: Could not find MathJax.Provider');
-        }, 5000);
-    });
-    try {
-        const response = await ViewModule.getMathJax(viewTag, request);
-        _.map(response, (data) => {
-            _getMathJax.cache.set(data.math, Promise.resolve(data));
-        });
-        cacheHandler.setCache(response);
-        return response;
-    }
-    catch (err) {
-        console.error(err.message || err);
-        return [];
-    }
-}
-
-const _getMathJax = _.memoize(getMathJaxNative);
-
-export async function getMathJax(math) {
-    const isArr = Array.isArray(math);
-    const arr = isArr ? math : [math];
-    const fetchFromNative = _.filter(arr, (str) => !_getMathJax.cache.has(str));
-    if (_.size(fetchFromNative) > 0) {
-        const canResolve = () => !_.some(fetchFromNative, (str) => !_getMathJax.cache.has(str));
-        await Promise.race([
-            new Promise((resolve) => {
-                if (cacheHandler.active && canResolve) resolve();
-                eventEmitter.once('cache', () => canResolve() && resolve());
-            }),
-            getMathJaxNative(fetchFromNative)
-        ]);
-    }
-    
-    const response = await Promise.all(_.map(arr, _getMathJax));
-    return isArr ? response : response[0];
-}
-
 class CacheHandler {
     active = false;
     cache = [];
+    maxTimeout = 10000;
+    storageKey = 'MathJaxProviderCache';
+    viewTag = null;
+    eventEmitter = new EventEmitter();
+
     constructor() {
         this.appState = AppState.currentState;
+        this.eventEmitter.setMaxListeners(1000);
         this.getCache();
     }
 
     async getCache() {
         if (AsyncStorage) {
-            const response = await AsyncStorage.getItem(storageKey);
+            const response = await AsyncStorage.getItem(this.storageKey);
             if (!response) return;
             _.map(JSON.parse(response), (data) => {
                 this.cache.push(data);
-                _getMathJax.cache.set(data.math, Promise.resolve(data));
+                this.requestMem.cache.set(data.math, Promise.resolve(data));
             });
             if (!this.active) {
                 this.active = true;
-                eventEmitter.emit('cache');
+                this.eventEmitter.emit('cache');
             }            
         }
     }
 
     async setCache(data) {
         if (AsyncStorage) {
-            this.cache.push(...data);
-            return AsyncStorage.setItem(storageKey, JSON.stringify(this.cache));
+            const response = _.filter(data, (val) => _.has(val, 'svg'));
+            this.cache.push(...response);
+            _.map(response, (val) => this.requestMem.cache.set(val.math, Promise.resolve(val)));
+            return AsyncStorage.setItem(this.storageKey, JSON.stringify(this.cache));
         }
     }
 
     clearCache() {
         this.cache = [];
-        _getMathJax.cache.clear();
-        return AsyncStorage.removeItem(storageKey);
+        this.requestMem.cache.clear();
+        return AsyncStorage.removeItem(this.storageKey);
     }
 
     isCached(key) {
-        return _getMathJax.cache.has(key);
+        return this.requestMem.cache.has(key);
+    }
+
+    setMaxTimeout(timeout) {
+        this.maxTimeout = timeout;
+    }
+
+    requestMem = _.memoize(this.handleRequest.bind(this));
+
+    async handleRequest(math, timeout = this.maxTimeout) {
+        const request = Array.isArray(math) ? math : [math];
+        await new Promise((resolve, reject) => {
+            const callback = () => !_.isNil(this.viewTag) && resolve();
+            callback();
+            this.eventEmitter.once('provider', callback);
+            setTimeout(() => {
+                this.eventEmitter.removeListener('provider', callback);
+                reject('timeout: Could not find MathJax.Provider');
+            }, timeout);
+        });
+        try {
+            const response = await ViewModule.getMathJax(this.viewTag, request, { timeout });
+            this.setCache(response);
+            return response;
+        }
+        catch (err) {
+            console.error(err.message || err);
+            return [];
+        }
+    }
+
+    async fetch(math, timeout = this.maxTimeout) {
+        const isArr = Array.isArray(math);
+        const arr = isArr ? math : [math];
+        const fetchFromNative = _.filter(arr, (str) => !this.requestMem.cache.has(str));
+        if (_.size(fetchFromNative) > 0) {
+            const canResolve = () => !_.some(fetchFromNative, (str) => !this.requestMem.cache.has(str));
+            await Promise.race([
+                new Promise((resolve) => {
+                    if (this.active && canResolve) resolve();
+                    this.eventEmitter.once('cache', () => canResolve() && resolve());
+                }),
+                this.handleRequest(fetchFromNative, timeout)
+            ]);
+        }
+
+        const response = await Promise.all(_.map(arr, this.requestMem.bind(this)));
+        return isArr ? response : response[0];
     }
 }
 
-export const cacheHandler = new CacheHandler();
+export const CacheManager = new CacheHandler();
 
 export class Provider extends Component {
     static propTypes = {
@@ -131,25 +135,29 @@ export class Provider extends Component {
 
     constructor(props) {
         super(props);
-        props.preload && getMathJax(props.preload);
+        props.preload && CacheManager.fetch(props.preload);
     }
 
     static getDerivedStateFormProps(nextProps) {
-        getMathJax(nextProps.preload);
+        CacheManager.fetch(nextProps.preload);
         return null;
     }
 
     _handleRef = (ref) => {
-        viewTag = ref ? findNodeHandle(ref) : null;
-        eventEmitter.emit('provider', viewTag);
+        CacheManager.viewTag = ref ? findNodeHandle(ref) : null;
+        CacheManager.eventEmitter.emit('provider', CacheManager.viewTag);
     }
 
     preload(math) {
-        return getMathJax(math);
+        return CacheManager.fetch(math);
     }
 
     clear() {
-        return cacheHandler.clearCache();
+        return CacheManager.clearCache();
+    }
+
+    getCacheManager() {
+        return CacheManager;
     }
 
     render() {

@@ -35,23 +35,25 @@ export default class App extends Component {
             mip: false,
             singleton: false
         }
+
+        MathJaxProvider.CacheManager.setMaxTimeout(7000);
     }
     
     async componentDidMount() {
         let i = 0;
         const interval = 3000;
         const tags = MathStrings.calculus.filter((obj) => obj.math);
-        setTimeout(async () => console.log('isCached', await MathJaxProvider.cacheHandler.isCached(cachePreloadRequest)), 5000);
+        setTimeout(async () => console.log('isCached', await MathJaxProvider.CacheManager.isCached(cachePreloadRequest)), 5000);
         this.t = setInterval(async () => {
-            const data = await MathJaxProvider.getMathJax(tags[i % tags.length].string);
+            const data = await MathJaxProvider.CacheManager.fetch(tags[i % tags.length].string);
             this.setState({
                 width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
                 tag: { ...tags[i % tags.length], renderingData:data },
                 mip: true
             });
             i++;
-            //console.log('getMathJax1', await MathJaxProvider.getMathJax(tags[i % tags.length].string));
-            //console.log('getMathJaxAll', await MathJaxProvider.getMathJax(tags.map(t => t.string)));
+            //console.log('getMathJax1', await MathJaxProvider.CacheManager.fetch(tags[i % tags.length].string));
+            //console.log('getMathJaxAll', await MathJaxProvider.CacheManager.fetch(tags.map(t => t.string)));
         }, interval);
     }
 

@@ -41,6 +41,7 @@ render() {
         source={{ math: 'x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}' }}
     /> 
     <MathView
+		scaleToFit
         source={{ math: '\\cos\\left(x\\right)=\\frac{b}{c}' }}
     /> 
     

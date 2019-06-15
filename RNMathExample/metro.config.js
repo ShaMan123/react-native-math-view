@@ -20,7 +20,8 @@ module.exports = {
         extraNodeModules: {
             '@babel/runtime': path.resolve(__dirname,'node_modules/@babel/runtime'),
             'lodash': path.resolve(__dirname, 'node_modules/lodash'),
-            'prop-types': path.resolve(__dirname, 'node_modules/prop-types')
+            'prop-types': path.resolve(__dirname, 'node_modules/prop-types'),
+            'events': path.resolve(__dirname, 'node_modules/events')
         }
     },
     watchFolders: [path.resolve(__dirname, '..')],

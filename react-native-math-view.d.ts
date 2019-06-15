@@ -54,7 +54,8 @@ declare module 'react-native-math-view' {
          * Android: passing `{ svg: string }` means you have to handle styling/layout yourself
          * iOS: pass `{ math: string }`
          * */
-        source: { svg: string } | { math: string };
+        source: { svg: string } | { math: string },
+        color: string
     }
 
     export default class MathView extends React.Component<MathViewProps> {

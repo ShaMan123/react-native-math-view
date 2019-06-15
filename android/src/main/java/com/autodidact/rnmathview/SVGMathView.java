@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 
 import com.caverock.androidsvg.PreserveAspectRatio;
 import com.caverock.androidsvg.RenderOptions;
+import com.caverock.androidsvg.*;
 import com.caverock.androidsvg.SVG;
 import com.caverock.androidsvg.SVGImageView;
 import com.caverock.androidsvg.SVGParseException;
@@ -26,6 +27,7 @@ public class SVGMathView extends SVGImageView {
 
     public SVGMathView(ThemedReactContext context){
         super(context);
+
         //setLayerType(View.LAYER_TYPE_SOFTWARE, null); //https://bigbadaboom.github.io/androidsvg/use_with_ImageView.html
         //setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
     }

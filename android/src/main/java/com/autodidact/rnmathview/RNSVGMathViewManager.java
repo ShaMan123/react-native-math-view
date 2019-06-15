@@ -41,7 +41,7 @@ public class RNSVGMathViewManager extends SimpleViewManager<SVGMathView> {
     public final String PROPS_SCALE_TYPE = "scaleType";
 
     public RNSVGMathViewManager(){
-
+        super();
     }
 
     @Override

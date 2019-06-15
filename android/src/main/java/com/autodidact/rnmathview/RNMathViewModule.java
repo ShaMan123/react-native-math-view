@@ -44,7 +44,7 @@ public class RNMathViewModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void getMathJax(final int tag, final ReadableArray strings, @Nullable final ReadableMap options, final Promise promise){
+    public void getMathJax(final int tag, final ReadableArray strings, final ReadableMap options, final Promise promise){
         try {
             final ReactApplicationContext context = getReactApplicationContext();
             final UIManagerModule uiManager = context.getNativeModule(UIManagerModule.class);

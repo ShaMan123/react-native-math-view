@@ -38,7 +38,7 @@ declare module 'react-native-math-view' {
         export function getMathJax(math: string): MathJaxResponse;
 
         export interface MathJaxProviderProps {
-            preload: string | Array<string>
+            preload?: string | Array<string>
         }
         export class Provider extends React.Component<MathJaxProviderProps> {
             /**preload math for later use */
@@ -55,8 +55,8 @@ declare module 'react-native-math-view' {
          * iOS: pass `{ math: string }`
          * */
         source: { svg: string } | { math: string },
-        color: string,
-        scaleToFit: boolean
+        color?: string,
+        scaleToFit?: boolean
     }
 
     export default class MathView extends React.Component<MathViewProps> {

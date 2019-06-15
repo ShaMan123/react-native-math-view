@@ -1,5 +1,10 @@
 # react-native-math-view
 
+| Launch Test | Example App |
+| --- | --- |
+| ![Launch](./docs/launchAndroid.gif) | ![Example App](./docs/exampleAndroid.gif) |
+
+
 ## WIP V2
 
 Building a react native math view to easily display and handle math.

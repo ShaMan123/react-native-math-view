@@ -45,7 +45,7 @@ export default class App extends Component {
         this.t = setInterval(async () => {
             const data = await MathJaxProvider.getMathJax(tags[i % tags.length].string);
             this.setState({
-                //width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
+                width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
                 tag: { ...tags[i % tags.length], renderingData:data },
                 mip: true
             });
@@ -72,36 +72,17 @@ export default class App extends Component {
         const getColor = () => Math.round(Math.random() * 255);
         const getPixel = () => [getColor(), getColor(), getColor()].join(',');
         const parsedColor = () => `rgb(${getPixel()})`;
-
-        const scaleWidth = Math.min(this.state.width / (Dimensions.get('window').width - 20), 1);
-        const scaleHeight = Math.min(Math.min(35 / tag.renderingData.apprxHeight), 1);
-        const scale = Math.min(scaleWidth, scaleHeight);
-        const width = tag.renderingData.apprxWidth * scale;
-
-        const innerStyle = {
-            /*
-            minWidth: 35,
-            minHeight: 35,
-            flexBasis: Math.max(width, 35),
-            maxWidth: Dimensions.get('window').width - 20,
-            display: 'flex',
-            //backgroundColor: 'transparent',
-            //right: -vAlign,
-            */
-           // elevation: 5,
-            marginVertical: 10
-            //flexWrap: 'wrap'
-        };
-
+        //
         return (
             <TouchableOpacity style={[styles.flexContainer]}>
                 <MathView
                     //onLayout={e => console.log(item.string, e.nativeEvent.layout)}
                     //svg={svg}
-                    source={{math:item.string}}
+                    source={{ math: item.string }}
                     //style={{maxHeight: 20, maxWidth: 200}}
                     style={null}
                     color={parsedColor()}
+                    scaleToFit
                     {...props}
                 />
             </TouchableOpacity>
@@ -128,7 +109,6 @@ export default class App extends Component {
     render1() {
         return (
             <SectionList
-                scrollEnabled
                 renderItem={({ item, index, section }) => this.renderStat(item)}
                 renderSectionHeader={({ section: { title } }) => <Text style={styles.sectionHeader}>{title}</Text>}
                 sections={this.state.singleton ? [

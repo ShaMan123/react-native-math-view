@@ -13,9 +13,6 @@ import java.util.Map;
 import io.github.kexanie.library.MathView;
 
 public class RNMathViewManager extends SimpleViewManager<RNMathView> {
-
-    public static RNMathView View = null;
-
     private static final String PROPS_MATH_TEXT = "text";
     private static final String PROPS_MATH_ENGINE = "mathEngine";
     private static final String PROPS_NATIVE_PROPS = "nativeProps";
@@ -34,6 +31,10 @@ public class RNMathViewManager extends SimpleViewManager<RNMathView> {
     @Override
     public String getName() {
         return "RNMathView";
+    }
+
+    public RNMathViewManager(){
+        super();
     }
 
     @Override

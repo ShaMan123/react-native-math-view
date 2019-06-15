@@ -2,10 +2,15 @@
   "name": "react-native-math-view",
   "version": "2.0.0",
   "description": "Math view for react-native",
-  "main": "index.js",
+  "main": "src",
+  "types": "react-native-math-view.d.ts",
   "nativePackage": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "node_modules/.bin/webpack --watch",
+    "build": "node_modules/.bin/webpack --progress",
+    "link": "node MathJaxProvider/link.js",
+    "publish": ""
   },
   "keywords": [
     "react-native",
@@ -17,9 +22,10 @@
     "math-view",
     "rn"
   ],
-  "author": "ShaMan123 (github.com/ShaMan123)",
+  "author": "ShaMan123 (https://github.com/ShaMan123)",
   "license": "",
   "peerDependencies": {
+    "@react-native-community/async-storage": "*",
     "lodash": "*",
     "react": "*",
     "react-native": "*"
@@ -27,5 +33,35 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/ShaMan123/react-native-math-view.git"
+  },
+  "dependencies": {
+    "events": "^3.0.0",
+    "lodash": "^4.17.11",
+    "prop-types": "^15.7.2"
+  },
+  "devDependencies": {
+    "@types/react": "^16.8.20",
+    "@types/react-dom": "^16.8.4",
+    "@types/react-native": "^0.57.63",
+    "babel-loader": "^8.0.6",
+    "is-fullwidth-code-point": "^3.0.0",
+    "mathjax": "^2.7.5",
+    "path": "^0.12.7",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "ts-loader": "^6.0.1",
+    "typescript": "^3.4.5",
+    "webpack": "^4.32.0",
+    "webpack-cli": "^3.3.2"
+  },
+  "rnpm": {
+    "assets": [
+      "MathJaxProvider/index.html",
+      "MathJaxProvider/dist"
+    ]
+  },
+  "resolutions": {
+    "react": "*",
+    "react-native": "*"
   }
 }

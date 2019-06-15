@@ -71,6 +71,7 @@ dependencies {
     implementation 'com.facebook.react:react-native:+'
     implementation 'io.github.kexanie.library:MathView:0.0.6'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    implementation 'com.caverock:androidsvg-aar:1.3'
 }
 
 

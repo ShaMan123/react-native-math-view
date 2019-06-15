@@ -33,15 +33,31 @@ const ViewModule = Platform.OS === 'ios' ? ViewManager : NativeModules.RNMathVie
 let viewTag = null;
 const storageKey = 'MathJaxProviderCache';
 const eventEmitter = new EventEmitter();
+eventEmitter.setMaxListeners(1000);
 
 async function getMathJaxNative(math) {
     const request = Array.isArray(math) ? math : [math];
-    const response = await ViewModule.getMathJax(viewTag, request);
-    _.map(response, (data) => {
-        _getMathJax.cache.set(data.math, Promise.resolve(data));
+    await new Promise((resolve, reject) => {
+        const callback = () => !_.isNil(viewTag) && resolve();
+        callback();
+        eventEmitter.once('provider', callback);
+        setTimeout(() => {
+            eventEmitter.removeListener('provider', callback);
+            reject('timeout: Could not find MathJax.Provider');
+        }, 5000);
     });
-    cacheHandler.setCache(response);
-    return response;
+    try {
+        const response = await ViewModule.getMathJax(viewTag, request);
+        _.map(response, (data) => {
+            _getMathJax.cache.set(data.math, Promise.resolve(data));
+        });
+        cacheHandler.setCache(response);
+        return response;
+    }
+    catch (err) {
+        console.error(err.message || err);
+        return [];
+    }
 }
 
 const _getMathJax = _.memoize(getMathJaxNative);
@@ -55,7 +71,7 @@ export async function getMathJax(math) {
         await Promise.race([
             new Promise((resolve) => {
                 if (cacheHandler.active && canResolve) resolve();
-                eventEmitter.once('active', () => canResolve() && resolve());
+                eventEmitter.once('cache', () => canResolve() && resolve());
             }),
             getMathJaxNative(fetchFromNative)
         ]);
@@ -83,7 +99,7 @@ class CacheHandler {
             });
             if (!this.active) {
                 this.active = true;
-                eventEmitter.emit('active');
+                eventEmitter.emit('cache');
             }            
         }
     }
@@ -94,13 +110,28 @@ class CacheHandler {
             return AsyncStorage.setItem(storageKey, JSON.stringify(this.cache));
         }
     }
+
+    clearCache() {
+        this.cache = [];
+        _getMathJax.cache.clear();
+        return AsyncStorage.removeItem(storageKey);
+    }
+
+    isCached(key) {
+        return _getMathJax.cache.has(key);
+    }
 }
 
-const cacheHandler = new CacheHandler();
+export const cacheHandler = new CacheHandler();
 
 export class Provider extends Component {
     static propTypes = {
         preload: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.string), PropTypes.string])
+    }
+
+    constructor(props) {
+        super(props);
+        props.preload && getMathJax(props.preload);
     }
 
     static getDerivedStateFormProps(nextProps) {
@@ -110,10 +141,15 @@ export class Provider extends Component {
 
     _handleRef = (ref) => {
         viewTag = ref ? findNodeHandle(ref) : null;
+        eventEmitter.emit('provider', viewTag);
     }
 
     preload(math) {
         return getMathJax(math);
+    }
+
+    clear() {
+        return cacheHandler.clearCache();
     }
 
     render() {

@@ -9,6 +9,8 @@ YellowBox.ignoreWarnings(['Warning: `flexWrap: `wrap`` is not supported with the
 
 const data = require('./tags.json');
 
+const cachePreloadRequest = 'x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}';
+
 export default class App extends Component {
     constructor(props) {
         super(props);
@@ -33,15 +35,13 @@ export default class App extends Component {
             mip: false,
             singleton: false
         }
-        
     }
     
     async componentDidMount() {
         let i = 0;
         const interval = 3000;
         const tags = MathStrings.calculus.filter((obj) => obj.math);
-        //console.log('getMathJax1', await MathJaxProvider.getMathJax('\\sin\\left(2\\alpha\\right)=2\\sin\\left(\\alpha\\right)\\cos\\left(\\alpha\\right)'));
-
+        setTimeout(async () => console.log('isCached', await MathJaxProvider.cacheHandler.isCached(cachePreloadRequest)), 5000);
         this.t = setInterval(async () => {
             const data = await MathJaxProvider.getMathJax(tags[i % tags.length].string);
             this.setState({
@@ -179,7 +179,9 @@ export default class App extends Component {
     render() {
         return (
             <View style={{ flex: 1 }}>
-                <MathJaxProvider.Provider />
+                <MathJaxProvider.Provider
+                    preload={cachePreloadRequest}
+                />
                 <View style={{ flex: 1 }}>
                     {this[`render${this.state.state}`]()}
                 </View>

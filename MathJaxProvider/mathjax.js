@@ -573,13 +573,14 @@ function Insert(dst, src) {
 //  Load MathJax into the DOM
 //
 function StartMathJax() {
-    
-    return
     serverState = STATE.STARTED;
+    return;
+    /*
     var script = document.createElement("script");
     script.src = MathJaxPath;
     script.onerror = function () { AddError("Can't load MathJax.js from " + MathJaxPath) };
     document.head.appendChild(script);
+    */
 }
 
 /********************************************************************/

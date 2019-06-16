@@ -56,8 +56,13 @@ public class JavaScriptUtility {
         }
 
         @JavascriptInterface
-        public void postMessage(String message) {
-            mContext.onMessage(message);
+        public void postMessage(final String message) {
+            mContext.post(new Runnable() {
+                @Override
+                public void run() {
+                    mContext.onMessage(message);
+                }
+            });
         }
     }
 

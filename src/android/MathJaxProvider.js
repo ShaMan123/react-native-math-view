@@ -84,7 +84,7 @@ class CacheHandler {
 
     requestMem = _.memoize(this.handleRequest.bind(this));
 
-    async handleRequest(math, timeout = this.maxTimeout) {
+    async handleRequest(math) {
         const request = Array.isArray(math) ? math : [math];
         await new Promise((resolve, reject) => {
             const callback = () => !_.isNil(this.viewTag) && resolve();
@@ -93,10 +93,10 @@ class CacheHandler {
             setTimeout(() => {
                 this.eventEmitter.removeListener('provider', callback);
                 reject('timeout: Could not find MathJax.Provider');
-            }, timeout);
+            }, this.maxTimeout);
         });
         try {
-            const response = await ViewModule.getMathJax(this.viewTag, request, { timeout });
+            const response = await ViewModule.getMathJax(this.viewTag, request, { timeout: this.maxTimeout });
             this.setCache(response);
             return response;
         }

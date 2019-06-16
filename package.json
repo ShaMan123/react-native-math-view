@@ -7,7 +7,7 @@
   "nativePackage": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "node_modules/.bin/webpack --watch",
+    "watch": "node_modules/.bin/webpack --watch --dev",
     "build": "node_modules/.bin/webpack --progress",
     "link": "node MathJaxProvider/link.js",
     "publish": ""

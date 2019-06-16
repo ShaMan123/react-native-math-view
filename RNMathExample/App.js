@@ -13,6 +13,8 @@ const cachePreloadRequest = 'x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}';
 
 const numStates = 4;
 
+const interval = 3000;
+
 export default class App extends Component {
     constructor(props) {
         super(props);
@@ -32,30 +34,32 @@ export default class App extends Component {
             ],
             width: Dimensions.get('window').width,
             fontScale: 1,
-            state: 2,
+            state: 3,
             tag: MathStrings.calculus.filter((obj) => obj.math)[0],
             mip: false,
-            singleton: false
+            singleton: false,
+            i: 0
         }
 
         MathJaxProvider.CacheManager.setMaxTimeout(7000);
+        MathJaxProvider.CacheManager.disableWarnings();
     }
     
     async componentDidMount() {
-        let i = 0;
-        const interval = 3000;
         const tags = MathStrings.calculus.filter((obj) => obj.math);
         setTimeout(async () => console.log('isCached', await MathJaxProvider.CacheManager.isCached(cachePreloadRequest)), 5000);
         this.t = setInterval(async () => {
-            const tag = this.state.state === 3 ? _.set(this.state.tag, 'string', `\\frac{${this.state.tag.string}}{${i}}`) : tags[i % tags.length];
-            const data = await MathJaxProvider.CacheManager.fetch(tag.string);
+            let i = (this.state.i + 1) % 20;
+
+            const tag = tags[i % tags.length];
+            //const data = await MathJaxProvider.CacheManager.fetch(tag.string);
             
             this.setState({
-                width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
-                tag: { ...tag, renderingData:data },
+                i,
+                //width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
+                tag: { ...tag },
                 mip: true
             });
-            i++;
             //console.log('getMathJax1', await MathJaxProvider.CacheManager.fetch(tags[i % tags.length].string));
             //console.log('getMathJaxAll', await MathJaxProvider.CacheManager.fetch(tags.map(t => t.string)));
         }, interval);
@@ -69,6 +73,21 @@ export default class App extends Component {
         const tag = data.find((tag) => tag.math === math);
         if (!tag) return null;
         return tag.renderingData;
+    }
+
+    getTaylor() {
+        const exp = new Array(this.state.i + 1).fill(0).map((val, index) => index + 2);
+        const rest = exp.map((val) => `{\\frac {x^{${val}}}{${val}!}}`).join('+');
+        return { string: `{\\displaystyle e^{x}=\\sum _{n=0}^{\\infty }{\\frac {x^{n}}{n!}}=1+x+${rest}+\\cdots }` };
+    }
+
+    getFrac(a, b) {
+        return { string: `\\frac{${a}}{${b}}` };
+    }
+
+    getRecursiveFrac() {
+        const a = new Array(this.state.i + 1).fill(0);
+        return { string: a.reduce((acc, val, index) => this.getFrac(acc, index + 1).string, `x^{${this.state.i + 1}}`) }
     }
     
     renderItem(item, props = {}) {
@@ -95,7 +114,39 @@ export default class App extends Component {
     }
 
     render3() {
-        return this.render0();
+        const taylor = this.getTaylor();
+        const rFrac = this.getRecursiveFrac();
+        const i = this.state.i + 1;
+        const frac = this.getFrac(`x+${i}`, i);
+
+        console.log('Dynamic values cached?', MathJaxProvider.CacheManager.isCached(taylor) && MathJaxProvider.CacheManager.isCached(rFrac));
+        return (
+            <ScrollView style={{ flex: 1 }}>
+                {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: true, resizeMode: 'contain' })}
+                {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: false, resizeMode: 'center' })}
+                <View>
+                    <ScrollView
+                        horizontal
+                        style={{ flexDirection: 'column' }}
+                        onStartShouldSetResponderCapture={() => true}
+                        onMoveShouldSetResponderCapture={() => true}
+                        scrollEnabled
+                        onScroll={e => console.log(e.nativeEvent)}
+                    >
+                        <View pointerEvents="none">
+                            {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: false, resizeMode: 'cover' })}
+                        </View>
+                    </ScrollView>
+                </View>
+                {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: true, resizeMode: 'stretch', style: { minHeight: 150, flex: 1 } })}
+                <View style={{ width: 200, height: 200, justifyContent: 'center', alignItems: 'stretch', borderColor: 'pink', borderWidth: 2, borderStyle: 'dashed', margin: 5 }} collapsable={false}>
+                    {this.renderItem(frac, { backgroundColor: 'blue', color: 'white', resizeMode: 'stretch' })}
+                </View>
+                {this.renderItem(rFrac, { backgroundColor: 'blue', color: 'white', resizeMode: 'contain', scaleToFit: true })}
+                {this.renderItem(rFrac, { backgroundColor: 'blue', color: 'white', resizeMode: 'cover', scaleToFit: false })}
+                {this.renderItem(rFrac, { backgroundColor: 'blue', color: 'white', resizeMode: 'stretch', style: {minHeight: 300,flex:1} })}
+            </ScrollView>
+        );
     }
     
     render2() {
@@ -163,22 +214,21 @@ export default class App extends Component {
 
     render() {
         return (
-            <View style={{ flex: 1 }}>
-                <MathJaxProvider.Provider
-                    preload={cachePreloadRequest}
-                />
+            <MathJaxProvider.Provider
+                preload={cachePreloadRequest}
+                style={{ flex: 1 }}
+            >
                 <View style={{ flex: 1 }}>
                     {this[`render${this.state.state}`]()}
                 </View>
                 <Button
-                    
                     //style={{bottom: 0}}
                     onPress={() => this.setState((prev) => {
                         return { state: (prev.state + 1) % numStates };
                     })}
                     title={`change to ${this.title}`}
                 />
-            </View>
+            </MathJaxProvider.Provider>
         );
     }
 }
@@ -196,6 +246,7 @@ const styles = StyleSheet.create({
     },
     flexWrapContainer: {
         display: 'flex',
+        flexWrap: 'wrap',
         flexDirection: 'row',
         margin: 5,
         elevation: 2,

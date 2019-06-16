@@ -26,12 +26,31 @@ declare module 'react-native-math-view' {
 
     export module MathJaxProvider {
         class CacheHandler {
-            private getCache(): Promise<void>
-            private setCache(): Promise<void>
+            private getCache(): Promise<MathJaxResponse[]>
+            public addToCache(data: Array<MathJaxResponse>): Promise<void>
+            /**
+             * clear data only from AsyncStorage
+             * */
+            private clearDatabase(): Promise<void>
             public clearCache(): Promise<void>
             public isCached(key: string): boolean
+            public enable(): void
+            /**
+             * disable the cache manager from updating
+             * *** BAD FOR PERFORMANCE ***
+             * */
+            public disable(): void
+            /**
+             * disable errors from MathJax
+             * */
+            public disableWarnings(): void
+            /**
+             * default is 10000ms
+             * @param timeout
+             */
             public setMaxTimeout(timeout: number): void
-            protected fetch(math: Array<string>, timeout?: number): Array<MathJaxResponse>
+            private handleRequest(math: string | string[]): MathJaxResponse[]
+            protected fetch(math: Array<string>, timeout?: number): MathJaxResponse[]
             protected fetch(math: string, timeout?: number): MathJaxResponse
         }
         export const CacheManager: CacheHandler;
@@ -54,10 +73,12 @@ declare module 'react-native-math-view' {
 
             /**clear provider cache */
             clear(): void
+
+            getCacheManager(): CacheHandler
         }
     }
 
-    export type ResizeMode = 'cover' | 'contain';
+    export type ResizeMode = 'center' | 'cover' | 'contain';
 
     export interface MathViewProps extends ViewProps {
         /**
@@ -79,7 +100,7 @@ declare module 'react-native-math-view' {
         scaleToFit?: boolean,
 
         /**
-         * defaults to 'cover'
+         * defaults to 'center'
          * @default 'cover'
          * */
         resizeMode?: ResizeMode
@@ -87,9 +108,10 @@ declare module 'react-native-math-view' {
 
     export interface StyleLayoutParams {
         maxWidth: number,
+        maxHeight?: number,
 
         /**
-         * defaults to 'cover' */
+         * defaults to 'center' */
         resizeMode?: ResizeMode
     }
 
@@ -103,7 +125,7 @@ declare module 'react-native-math-view' {
 
         /**
          * helper function that provides the style object for custom handling
-         * resizeMode defaults to 'cover'
+         * resizeMode defaults to 'center'
          * @param layoutData
          * @param maxWidth
          */

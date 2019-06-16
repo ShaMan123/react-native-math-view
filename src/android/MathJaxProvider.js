@@ -32,57 +32,121 @@ const ViewModule = Platform.OS === 'ios' ? ViewManager : NativeModules.RNMathVie
 
 class CacheHandler {
     active = false;
-    cache = [];
+    static cache = [];
+    static tags = [];
+    disabled = false;
+    warning = true;
     maxTimeout = 10000;
     storageKey = 'MathJaxProviderCache';
     viewTag = null;
     eventEmitter = new EventEmitter();
+    isGlobal = false
 
-    constructor() {
+    constructor(isGlobal = false) {
         this.appState = AppState.currentState;
         this.eventEmitter.setMaxListeners(1000);
         this.getCache();
     }
 
-    async getCache() {
-        if (AsyncStorage) {
-            const response = await AsyncStorage.getItem(this.storageKey);
-            if (!response) return;
-            _.map(JSON.parse(response), (data) => {
-                this.cache.push(data);
-                this.requestMem.cache.set(data.math, Promise.resolve(data));
+    //  AsyncStorage
+
+    getAllKeys() {
+        return AsyncStorage
+            .getAllKeys()
+            .then((keys) => {
+                return keys.filter((key) => key.startsWith(this.storageKey));
             });
-            if (!this.active) {
-                this.active = true;
-                this.eventEmitter.emit('cache');
-            }            
-        }
     }
 
-    async setCache(data) {
-        if (AsyncStorage) {
-            const response = _.filter(data, (val) => _.has(val, 'svg'));
-            this.cache.push(...response);
-            _.map(response, (val) => this.requestMem.cache.set(val.math, Promise.resolve(val)));
-            return AsyncStorage.setItem(this.storageKey, JSON.stringify(this.cache));
-        }
+    fetchFromDatabase() {
+        return this.getAllKeys()
+            .then((cacheKeys) => {
+                return AsyncStorage
+                    .multiGet(cacheKeys)
+                    .then((response) => {
+                        return response.map((value) => {
+                            const [storageKey, data] = value;
+                            return JSON.parse(data);
+                        });
+                    });
+            });
+    }
+
+    setDatabaseItem(data) {
+        return AsyncStorage
+            .setItem(`${this.storageKey}:${data.math}`, JSON.stringify(data))
+            .catch(err => {
+                if (err.code === 13) this.clearDatabase();
+                console.error(err);
+            });
+    }
+
+    clearDatabase() {
+        return this.getAllKeys()
+            .then((cacheKeys) => {
+                return AsyncStorage
+                    .multiRemove(cacheKeys);
+            });
+    }
+
+    //  CacheManager
+
+    getCache() {
+        return Promise.resolve()
+            .then(async () => {
+                if (AsyncStorage) {
+                    const response = await this.fetchFromDatabase();
+                    if (!response) return;
+                    CacheHandler.cache = response;
+
+                    if (!this.active) {
+                        this.active = true;
+                        this.eventEmitter.emit('cache');
+                    }
+
+                    return response;
+                }
+            })
+            .catch(err => console.error(err));
+    }
+
+    addToCache(data) {
+        if (this.disabled) console.error('MathJaxProvider.CacheManager is disabled');
+        return this.updateCache(data);
+    }
+
+    updateCache(data) {
+        const response = _.filter(data, (val) => _.has(val, 'svg'));
+        CacheHandler.cache.push(...response);
+        return Promise.resolve(AsyncStorage && !this.disabled ? _.map(response, (val) => this.setDatabaseItem(val)) : false);
     }
 
     clearCache() {
-        this.cache = [];
-        this.requestMem.cache.clear();
-        return AsyncStorage.removeItem(this.storageKey);
+        CacheHandler.cache = [];
+        return Promise.resolve(AsyncStorage ? this.clearDatabase() : false);
     }
 
     isCached(key) {
-        return this.requestMem.cache.has(key);
+        return _.find(CacheHandler.cache, (val) => _.isEqual(val.math, key));
+    }
+
+    enable() {
+        this.disabled = false;
+    }
+
+    disable() {
+        this.disabled = true;
+    }
+
+    //  RequestManager
+
+    disableWarnings() {
+        this.warning = false;
     }
 
     setMaxTimeout(timeout) {
         this.maxTimeout = timeout;
     }
-
-    requestMem = _.memoize(this.handleRequest.bind(this));
 
     async handleRequest(math) {
         const request = Array.isArray(math) ? math : [math];
@@ -97,11 +161,16 @@ class CacheHandler {
         });
         try {
             const response = await ViewModule.getMathJax(this.viewTag, request, { timeout: this.maxTimeout });
-            this.setCache(response);
+            this.updateCache(response);
             return response;
         }
         catch (err) {
-            console.warn(err);
+            if (this.warning) {
+                console.warn(err.message || err);
+            }
+            else {
+                console.log(err);
+            }
             return [];
         }
     }
@@ -109,24 +178,33 @@ class CacheHandler {
     async fetch(math, timeout = this.maxTimeout) {
         const isArr = Array.isArray(math);
         const arr = isArr ? math : [math];
-        const fetchFromNative = _.filter(arr, (str) => !this.requestMem.cache.has(str));
+        const fetchFromNative = _.reject(arr, this.isCached);
         if (_.size(fetchFromNative) > 0) {
-            const canResolve = () => !_.some(fetchFromNative, (str) => !this.requestMem.cache.has(str));
+            const canResolve = () => !_.every(fetchFromNative, this.isCached);
             await Promise.race([
                 new Promise((resolve) => {
                     if (this.active && canResolve) resolve();
                     this.eventEmitter.once('cache', () => canResolve() && resolve());
                 }),
-                this.handleRequest(fetchFromNative, timeout)
+                this.handleRequest(fetchFromNative)
             ]);
         }
 
-        const response = await Promise.all(_.map(arr, this.requestMem.bind(this)));
+        const response = _.map(arr, (val) => _.find(CacheHandler.cache, (o) => _.isEqual(o.math, val)));
         return isArr ? response : response[0];
+    }
+
+    setViewTag(next, prev) {
+        _.pull(CacheHandler.tags, prev);
+        this.viewTag = next;
+        if (CacheManager.viewTag === prev) CacheManager.viewTag = next;
+        this.eventEmitter.emit('provider', this.viewTag);
     }
 }
 
-export const CacheManager = new CacheHandler();
+export const CacheManager = new CacheHandler(true);
+
+export const Context = React.createContext(CacheHandler);
 
 export class Provider extends Component {
     static propTypes = {
@@ -134,39 +212,50 @@ export class Provider extends Component {
         preload: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.string), PropTypes.string])
     }
 
+    tag = null;
+
     constructor(props) {
         super(props);
-        props.preload && CacheManager.fetch(props.preload);
+        this.cacheManager = new CacheHandler();
+        props.preload && this.cacheManager.fetch(props.preload);
     }
 
     static getDerivedStateFormProps(nextProps) {
-        CacheManager.fetch(nextProps.preload);
+        this.cacheManager.fetch(nextProps.preload);
         return null;
     }
 
     _handleRef = (ref) => {
-        CacheManager.viewTag = ref ? findNodeHandle(ref) : null;
-        CacheManager.eventEmitter.emit('provider', CacheManager.viewTag);
+        const tag = ref ? findNodeHandle(ref) : null;
+        this.cacheManager.setViewTag(tag, this.tag);
+        this.tag = tag;
     }
 
     preload(math) {
-        return CacheManager.fetch(math);
+        return this.cacheManager.fetch(math);
     }
 
     clear() {
-        return CacheManager.clearCache();
+        return this.cacheManager.clearCache();
     }
 
     getCacheManager() {
-        return CacheManager;
+        return this.cacheManager;
     }
 
     render() {
         return (
-            <RNMathJaxProvider
-                ref={this._handleRef}
-                onLayout={this.props.onLayout}
-            />
+            <>
+                <RNMathJaxProvider
+                    ref={this._handleRef}
+                    onLayout={this.props.onLayout}
+                />
+                <Context.Provider
+                    value={this.cacheManager}
+                >
+                    {this.props.children}
+                </Context.Provider>
+            </>
         );
     }
 }

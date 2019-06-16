@@ -41,6 +41,7 @@ const styles = StyleSheet.create({
 
 export default class SVGMathView extends Component {
     static propTypes = {
+        resizeMode: PropTypes.oneOf(['contain', 'cover']),
         scaleToFit: PropTypes.bool,
         source: PropTypes.shape({
             svg: PropTypes.string,
@@ -49,6 +50,7 @@ export default class SVGMathView extends Component {
         style: ViewPropTypes.style
     }
     static defaultProps = {
+        resizeMode: 'cover',
         scaleToFit: false,
         style: styles.base
     }
@@ -90,19 +92,31 @@ export default class SVGMathView extends Component {
 
     get innerStyle() {
         const { maxWidth } = this.state;
+        return SVGMathView.getInnerStyleSync(this.data, { maxWidth, resizeMode: this.props.resizeMode });
+    }
+
+    static async getInnerStyle(math, layoutParams) {
+        const layoutData = await CacheManager.fetch(math);
+        return SVGMathView.getInnerStyle(layoutData, layoutParams);
+    }
+
+    static getInnerStyleSync(layoutData, { maxWidth, resizeMode }) {
+        const contain = resizeMode === 'contain';
+        const pow = contain ? -1 : 1;
+        const minMax = contain ? Math.min : Math.max;
+        const aWidth = _.get(layoutData, 'apprxWidth', 0);
+        const aHeight = _.get(layoutData, 'apprxHeight', 0);
         const window = Dimensions.get('window');
-        const aWidth = _.get(this.data, 'apprxWidth', 0);
-        const aHeight = _.get(this.data, 'apprxHeight', 0);
-        const scaleWidth = Math.min(window.width / (maxWidth - padding * 2), 1);
+        const scaleWidth = Math.min(Math.pow(window.width / (maxWidth - padding * 2), pow), 1);
         const scaleHeight = Math.min(Math.min(minDim / aHeight), 1);
-        const scale = Math.min(scaleWidth, scaleHeight);
+        const scale = minMax(scaleWidth, scaleHeight);
 
         const width = aWidth * scale;
         const height = aHeight * scale;
 
         return {
             minWidth: minDim,
-            minHeight: minDim,  //Math.max(height, minDim),
+            minHeight: Math.max(height, minDim),
             flexBasis: Math.max(width, minDim),
             maxWidth: maxWidth - padding * 2,
             display: 'flex',

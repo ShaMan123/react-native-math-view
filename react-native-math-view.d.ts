@@ -9,7 +9,8 @@ declare module 'react-native-math-view' {
         ViewStyle,
         StyleProp,
         View,
-        ViewProps
+        ViewProps,
+        ImageResizeMode
     } from 'react-native';
 
     /*
@@ -56,6 +57,8 @@ declare module 'react-native-math-view' {
         }
     }
 
+    export type ResizeMode = 'cover' | 'contain';
+
     export interface MathViewProps extends ViewProps {
         /**
          * Android: passing `{ svg: string }` means you have to handle styling/layout yourself
@@ -73,7 +76,21 @@ declare module 'react-native-math-view' {
          * set to `true` to fit the view to it's parent
          * defaults to `false`
          * */
-        scaleToFit?: boolean
+        scaleToFit?: boolean,
+
+        /**
+         * defaults to 'cover'
+         * @default 'cover'
+         * */
+        resizeMode?: ResizeMode
+    }
+
+    export interface StyleLayoutParams {
+        maxWidth: number,
+
+        /**
+         * defaults to 'cover' */
+        resizeMode?: ResizeMode
     }
 
     export default class MathView extends React.Component<MathViewProps> {
@@ -83,6 +100,22 @@ declare module 'react-native-math-view' {
          * @param scale
          */
         public static getPreserveAspectRatio(alignment: string, scale: string): string
+
+        /**
+         * helper function that provides the style object for custom handling
+         * resizeMode defaults to 'cover'
+         * @param layoutData
+         * @param maxWidth
+         */
+        public static getInnerStyleSync(layoutData: MathJaxProvider.MathJaxResponse, layoutParams: StyleLayoutParams): StyleProp<View>
+
+        /**
+         * helper function that provides the style object for custom handling
+         * if you need a snyc version consider using `MathView.getInnerStyleSync`
+         * @param math
+         * @param maxWidth
+         */
+        public static getInnerStyle(math: string, layoutParams: StyleLayoutParams): Promise<StyleProp<View>>
 
         /**
          * Android only

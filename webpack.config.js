@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
-const mode = process.argv[2] === '--watch' ? 'development' : 'production';
+const isDebug = process.argv.some((arg) => arg === '--debug' || arg === '--dev');
+const mode = isDebug ? 'development' : 'production';
 const base = path.resolve(__dirname, 'MathJaxProvider');
 module.exports = {
     mode,        //'production'|'development'
@@ -24,5 +25,12 @@ module.exports = {
         filename: 'bundle.js',
         path: path.resolve(base, 'dist'),
         globalObject: 'this'
-    }
+    },
+    plugins: [
+        new webpack.DefinePlugin({
+            //'process.env.NODE_ENV': mode,
+            'process.env.BROWSER': true,
+            __DEV__: isDebug,
+        })
+    ],
 };

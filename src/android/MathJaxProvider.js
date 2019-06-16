@@ -101,7 +101,7 @@ class CacheHandler {
             return response;
         }
         catch (err) {
-            console.error(err.message || err);
+            console.warn(err);
             return [];
         }
     }
@@ -130,6 +130,7 @@ export const CacheManager = new CacheHandler();
 
 export class Provider extends Component {
     static propTypes = {
+        onLayout: PropTypes.func,
         preload: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.string), PropTypes.string])
     }
 
@@ -164,6 +165,7 @@ export class Provider extends Component {
         return (
             <RNMathJaxProvider
                 ref={this._handleRef}
+                onLayout={this.props.onLayout}
             />
         );
     }

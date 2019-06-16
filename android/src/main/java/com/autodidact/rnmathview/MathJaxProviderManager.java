@@ -16,6 +16,10 @@ import javax.annotation.Nonnull;
 import static com.autodidact.rnmathview.MathJaxProvider.TAG;
 
 public class MathJaxProviderManager extends SimpleViewManager<MathJaxProvider> {
+    public MathJaxProviderManager(){
+        super();
+    }
+
     @Override
     public String getName() {
         return "RNMathJaxProvider";

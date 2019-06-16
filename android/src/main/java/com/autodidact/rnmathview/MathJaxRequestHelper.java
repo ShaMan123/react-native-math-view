@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import javax.annotation.Nullable;
 
 public class MathJaxRequestHelper implements MathJaxProvider.OnMessageListener {
-    public final static String TAG = "MathJaxProvider";
+    public final static String TAG = "MathJaxRequestHelper";
     private MathJaxProvider mView;
     private WritableArray mathJaxResponse;
     private ArrayList<String> pendingStrings = new ArrayList<>();
@@ -54,7 +54,6 @@ public class MathJaxRequestHelper implements MathJaxProvider.OnMessageListener {
         mathJaxResponse = Arguments.createArray();
         mView.addOnMessageListener(this);
         mOptions = options;
-        Log.d(TAG, "timeout: " + options.timeout);
     }
 
     public void run(){
@@ -96,6 +95,10 @@ public class MathJaxRequestHelper implements MathJaxProvider.OnMessageListener {
 
     public void reject(){
         reject("View has been destroyed");
+    }
+
+    public void reject(Object err){
+        reject(err.toString());
     }
 
     public void reject(String message){

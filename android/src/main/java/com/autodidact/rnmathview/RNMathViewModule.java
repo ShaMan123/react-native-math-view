@@ -31,6 +31,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class RNMathViewModule extends ReactContextBaseJavaModule {
+    public static final String TAG = "RNMathViewModule";
     private final ReactApplicationContext reactContext;
 
     public RNMathViewModule(final ReactApplicationContext reactContext) {

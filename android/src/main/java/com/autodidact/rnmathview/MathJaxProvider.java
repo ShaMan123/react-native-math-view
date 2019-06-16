@@ -115,20 +115,33 @@ public class MathJaxProvider extends WebView {
     protected void onMessage(String message){
         try{
             JSONObject o = new JSONObject(message);
+            Log.d(TAG, "isError: " + o.has("error"));
+            if(o.has("error")){
+                throwError(o.get("error"));
+                return;
+            }
             String math = o.getString("speakText");
             String svg = o.getString("svg").replaceAll("xlink:xlink", "xlink");
             Double width = o.getDouble("measuredWidth");
             Double height = o.getDouble("measuredHeight");
             Double apprxWidth = o.getDouble("apprxWidth");
             Double apprxHeight = o.getDouble("apprxHeight");
-            for(OnMessageListener listener: messageListeners){
+
+            for(OnMessageListener listener: cloneMessageListeners()){
                 listener.invoke(math, svg, width, height, apprxWidth, apprxHeight);
             }
         }
         catch (JSONException err){
-            Log.e(TAG, "Failed to parse message: " + message, err);
+            for(OnMessageListener listener: cloneMessageListeners()){
+                listener.reject(err);
+            }
         }
+    }
 
+    private ArrayList<OnMessageListener> cloneMessageListeners(){
+        ArrayList<OnMessageListener> copy = new ArrayList<>();
+        copy.addAll(messageListeners);
+        return copy;
     }
 
     public void addOnMessageListener(OnMessageListener listener){
@@ -146,6 +159,14 @@ public class MathJaxProvider extends WebView {
         messageListeners.clear();
     }
 
+    public void throwError(Object error){
+        for(OnMessageListener listener: cloneMessageListeners()){
+            Exception e = new Exception(error.toString());
+            e.fillInStackTrace();
+            listener.reject(error);
+        }
+    }
+
     public OnMessageListener getOnMessageListener(int i){
         return messageListeners.get(i);
     }
@@ -153,6 +174,8 @@ public class MathJaxProvider extends WebView {
     public interface OnMessageListener {
         public void invoke(String math, String svg, double width, double height, @Nullable double apprxWidth, @Nullable double apprxHeight);
         public void reject();
+        public void reject(Object error);
+        public void reject(Throwable error);
     }
 
     public class MathJaxOptions {

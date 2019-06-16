@@ -12,6 +12,17 @@ declare module 'react-native-math-view' {
         ViewProps
     } from 'react-native';
 
+    /*
+    import MathJaxHandler, { MathJaxConfig as IMathJaxConfig, MathJaxOptions as IMathJaxOptions, MathJaxResult as IMathJaxResult } from 'mathjax-node';
+
+    export module MathJax {
+        export type MathJax = MathJaxHandler
+        export type MathJaxConfig = IMathJaxConfig
+        export type MathJaxOptions = IMathJaxOptions
+        export type MathJaxResult = IMathJaxResult
+    }
+    */
+
     export module MathJaxProvider {
         class CacheHandler {
             private getCache(): Promise<void>

@@ -32,6 +32,7 @@ var isFullwidthCodePoint = require('is-fullwidth-code-point');
 
 var displayMessages = false;      // don't log Message.Set() calls
 var displayErrors = true;         // show error messages on the console
+var logger = (message) => console.error(message);
 var undefinedChar = false;        // unknown characters are not saved in the error array
 var extensions = '';              // no additional extensions used
 var paths = {};                   // additional paths (for third party extensions)
@@ -114,7 +115,7 @@ var CHTMLSTYLES;         // filled in when CommonHTML is loaded
 //
 function GetWindow() {
     htmlDOMElement = document.firstChild;
-    //window.addEventListener("error", function (event) { console.error("Error: " + event.error) });
+    //window.addEventListener("error", function (event) { logger("Error: " + event.error) });
     content = document.body.appendChild(document.createElement("div"));
     content.id = "MathJax_Content";
     content.innerHTML = '<script type="math/tex">x</script>' +
@@ -173,7 +174,7 @@ function ConfigureMathJax() {
             MathJax.Message.Set = function (text, n, delay) {
                 if (displayMessages && n !== 0) {
                     if (text instanceof window.Array) { text = MathJax.Localization._.apply(MathJax.Localization, text) }
-                    console.error(text);
+                    logger(text);
                 }
             };
             MathJax.Message.Clear = function () { };
@@ -595,7 +596,7 @@ function ReportError(message, currentCallback) {
 //  Add an error to the error list and display it on the console
 //
 function AddError(message, nopush) {
-    if (displayErrors) console.error(message);
+    if (displayErrors) logger(message);
     if (!nopush) errors.push(message);
 }
 
@@ -899,14 +900,16 @@ function RerenderSVG(result) {
 function RestartMathJax() {
     if (timer) {
         MathJax.Hub.queue.queue = [];  // clear MathJax queue, so pending operations won't fire
-        MathJax = timer = htmlDOMElement = content = null;
+        window.MathJax = MathJax = timer = htmlDOMElement = content = null;
         document.getElementById("MathJax_Content").remove();
         ReportError("Timeout waiting for MathJax:  restarting");
     }
+    
     serverState = STATE.STOPPED;
     GetWindow();
     ConfigureMathJax();
     StartMathJax();
+
 }
 
 /********************************************************************/
@@ -921,7 +924,7 @@ function RestartMathJax() {
 // callback API for compatibility with MathJax
 var cbTypeset = function (data, callback) {
     if (!callback || typeof (callback) !== "function") {
-        if (displayErrors) console.error("Missing callback");
+        if (displayErrors) logger("Missing callback");
         return;
     }
     var options = {};
@@ -979,6 +982,7 @@ exports.start = function () {
 exports.config = function (config) {
     if (config.displayMessages != null) { displayMessages = config.displayMessages }
     if (config.displayErrors != null) { displayErrors = config.displayErrors }
+    if (typeof config.logger === 'function') { logger = config.logger }
     if (config.undefinedCharError != null) { undefinedChar = config.undefinedCharError }
     if (config.extensions != null) { extensions = config.extensions }
     if (config.paths != null) { paths = config.paths }

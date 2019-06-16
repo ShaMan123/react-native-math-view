@@ -115,7 +115,6 @@ public class MathJaxProvider extends WebView {
     protected void onMessage(String message){
         try{
             JSONObject o = new JSONObject(message);
-            Log.d(TAG, "isError: " + o.has("error"));
             if(o.has("error")){
                 throwError(o.get("error"));
                 return;

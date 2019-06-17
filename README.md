@@ -22,9 +22,6 @@ A react native view used to easily display and handle math.
 `yarn add github:ShaMan123/react-native-math-view`
 
 ## Getting Started
-```js
-import MathView, { MathJaxProvider } from 'react-native-math-view';
-
 //	index.js
 
 ```js
@@ -38,6 +35,9 @@ import { name as appName } from './app.json';
 + AppRegistry.registerComponent(appName, () => MathProviderHOC(App));
 
 ```
+
+```js
+import MathView, { MathJaxProvider } from 'react-native-math-view';
 
 //	use inside render
 render() {
@@ -66,8 +66,7 @@ render() {
 render() {
   return (
     ...
-    
-    <MathView
+    	<MathView
 		resizeMode='stretch'
 		source={{ math: 'x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}' }}
 	/> 

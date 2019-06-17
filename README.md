@@ -25,6 +25,21 @@ A react native view used to easily display and handle math.
 ```js
 import MathView, { MathJaxProvider } from 'react-native-math-view';
 
+//	index.js
+
+```js
+
+import {AppRegistry} from 'react-native';
+import App from './App';
+import { name as appName } from './app.json';
++ import { MathProviderHOC } from 'react-native-math-view';
+
+- AppRegistry.registerComponent(appName, () => App);
++ AppRegistry.registerComponent(appName, () => MathProviderHOC(App));
+
+```
+
+//	use inside render
 render() {
   return (
     ...
@@ -40,20 +55,26 @@ render() {
 	// get an instance of MathJaxProvider.CacheManager
 	ref={ref => ref && ref.setMaxTimeout(8000)}
     >
-    
-	    <MathView
-		source={{ math: 'x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}' }}
-	    /> 
-	    <MathView
-			scaleToFit
-		source={{ math: '\\cos\\left(x\\right)=\\frac{b}{c}' }}
-	    /> 
-    
-    
     ...
     
     </MathJaxProvider.Provider>
     
+    ...
+  );
+}
+
+render() {
+  return (
+    ...
+    
+    <MathView
+		resizeMode='stretch'
+		source={{ math: 'x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}' }}
+	/> 
+	<MathView
+		scaleToFit
+		source={{ math: '\\cos\\left(x\\right)=\\frac{b}{c}' }}
+	/> 
     ...
   );
 }

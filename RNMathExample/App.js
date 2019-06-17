@@ -54,15 +54,16 @@ export default class App extends Component {
             mip: false,
             singleton: false,
             i: 0
-        }
+        };
 
-        MathProvider.CacheManager.setMaxTimeout(7000);
-        MathProvider.CacheManager.disableWarnings();
+        MathProvider.CacheManager
+            .setMaxTimeout(7000)
+            .disableLogging();
     }
     
     async componentDidMount() {
         const tags = MathStrings.calculus.filter((obj) => obj.math);
-        setTimeout(async () => console.log('isCached', await MathProvider.CacheManager.isCached(cachePreloadRequest[0])), 5000);
+        setTimeout(() => console.log('isCached', MathProvider.CacheManager.isCached(cachePreloadRequest[0])), 5000);
         this.t = setInterval(async () => {
             let i = (this.state.i + 1) % 20;
 
@@ -138,14 +139,20 @@ export default class App extends Component {
             <MathProvider.Provider
                 preload={cachePreloadRequest}
                 style={{ flex: 1 }}
-                ref={ref => ref && ref.getCacheManager().disableWarnings()}
+                ref={ref => ref && ref.getCacheManager().disableLogging()}
                 useGlobalCacheManager={false}
             >
                 <ScrollView style={{ flex: 1 }}>
                     <Text>resizeMode: 'contain'</Text>
                     {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: true, resizeMode: 'contain' })}
                     <Text>resizeMode: 'center'</Text>
-                    {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: false, resizeMode: 'center' })}
+                    <MathProvider.Provider
+                        preload={cachePreloadRequest}
+                        ref={ref => ref && ref.getCacheManager()}
+                        useGlobalCacheManager={false}
+                    >
+                        {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: false, resizeMode: 'center' })}
+                    </MathProvider.Provider>
                     <Text>resizeMode: 'cover'</Text>
                     <View>
                         <ScrollView
@@ -154,7 +161,7 @@ export default class App extends Component {
                             onStartShouldSetResponderCapture={() => true}
                             onMoveShouldSetResponderCapture={() => true}
                             scrollEnabled
-                            //onScroll={e => console.log(e.nativeEvent)}
+                        //onScroll={e => console.log(e.nativeEvent)}
                         >
                             <View pointerEvents="none">
                                 {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: false, resizeMode: 'cover' })}

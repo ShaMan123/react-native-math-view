@@ -1,5 +1,3 @@
-import { MathProviderHOC } from './src/index.android';
-
 // Project: https://github.com/ShaMan123/react-native-math-view
 // TypeScript Version: 2.6.2
 
@@ -50,21 +48,25 @@ declare module 'react-native-math-view' {
             private clearDatabase(): Promise<void>
             public clearCache(): Promise<void>
             public isCached(key: string): boolean
-            public enable(): void
+            public enable(): this
             /**
              * disable the cache manager from updating
              * *** BAD FOR PERFORMANCE ***
              * */
-            public disable(): void
+            public disable(): this
             /**
              * disable errors from MathJax
              * */
-            public disableWarnings(): void
+            public disableWarnings(): this
+            /**
+             * disable gracious logging
+             * */
+            public disableLogging(): this
             /**
              * default is 10000ms
              * @param timeout
              */
-            public setMaxTimeout(timeout: number): void
+            public setMaxTimeout(timeout: number): this
             private handleRequest(math: string | string[]): MathJaxResponse[]
             protected fetch(math: Array<string>, timeout?: number): MathJaxResponse[]
             protected fetch(math: string, timeout?: number): MathJaxResponse
@@ -80,7 +82,22 @@ declare module 'react-native-math-view' {
         export const CacheManager: CacheHandler;
 
         export interface MathJaxProviderProps {
+            /**
+             * pass TeX strings to preload for enhanced performance
+             * */
             preload?: string | Array<string>
+
+            /**
+             * defaults to true
+             * 
+             * ***  EXPERIMENTAL    ***
+             * pass `false` to create multiple instances of `MathProvider`
+             * this means more rendering of `WebView` which sucks mainly because 3s-5s of initialization
+             * however if you're dealing with excessive rendering of dynamic math this might boost performance but it's unlikely to make a difference because the amount would be more than could be rendered
+             * I tend to use `true` especially if you're registering a lot of components using `AppRegistry.registerComponent` via a custom navigation protocol
+             * try it out and tell what's best
+             * */
+            useGlobalCacheManager?: boolean
         }
         export class Provider extends Component<MathJaxProviderProps> {
             /**preload math for later use */
@@ -95,7 +112,7 @@ declare module 'react-native-math-view' {
         export const Context: Context<CacheHandler>;
     }
 
-    export type MathProviderHOC<T extends Component> = (WrappedComponent: T, preloadMath: string[]) => T;
+    export type MathProviderHOC<T extends Component> = (WrappedComponent: T, props: MathProvider.MathJaxProviderProps) => T;
 
     export type ResizeMode = 'center' | 'cover' | 'contain';
 

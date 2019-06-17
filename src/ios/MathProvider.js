@@ -2,8 +2,11 @@
 import React from 'react';
 
 export class CacheHandler {
-    warnings = true;
-    stub = () => { this.warnings && console.warn('MathProvider: stubbed `CacheManager` method'); }
+    warn = true;
+    stub = () => {
+        this.warn && console.warn('MathProvider: stubbed `CacheManager` method');
+        return this;
+    }
     getCache = this.stub;
     addToCache = this.stub;
     clearDatabase = this.stub;
@@ -12,7 +15,8 @@ export class CacheHandler {
     enable = this.stub;
     disable = this.stub;
     disableWarnings() {
-        this.warnings = false;
+        this.warn = false;
+        return this;
     }
     setMaxTimeout = this.stub;
     handleRequest = this.stub;

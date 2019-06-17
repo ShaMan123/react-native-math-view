@@ -128,11 +128,13 @@ class CacheHandler {
     enable() {
         this.disabled = false;
         if (this.isGlobal) CacheHandler.sharedConfig.disabled = false;
+        return this;
     }
 
     disable() {
         this.disabled = true;
         if (this.isGlobal) CacheHandler.sharedConfig.disabled = true;
+        return this;
     }
 
     //  RequestManager
@@ -140,17 +142,20 @@ class CacheHandler {
     disableWarnings() {
         this.warn = false;
         if (this.isGlobal) CacheHandler.sharedConfig.warn = false;
+        return this;
     }
 
     disableLogging() {
         this.disableWarnings();
         this.log = false;
         if (this.isGlobal) CacheHandler.sharedConfig.log = false;
+        return this;
     }
 
     setMaxTimeout(timeout) {
         this.maxTimeout = timeout;
         if (this.isGlobal) CacheHandler.sharedConfig.maxTimeout = timeout;
+        return this;
     }
 
     async handleRequest(math) {

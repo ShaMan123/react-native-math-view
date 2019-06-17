@@ -22,11 +22,13 @@ class CacheHandler {
     static tags = [];
     static sharedConfig = {
         disabled: false,
-        warning: true,
+        warn: true,
+        log: true,
         maxTimeout: 10000
     }
     disabled = false;
-    warning = true;
+    warn = true;
+    log = true;
     maxTimeout = 10000;
     storageKey = 'MathJaxProviderCache';
     viewTag = null;
@@ -136,8 +138,14 @@ class CacheHandler {
     //  RequestManager
 
     disableWarnings() {
-        this.warning = false;
-        if (this.isGlobal) CacheHandler.sharedConfig.warning = false;
+        this.warn = false;
+        if (this.isGlobal) CacheHandler.sharedConfig.warn = false;
+    }
+
+    disableLogging() {
+        this.disableWarnings();
+        this.log = false;
+        if (this.isGlobal) CacheHandler.sharedConfig.log = false;
     }
 
     setMaxTimeout(timeout) {
@@ -162,10 +170,10 @@ class CacheHandler {
             return response;
         }
         catch (err) {
-            if (this.warning) {
+            if (this.warn) {
                 console.warn(err.message || err);
             }
-            else {
+            else if (this.log) {
                 console.log(err);
             }
             return [];
@@ -214,10 +222,14 @@ class CacheHandler {
 
     setViewTag(next, prev) {
         _.pull(CacheHandler.tags, prev);
-        if (next) CacheHandler.tags.push(next);
+        if (_.isNumber(next)) CacheHandler.tags.push(next);
         this.viewTag = next;
-        if (CacheManager.viewTag === prev) CacheManager.viewTag = CacheHandler.tags[0];
+        if (CacheManager.viewTag === prev || _.isNil(CacheManager.viewTag)) CacheManager.viewTag = CacheHandler.tags[0];
         this.eventEmitter.emit('provider', this.viewTag);
+    }
+
+    isLinked() {
+        return !_.isNil(this.viewTag);
     }
 }
 
@@ -225,23 +237,32 @@ export const CacheManager = new CacheHandler(true);
 
 export const Context = React.createContext(CacheHandler);
 
-export class Provider extends Component {
+export class Provider extends React.PureComponent {
     static propTypes = {
         onLayout: PropTypes.func,
-        preload: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.string), PropTypes.string])
+        preload: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.string), PropTypes.string]),
+        useGlobalCacheManager: PropTypes.bool
+    }
+
+    static defaultProps = {
+        useGlobalCacheManager: true
     }
 
     tag = null;
 
     constructor(props) {
         super(props);
-        this.cacheManager = new CacheHandler();        
-        props.preload && this.cacheManager.fetch(props.preload);
+        this.cacheManager = props.useGlobalCacheManager ? CacheManager: new CacheHandler();        
     }
 
     static getDerivedStateFormProps(nextProps) {
         this.cacheManager.fetch(nextProps.preload);
         return null;
+    }
+
+    componentDidMount() {
+        const { preload } = this.props;
+        preload && this.cacheManager.fetch(preload);
     }
 
     _handleRef = (ref) => {
@@ -262,13 +283,21 @@ export class Provider extends Component {
         return this.cacheManager;
     }
 
+    get shouldRender() {
+        return !this.cacheManager.isLinked() || this.tag === CacheManager.viewTag || !this.props.useGlobalCacheManager;
+    }
+
     render() {
         return (
             <>
-                <RNMathJaxProvider
-                    ref={this._handleRef}
-                    onLayout={this.props.onLayout}
-                />
+                {
+                    this.shouldRender &&
+                    <RNMathJaxProvider
+                        ref={this._handleRef}
+                        onLayout={this.props.onLayout}
+                    />
+                }
+
                 <Context.Provider
                     value={this.cacheManager}
                 >

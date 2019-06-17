@@ -60,8 +60,8 @@ export default class App extends Component {
             
             this.setState({
                 i,
-                //width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
-                tag: { ...tag },
+                width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
+                tag,
                 mip: true
             });
             //console.log('getMathJax1', await MathJaxProvider.CacheManager.fetch(tags[i % tags.length].string));
@@ -240,11 +240,10 @@ export default class App extends Component {
                 <Button
                     //style={{bottom: 0}}
                     onPress={async () => {
+                        const state = this.state.state;
                         this.setState({ state: 4 });
                         await MathJaxProvider.CacheManager.clearCache();
-                        await MathJaxProvider.CacheManager.getCache();
-                        //MathJaxProvider.CacheManager.addToCache(cacheMirror)
-                        this.setState({ state: 0 });
+                        this.setState({ state });
                     }}
                     title={`reset`}
                 />

@@ -202,7 +202,6 @@ var App = /** @class */ (function (_super) {
                 }
             });
         });
-        setTimeout(function () { return window.location.reload(false); }, 50);
     };
     App.postMessage = function (data) {
         /**

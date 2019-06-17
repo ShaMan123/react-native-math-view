@@ -35,15 +35,23 @@ render() {
     // Use `preload` to enhance performance. To make this work install '@react-native-community/async-storage'
     <MathJaxProvider.Provider
         preload={['\\cos\\left(x\\right)=\\frac{b}{c}']}
-    />
+	
+	// get an instance of MathJaxProvider.CacheManager
+	ref={ref => ref && ref.setMaxTimeout(8000)}
+    >
     
-    <MathView
-        source={{ math: 'x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}' }}
-    /> 
-    <MathView
-		scaleToFit
-        source={{ math: '\\cos\\left(x\\right)=\\frac{b}{c}' }}
-    /> 
+	    <MathView
+		source={{ math: 'x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}' }}
+	    /> 
+	    <MathView
+			scaleToFit
+		source={{ math: '\\cos\\left(x\\right)=\\frac{b}{c}' }}
+	    /> 
+    
+    
+    ...
+    
+    </MathJaxProvider.Provider>
     
     ...
   );

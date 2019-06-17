@@ -36,9 +36,9 @@ RCT_EXPORT_MODULE()
 RCT_EXPORT_VIEW_PROPERTY(onChange, RCTBubblingEventBlock);
 /*
  #pragma mark - Props
- RCT_CUSTOM_VIEW_PROPERTY(localSourceImage, NSDictionary, RNSketchCanvas)
+ RCT_CUSTOM_VIEW_PROPERTY(localSourceImage, NSDictionary, MTMathUILabel)
  {
- RNSketchCanvas *currentView = !view ? defaultView : view;
+ MTMathUILabel *currentView = !view ? defaultView : view;
  NSDictionary *dict = [RCTConvert NSDictionary:json];
  dispatch_async(dispatch_get_main_queue(), ^{
  [currentView openSketchFile:dict[@"filename"]
@@ -47,9 +47,9 @@ RCT_EXPORT_VIEW_PROPERTY(onChange, RCTBubblingEventBlock);
  });
  }
  
- RCT_CUSTOM_VIEW_PROPERTY(text, NSArray, RNSketchCanvas)
+ RCT_CUSTOM_VIEW_PROPERTY(text, NSArray, MTMathUILabel)
  {
- RNSketchCanvas *currentView = !view ? defaultView : view;
+ MTMathUILabel *currentView = !view ? defaultView : view;
  NSArray *arr = [RCTConvert NSArray:json];
  dispatch_async(dispatch_get_main_queue(), ^{
  [currentView setCanvasText:arr];
@@ -63,8 +63,25 @@ RCT_EXPORT_VIEW_PROPERTY(onChange, RCTBubblingEventBlock);
     MTMathUILabel* label = [[MTMathUILabel alloc] init];
     label.latex = @"x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}";
     return label;
-    //return [[RNSketchCanvas alloc] initWithEventDispatcher: self.bridge.eventDispatcher];
+    //return [[MTMathUILabel alloc] initWithEventDispatcher: self.bridge.eventDispatcher];
 }
 
+/*
+#pragma mark - Utils
+
+- (void)runTask:(nonnull NSNumber *)reactTag block:(void (^)(MTMathUILabel *canvas))block {
+    [self.bridge.uiManager addUIBlock:
+     ^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, MTMathUILabel *> *viewRegistry){
+
+         MTMathUILabel *view = viewRegistry[reactTag];
+         if (!view || ![view isKindOfClass:[MTMathUILabel class]]) {
+             RCTLogError(@"Cannot find MTMathUILabel with tag #%@", reactTag);
+             return;
+         }
+
+         block(view);
+     }];
+}
+*/
 @end
 

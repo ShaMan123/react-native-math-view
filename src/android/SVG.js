@@ -122,7 +122,7 @@ export default class SVGMathView extends React.PureComponent {
     }
 
     get innerStyle() {
-        const { maxWidth, maxHeight } = this;//this.state;
+        const { maxWidth, maxHeight } = this;
         return SVGMathView.getInnerStyleSync(this.data, { maxWidth, maxHeight, resizeMode: this.props.resizeMode });
     }
 

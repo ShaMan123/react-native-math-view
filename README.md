@@ -22,7 +22,9 @@ A react native view used to easily display and handle math.
 `yarn add github:ShaMan123/react-native-math-view`
 
 ## Getting Started
-//	index.js
+
+1. Setting up `MathProvider`
+`index.js`
 
 ```js
 
@@ -35,9 +37,8 @@ import { name as appName } from './app.json';
 + AppRegistry.registerComponent(appName, () => MathProviderHOC(App));
 
 ```
-
 ```js
-import MathView, { MathJaxProvider } from 'react-native-math-view';
+import MathView, { MathProvider } from 'react-native-math-view';
 
 //	use inside render
 render() {
@@ -45,23 +46,31 @@ render() {
     ...
     
     // Android only:
-    // Android MathView depends on MathJaxProvider.Provider
+    // Android MathView depends on 
+    .Provider
     // Render this element once (you can render more) at the top of your app as soon as possible
     	(it takes 3000-5000ms to get the Provider running)
-    <MathJaxProvider.Provider
+    <MathProvider.Provider
     	// Use `preload` to enhance performance. To make this work install '@react-native-community/async-storage
         preload={['\\cos\\left(x\\right)=\\frac{b}{c}']}
 	
-	// get an instance of MathJaxProvider.CacheManager
+	// get an instance of MathProvider.CacheManager
 	ref={ref => ref && ref.setMaxTimeout(8000)}
     >
     ...
     
-    </MathJaxProvider.Provider>
+    </MathProvider.Provider>
     
     ...
   );
 }
+
+
+```
+
+2. Rendering `MathView`
+```js
+import MathView, { MathProvider } from 'react-native-math-view';
 
 render() {
   return (

@@ -39,6 +39,8 @@ import { name as appName } from './app.json';
 
 ```
 
+**OR**
+
 `App.js`
 
 ```js
@@ -49,11 +51,12 @@ render() {
   return (
     ...
     
-    // Android only:
-    // Android MathView depends on 
-    .Provider
-    // Render this element once (you can render more) at the top of your app as soon as possible
+    	// Android only:
+    	// Android MathView depends on MathProvider.Provider to function
+    	// Render this element once (you can render more) at the top of your app as soon as possible
     	(it takes 3000-5000ms to get the Provider running)
+	//iOS MathProvider.Provider is a stub
+	
     <MathProvider.Provider
     	// Use `preload` to enhance performance. To make this work install '@react-native-community/async-storage
         preload={['\\cos\\left(x\\right)=\\frac{b}{c}']}

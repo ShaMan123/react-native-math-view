@@ -24,7 +24,7 @@ const chem = `\\documentclass{article}
 \\noindent Subscript: \\\\
 \\ce{ 2H + {}_{ (aq) } + CO3 ^ { 2-}{ } _{ (aq) } -> CO2{ } _{ (g) } + H2O{ } _{ (l) } }
 \\end{ document }`;
-const cachePreloadRequest = ['x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}', ...mathO.map(o => o.string)];
+const cachePreloadRequest = [chem, 'x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}', ...mathO.map(o => o.string)];
 
 const numStates = 4;
 
@@ -133,13 +133,13 @@ export default class App extends Component {
         const rFrac = this.getRecursiveFrac();
         const i = this.state.i + 1;
         const frac = this.getFrac(`x+${i}`, i);
-
-        console.log('Dynamic values cached?', MathProvider.CacheManager.isCached(taylor) && MathProvider.CacheManager.isCached(rFrac));
+        
         return (
             <MathProvider.Provider
                 preload={cachePreloadRequest}
                 style={{ flex: 1 }}
                 ref={ref => ref && ref.getCacheManager().disableWarnings()}
+                useGlobalCacheManager={false}
             >
                 <ScrollView style={{ flex: 1 }}>
                     <Text>resizeMode: 'contain'</Text>
@@ -154,7 +154,7 @@ export default class App extends Component {
                             onStartShouldSetResponderCapture={() => true}
                             onMoveShouldSetResponderCapture={() => true}
                             scrollEnabled
-                            onScroll={e => console.log(e.nativeEvent)}
+                            //onScroll={e => console.log(e.nativeEvent)}
                         >
                             <View pointerEvents="none">
                                 {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: false, resizeMode: 'cover' })}

@@ -19,7 +19,12 @@ module.exports = {
         ]
     },
     resolve: {
-        extensions: ['.tsx', '.ts', '.js']
+        extensions: ['.tsx', '.ts', '.js'],
+        alias: {
+            'node_modules': path.join(__dirname, 'node_modules'),
+            'mathjax': path.join(__dirname, 'node_modules/mathjax/unpacked/MathJax.js'),
+            'bower_modules': path.join(__dirname, 'bower_modules'),
+        }
     },
     output: {
         filename: 'bundle.js',

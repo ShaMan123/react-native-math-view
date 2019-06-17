@@ -248,16 +248,6 @@ export default class App extends Component {
     render() {
         return (
             <>
-                <View style={{ flex: 1 }}>
-                    {this[`render${this.state.state}`]()}
-                </View>
-                <Button
-                    //style={{bottom: 0}}
-                    onPress={() => this.setState((prev) => {
-                        return { state: (prev.state + 1) % numStates };
-                    })}
-                    title={`change to ${this.title}`}
-                />
                 <Button
                     //style={{bottom: 0}}
                     onPress={async () => {
@@ -266,7 +256,20 @@ export default class App extends Component {
                         await MathProvider.CacheManager.clearCache();
                         this.setState({ state });
                     }}
-                    title={`clear cache`}
+                    title={`clear cache to test first launch`}
+                />
+                
+                <View style={{ flex: 1 }}>
+                    {this[`render${this.state.state}`]()}
+                </View>
+               
+                <Button
+                    //style={{bottom: 0}}
+                    onPress={() => this.setState((prev) => {
+                        return { state: (prev.state + 1) % numStates };
+                    })}
+                    title={`change to ${this.title}`}
+
                 />
             </>
         );

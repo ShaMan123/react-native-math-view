@@ -22,7 +22,10 @@ A react native view used to easily display and handle math.
 `yarn add github:ShaMan123/react-native-math-view`
 
 ## Getting Started
-//	index.js
+
+### Setting up `MathProvider`
+
+`index.js`
 
 ```js
 
@@ -36,32 +39,45 @@ import { name as appName } from './app.json';
 
 ```
 
+**OR**
+
+`App.js`
+
 ```js
-import MathView, { MathJaxProvider } from 'react-native-math-view';
+import MathView, { MathProvider } from 'react-native-math-view';
 
 //	use inside render
 render() {
   return (
     ...
     
-    // Android only:
-    // Android MathView depends on MathJaxProvider.Provider
-    // Render this element once (you can render more) at the top of your app as soon as possible
-    	(it takes 3000-5000ms to get the Provider running)
-    <MathJaxProvider.Provider
+    	// Android only:
+    	// Android MathView depends on MathProvider.Provider to function
+    	// Render this element once (you can render more) at the top of your app as soon as possible
+    	(it takes 3s-5s to get the Provider running)
+	//iOS MathProvider.Provider is a stub
+	
+    <MathProvider.Provider
     	// Use `preload` to enhance performance. To make this work install '@react-native-community/async-storage
         preload={['\\cos\\left(x\\right)=\\frac{b}{c}']}
 	
-	// get an instance of MathJaxProvider.CacheManager
+	// get an instance of MathProvider.CacheManager
 	ref={ref => ref && ref.setMaxTimeout(8000)}
     >
     ...
     
-    </MathJaxProvider.Provider>
+    </MathProvider.Provider>
     
     ...
   );
 }
+
+
+```
+
+### Rendering `MathView`
+```js
+import MathView, { MathProvider } from 'react-native-math-view';
 
 render() {
   return (
@@ -77,6 +93,17 @@ render() {
     ...
   );
 }
+
+
+```
+
+### Using Global `CacheManager`
+```js
+import MathView, { MathProvider } from 'react-native-math-view';
+
+//	call this method if you want to clear up storage space
+//	this method is called internally once AsyncStorage throws an out-of-memory error
+MathProvider.CacheManager.clearCache();
 
 ```
 

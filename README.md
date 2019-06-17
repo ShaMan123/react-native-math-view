@@ -38,6 +38,9 @@ import { name as appName } from './app.json';
 + AppRegistry.registerComponent(appName, () => MathProviderHOC(App));
 
 ```
+
+`App.js`
+
 ```js
 import MathView, { MathProvider } from 'react-native-math-view';
 

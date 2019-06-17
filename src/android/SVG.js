@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import {
     requireNativeComponent,
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
     }
 });
 
-export default class SVGMathView extends Component {
+export default class SVGMathView extends React.PureComponent {
     static propTypes = {
         cacheManager: PropTypes.any,
         resizeMode: PropTypes.oneOf(['center', 'contain', 'cover', 'stretch']),
@@ -62,18 +62,24 @@ export default class SVGMathView extends Component {
 
     ref = React.createRef();
     data = {};
+    disposer;
 
     constructor(props) {
         super(props);
         const { width, height } = Dimensions.get('window');
-        
+        this.maxWidth = width;
+        this.maxHeight = height;
+        /*
         this.state = {
             maxWidth: width,
-            maxHeight: height
+            maxHeight: height,
+            //svg: props.source.svg
         };
+        */
     }
    
-
+    /*
+     * @deprecated in favor of PureComponent
     static getDerivedStateFromProps(nextProps, prevState) {
         if (!nextProps.scaleToFit) {
             const { width, height } = Dimensions.get('window');
@@ -81,24 +87,42 @@ export default class SVGMathView extends Component {
         }
         return null;
     }
+    */
 
     async componentDidMount() {
-        await this.fetchAndUpdate();
+        this.subscribe();
     }
 
     async componentDidUpdate(prevProps, prevState) {
+        if (!this.props.scaleToFit) {
+            const { width, height } = Dimensions.get('window');
+            this.setStyle(width, height);
+        }
         if (!_.isEqual(prevProps.source, this.props.source)) {
             if (this.props.source.math) {
-                this.fetchAndUpdate();
+                this.subscribe();
             }
             else {
-                this.update(this.props.svg);
+                this.update(_.set(data, 'svg', svg));
             }
         }
     }
 
+    componentWillUnmount() {
+        this.unsubscribe();
+    }
+
+    subscribe() {
+        this.unsubscribe();
+        this.disposer = this.props.cacheManager.onReady(this.props.source.math, this.update);
+    }
+
+    unsubscribe() {
+        if (this.disposer) this.disposer();
+    }
+
     get innerStyle() {
-        const { maxWidth, maxHeight } = this.state;
+        const { maxWidth, maxHeight } = this;//this.state;
         return SVGMathView.getInnerStyleSync(this.data, { maxWidth, maxHeight, resizeMode: this.props.resizeMode });
     }
 
@@ -134,16 +158,16 @@ export default class SVGMathView extends Component {
             flexDirection: 'row'
         };
     }
-
-    async fetchAndUpdate() {
-        this.data = await this.props.cacheManager.fetch(this.props.source.math);
-        //  change in time => check validity
-        if (this.data && _.isEqual(this.data.math, this.props.source.math)) this.update(this.data.svg);
+    
+    update = (data) => {
+        this.data = data;
+        this.setNativeProps({ svg: data.svg, style: [this.innerStyle, this.props.style] });
     }
 
-    update(svg) {
-        this.setNativeProps({ svg });
-        this.forceUpdate();
+    setStyle(w, h) {
+        this.maxWidth = w;
+        this.maxHeight = h;
+        this.setNativeProps({ style: [this.innerStyle, this.props.style] });
     }
 
     setNativeProps(props) {
@@ -151,10 +175,7 @@ export default class SVGMathView extends Component {
     }
 
     _onLayout = (e) => {
-        if (this.props.scaleToFit) this.setState({
-            maxWidth: e.nativeEvent.layout.width,
-            maxHeight: e.nativeEvent.layout.height
-        });
+        if (this.props.scaleToFit) this.setStyle(e.nativeEvent.layout.width, e.nativeEvent.layout.height);
     }
 
     render() {

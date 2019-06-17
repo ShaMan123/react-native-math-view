@@ -23,7 +23,8 @@ A react native view used to easily display and handle math.
 
 ## Getting Started
 
-1. Setting up `MathProvider`
+### Setting up `MathProvider`
+
 `index.js`
 
 ```js
@@ -68,7 +69,7 @@ render() {
 
 ```
 
-2. Rendering `MathView`
+### Rendering `MathView`
 ```js
 import MathView, { MathProvider } from 'react-native-math-view';
 

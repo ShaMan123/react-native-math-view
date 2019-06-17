@@ -54,7 +54,7 @@ render() {
     	// Android only:
     	// Android MathView depends on MathProvider.Provider to function
     	// Render this element once (you can render more) at the top of your app as soon as possible
-    	(it takes 3000-5000ms to get the Provider running)
+    	(it takes 3s-5s to get the Provider running)
 	//iOS MathProvider.Provider is a stub
 	
     <MathProvider.Provider

@@ -94,6 +94,17 @@ render() {
   );
 }
 
+
+```
+
+### Using Global `CacheManager`
+```js
+import MathView, { MathProvider } from 'react-native-math-view';
+
+//	call this method if you want to clear up storage space
+//	this method is called internally once AsyncStorage throws an out-of-memory error
+MathProvider.CacheManager.clearCache();
+
 ```
 
 ## Running example app

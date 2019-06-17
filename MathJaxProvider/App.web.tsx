@@ -116,8 +116,6 @@ export default class App extends React.Component {
                 }
             });
         });
-
-        setTimeout(() => window.location.reload(false), 50);
     }
 
     static postMessage(data = {}) {

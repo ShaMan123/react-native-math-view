@@ -139,20 +139,14 @@ export default class App extends Component {
             <MathProvider.Provider
                 preload={cachePreloadRequest}
                 style={{ flex: 1 }}
-                ref={ref => ref && ref.getCacheManager().disableLogging()}
-                useGlobalCacheManager={false}
+                ref={ref => ref && ref.getCacheManager().disableWarnings()}
+                //useGlobalCacheManager={false}
             >
                 <ScrollView style={{ flex: 1 }}>
                     <Text>resizeMode: 'contain'</Text>
                     {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: true, resizeMode: 'contain' })}
                     <Text>resizeMode: 'center'</Text>
-                    <MathProvider.Provider
-                        preload={cachePreloadRequest}
-                        ref={ref => ref && ref.getCacheManager()}
-                        useGlobalCacheManager={false}
-                    >
-                        {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: false, resizeMode: 'center' })}
-                    </MathProvider.Provider>
+                    {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: false, resizeMode: 'center' })}
                     <Text>resizeMode: 'cover'</Text>
                     <View>
                         <ScrollView

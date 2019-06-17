@@ -13,7 +13,18 @@ const mathO = _.values({ ...MathStrings.calculus, ...MathStrings.trig }).filter(
 const cacheMirror = _.filter(data, o => _.has(o, 'renderingData')).map(o => ({ ...o.renderingData, math: o.math }));
 
 //MathJaxProvider.CacheManager.addToCache(cacheMirror)
-const cachePreloadRequest = ['x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}', ...mathO.map(o => o.string)];
+const chem = `\\documentclass{article}
+\\usepackage[version = 3]{ mhchem }
+\\begin{ document }
+\\noindent IUPAC recommendation: \\\\
+\\ce{ 2H + (aq) + CO3 ^ { 2-}(aq) -> CO2(g) + H2O(l) }
+
+\\bigskip
+
+\\noindent Subscript: \\\\
+\\ce{ 2H + {}_{ (aq) } + CO3 ^ { 2-}{ } _{ (aq) } -> CO2{ } _{ (g) } + H2O{ } _{ (l) } }
+\\end{ document }`;
+const cachePreloadRequest = ['x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}', ...mathO.map(o => o.string)];
 
 const numStates = 4;
 
@@ -53,14 +64,14 @@ export default class App extends Component {
         const tags = MathStrings.calculus.filter((obj) => obj.math);
         setTimeout(async () => console.log('isCached', await MathJaxProvider.CacheManager.isCached(cachePreloadRequest[0])), 5000);
         this.t = setInterval(async () => {
-            let i = (this.state.i + 1) //% 20;
+            let i = (this.state.i + 1) % 20;
 
             const tag = tags[i % tags.length];
             //const data = await MathJaxProvider.CacheManager.fetch(tag.string);
             
             this.setState({
                 i,
-                width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
+                //width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
                 tag,
                 mip: true
             });
@@ -156,6 +167,7 @@ export default class App extends Component {
                 {this.renderItem(rFrac, { backgroundColor: 'blue', color: 'white', resizeMode: 'cover', scaleToFit: false })}
                 <Text>resizeMode: 'stretch'</Text>
                 {this.renderItem(rFrac, { backgroundColor: 'blue', color: 'white', resizeMode: 'stretch', style: { minHeight: 300, flex: 1 } })}
+                {this.renderItem(chem, { backgroundColor: 'blue', color: 'white', resizeMode: 'contain', scaleToFit: true })}
             </ScrollView>
         );
     }

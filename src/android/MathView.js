@@ -3,7 +3,7 @@ import React from 'react';
 import SVGMathView from './SVG';
 import { Context } from './MathJaxProvider';
 
-class MathView extends React.Component {
+class MathView extends React.PureComponent {
     static propTypes = SVGMathView.propTypes;
     static getPreserveAspectRatio = SVGMathView.getPreserveAspectRatio;
     static getInnerStyleSync = SVGMathView.getInnerStyleSync;

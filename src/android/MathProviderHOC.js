@@ -2,12 +2,12 @@
 import React from 'react';
 import { Provider } from './MathProvider';
 
-export default function MathProviderHOC(WrappedComponent, preloadMath) {
+export default function MathProviderHOC(WrappedComponent, props = {}) {
     return class MathProviderHOC extends React.PureComponent {
         render() {
             return (
                 <Provider
-                    preload={preloadMath}
+                    {...this.props}
                 >
                     <WrappedComponent />
                 </Provider>

@@ -24,7 +24,7 @@ const chem = `\\documentclass{article}
 \\noindent Subscript: \\\\
 \\ce{ 2H + {}_{ (aq) } + CO3 ^ { 2-}{ } _{ (aq) } -> CO2{ } _{ (g) } + H2O{ } _{ (l) } }
 \\end{ document }`;
-const cachePreloadRequest = [chem, 'x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}', ...mathO.map(o => o.string)];
+const cachePreloadRequest = ['x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}', ...mathO.map(o => o.string)];
 
 const numStates = 4;
 
@@ -140,11 +140,20 @@ export default class App extends Component {
                 preload={cachePreloadRequest}
                 style={{ flex: 1 }}
                 ref={ref => ref && ref.getCacheManager().disableWarnings()}
-                //useGlobalCacheManager={false}
+                useGlobalCacheManager={false}
             >
                 <ScrollView style={{ flex: 1 }}>
-                    <Text>resizeMode: 'contain'</Text>
-                    {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: true, resizeMode: 'contain' })}
+                    <MathProvider.Provider
+                        preload={cachePreloadRequest}
+                        style={{ flex: 1 }}
+                        ref={ref => ref && ref.getCacheManager().disableWarnings()}
+                        useGlobalCacheManager={false}
+                    >
+                        <Text>resizeMode: 'contain'</Text>
+                        <Text>useGlobalCacheManager: false</Text>
+                        <Text>clear cache to see the difference</Text>
+                        {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: true, resizeMode: 'contain' })}
+                    </MathProvider.Provider>
                     <Text>resizeMode: 'center'</Text>
                     {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: false, resizeMode: 'center' })}
                     <Text>resizeMode: 'cover'</Text>

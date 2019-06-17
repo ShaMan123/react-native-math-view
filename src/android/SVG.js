@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
 
 export default class SVGMathView extends Component {
     static propTypes = {
-        cacheManager: PropTypes.node,
+        cacheManager: PropTypes.any,
         resizeMode: PropTypes.oneOf(['center', 'contain', 'cover', 'stretch']),
         scaleToFit: PropTypes.bool,
         source: PropTypes.shape({
@@ -66,6 +66,7 @@ export default class SVGMathView extends Component {
     constructor(props) {
         super(props);
         const { width, height } = Dimensions.get('window');
+        
         this.state = {
             maxWidth: width,
             maxHeight: height
@@ -75,8 +76,8 @@ export default class SVGMathView extends Component {
 
     static getDerivedStateFromProps(nextProps, prevState) {
         if (!nextProps.scaleToFit) {
-            const width = Dimensions.get('window').width;
-            if (width !== prevState.maxWidth) return { maxWidth: width };
+            const { width, height } = Dimensions.get('window');
+            if (width !== prevState.maxWidth) return { maxWidth: width, maxHeight: height };
         }
         return null;
     }
@@ -136,9 +137,8 @@ export default class SVGMathView extends Component {
 
     async fetchAndUpdate() {
         this.data = await this.props.cacheManager.fetch(this.props.source.math);
-        console.log('ggg',this.data)
         //  change in time => check validity
-        if (_.isEqual(this.data.math, this.props.source.math)) this.update(this.data.svg);
+        if (this.data && _.isEqual(this.data.math, this.props.source.math)) this.update(this.data.svg);
     }
 
     update(svg) {

@@ -10,37 +10,24 @@ interface MathJaxOptions {
 export default class App extends React.Component {
     messageEventDisposer: () => void;
     componentDidMount() {
-        if (__DEV__) {
-            const devCallback = (message: string) => console.log('__DEV__: ReactNativeWebView received a message', JSON.parse(message));
-            const badMath = '\\frac{\\frac{\\frac{\\frac{\\frac{f\'\'\\left(x\\right)=0}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}';
-            const goodMath ='\\frac{1}{2}'
-            if (window.ReactNativeWebView) {
-                const originalCallback = window.ReactNativeWebView.postMessage;
-                window.ReactNativeWebView.postMessage = {
-                    devCallback();
-                    originalCallback();
-                };
-            }
-            else {
-                window.ReactNativeWebView = {
-                    postMessage: devCallback
-                }
-            }
-                
-            setTimeout(() => {
-                window.postMessage({
-                    data: goodMath,
-                    origin: 'ReactNativeJS'
-                }, '*');
-            }, 2000);
-        }
+        this.runDev();
         
         MathJax.config({
             MathJax: {
                 // traditional MathJax configuration
             },
             displayErrors: true,
-            logger: (message: string) => App.postMessage({ error: { message } })
+            logger: (message: string) => {
+                App.postMessage({ error: { message } })
+                MathJax.config({
+                    MathJax: {
+                        // traditional MathJax configuration
+                    },
+                    displayErrors: true,
+                    logger: (message: string) => App.postMessage({ error: { message } })
+                });
+                MathJax.start();
+            }
         });
         MathJax.start();
 
@@ -56,6 +43,34 @@ export default class App extends React.Component {
     
     componentWillUnmount() {
         this.messageEventDisposer();
+    }
+
+    runDev() {
+        if (__DEV__) {
+            return
+            const devCallback = (message: string) => console.log('__DEV__: ReactNativeWebView received a message', JSON.parse(message));
+            const badMath = '\\frac{\\frac{\\frac{\\frac{\\frac{f\'\'\\left(x\\right)=0}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}}{2}';
+            const goodMath = '\\frac{1}{2}'
+            if (window.ReactNativeWebView) {
+                const originalCallback = window.ReactNativeWebView.postMessage;
+                window.ReactNativeWebView.postMessage = {
+                    devCallback();
+                    originalCallback();
+                };
+            }
+            else {
+                window.ReactNativeWebView = {
+                    postMessage: devCallback
+                }
+            }
+
+            setTimeout(() => {
+                window.postMessage({
+                    data: goodMath,
+                    origin: 'ReactNativeJS'
+                }, '*');
+            }, 2000);
+        }
     }
 
     mathjax(options: MathJaxOptions) {

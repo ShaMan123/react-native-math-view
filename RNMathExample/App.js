@@ -38,7 +38,7 @@ export default class App extends Component {
             ],
             width: Dimensions.get('window').width,
             fontScale: 1,
-            state: 0,
+            state: 3,
             tag: MathStrings.calculus.filter((obj) => obj.math)[0],
             mip: false,
             singleton: false,
@@ -53,7 +53,7 @@ export default class App extends Component {
         const tags = MathStrings.calculus.filter((obj) => obj.math);
         setTimeout(async () => console.log('isCached', await MathJaxProvider.CacheManager.isCached(cachePreloadRequest[0])), 5000);
         this.t = setInterval(async () => {
-            let i = (this.state.i + 1) % 20;
+            let i = (this.state.i + 1) //% 20;
 
             const tag = tags[i % tags.length];
             //const data = await MathJaxProvider.CacheManager.fetch(tag.string);
@@ -126,8 +126,11 @@ export default class App extends Component {
         console.log('Dynamic values cached?', MathJaxProvider.CacheManager.isCached(taylor) && MathJaxProvider.CacheManager.isCached(rFrac));
         return (
             <ScrollView style={{ flex: 1 }}>
+                <Text>resizeMode: 'contain'</Text>
                 {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: true, resizeMode: 'contain' })}
+                <Text>resizeMode: 'center'</Text>
                 {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: false, resizeMode: 'center' })}
+                <Text>resizeMode: 'cover'</Text>
                 <View>
                     <ScrollView
                         horizontal
@@ -142,12 +145,16 @@ export default class App extends Component {
                         </View>
                     </ScrollView>
                 </View>
-                {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: true, resizeMode: 'stretch', style: { minHeight: 150, flex: 1 } })}
+                <Text>resizeMode: 'stretch'</Text>
+                {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: true, resizeMode: 'stretch', style: { minHeight: 150, flex: 1  } })}
                 <View style={{ width: 200, height: 200, justifyContent: 'center', alignItems: 'stretch', borderColor: 'pink', borderWidth: 2, borderStyle: 'dashed', margin: 5 }} collapsable={false}>
                     {this.renderItem(frac, { backgroundColor: 'blue', color: 'white', resizeMode: 'stretch' })}
                 </View>
+                <Text>resizeMode: 'contain'</Text>
                 {this.renderItem(rFrac, { backgroundColor: 'blue', color: 'white', resizeMode: 'contain', scaleToFit: true })}
+                <Text>resizeMode: 'cover'</Text>
                 {this.renderItem(rFrac, { backgroundColor: 'blue', color: 'white', resizeMode: 'cover', scaleToFit: false })}
+                <Text>resizeMode: 'stretch'</Text>
                 {this.renderItem(rFrac, { backgroundColor: 'blue', color: 'white', resizeMode: 'stretch', style: { minHeight: 300, flex: 1 } })}
             </ScrollView>
         );
@@ -245,7 +252,7 @@ export default class App extends Component {
                         await MathJaxProvider.CacheManager.clearCache();
                         this.setState({ state });
                     }}
-                    title={`reset`}
+                    title={`clear cache`}
                 />
             </MathJaxProvider.Provider>
         );

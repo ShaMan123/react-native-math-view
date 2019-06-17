@@ -1,9 +1,11 @@
+import { MathProviderHOC } from './src/index.android';
+
 // Project: https://github.com/ShaMan123/react-native-math-view
 // TypeScript Version: 2.6.2
 
 declare module 'react-native-math-view' {
     import { Context, Component } from 'react';
-    import EventEmitter from 'events';
+    import { EventEmitter } from 'events';
     import {
         ViewProperties,
         Insets,
@@ -11,10 +13,9 @@ declare module 'react-native-math-view' {
         StyleProp,
         View,
         ViewProps,
-        ImageResizeMode,
-        
+        ImageResizeMode
     } from 'react-native';
-
+    
     /*
     import MathJaxHandler, { MathJaxConfig as IMathJaxConfig, MathJaxOptions as IMathJaxOptions, MathJaxResult as IMathJaxResult } from 'mathjax-node';
 
@@ -26,10 +27,19 @@ declare module 'react-native-math-view' {
     }
     */
 
-    export type ReadyCallback = (response: MathJaxResponse) => any;
-    export type Disposer = () => void;
+    export module MathProvider {
+        export interface MathJaxResponse {
+            math: string,
+            svg: string,
+            width: number,
+            height: number,
+            apprxWidth: number,
+            apprxHeight: number
+        }
 
-    export module MathJaxProvider {
+        export type ReadyCallback = (response: MathJaxResponse) => any;
+        export type Disposer = () => void;
+
         class CacheHandler {
             private eventEmitter: EventEmitter
             private getCache(): Promise<MathJaxResponse[]>
@@ -69,15 +79,6 @@ declare module 'react-native-math-view' {
         }
         export const CacheManager: CacheHandler;
 
-        export interface MathJaxResponse {
-            math: string,
-            svg: string,
-            width: number,
-            height: number,
-            apprxWidth: number,
-            apprxHeight: number
-        }
-
         export interface MathJaxProviderProps {
             preload?: string | Array<string>
         }
@@ -93,6 +94,8 @@ declare module 'react-native-math-view' {
 
         export const Context: Context<CacheHandler>;
     }
+
+    export type MathProviderHOC<T extends Component> = (WrappedComponent: T, preloadMath: string[]) => T;
 
     export type ResizeMode = 'center' | 'cover' | 'contain';
 
@@ -145,7 +148,7 @@ declare module 'react-native-math-view' {
          * @param layoutData
          * @param maxWidth
          */
-        public static getInnerStyleSync(layoutData: MathJaxProvider.MathJaxResponse, layoutParams: StyleLayoutParams): StyleProp<View>
+        public static getInnerStyleSync(layoutData: MathProvider.MathJaxResponse, layoutParams: StyleLayoutParams): StyleProp<View>
 
         /**
          * helper function that provides the style object for custom handling

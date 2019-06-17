@@ -1,24 +1,10 @@
 'use strict';
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import {
-    requireNativeComponent,
-    NativeModules,
-    UIManager,
-    PixelRatio,
-    Platform,
-    ViewPropTypes,
-    processColor,
-    Dimensions,
-    Animated,
-    View,
-    StyleSheet,
-    findNodeHandle,
-    AppState
-} from 'react-native';
-import * as _ from 'lodash';
 import AsyncStorage from '@react-native-community/async-storage';
 import EventEmitter from 'events';
+import * as _ from 'lodash';
+import PropTypes from 'prop-types';
+import React, { Component } from 'react';
+import { AppState, findNodeHandle, NativeModules, Platform, requireNativeComponent, UIManager } from 'react-native';
 
 const nativeViewName = 'RNMathJaxProvider';
 const RNMathJaxProvider = requireNativeComponent(nativeViewName, Provider, {

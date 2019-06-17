@@ -1,24 +1,11 @@
 'use strict';
 
-import React from 'react';
-import PropTypes from 'prop-types';
-import {
-    requireNativeComponent,
-    NativeModules,
-    UIManager,
-    PixelRatio,
-    Platform,
-    ViewPropTypes,
-    processColor,
-    Dimensions,
-    Animated,
-    View,
-    StyleSheet,
-    findNodeHandle
-} from 'react-native';
 import * as _ from 'lodash';
+import PropTypes from 'prop-types';
+import React from 'react';
+import { Dimensions, NativeModules, requireNativeComponent, StyleSheet, UIManager, View, ViewPropTypes } from 'react-native';
+import { CacheManager } from './MathProvider';
 
-import { CacheManager } from './MathJaxProvider';
 
 const nativeViewName = 'RNSVGMathView';
 const RNMathView = requireNativeComponent(nativeViewName, SVGMathView, {

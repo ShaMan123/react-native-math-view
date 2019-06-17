@@ -2,7 +2,7 @@
 import React, {Component} from 'react';
 import { Platform, StyleSheet, Text, View, TextInput, SectionList, FlatList, UIManager, Alert, Dimensions, ScrollView, YellowBox, Button, TouchableOpacity } from 'react-native';
 import * as _ from 'lodash';
-import MathView, { MathJaxProvider } from 'react-native-math-view';
+import MathView, { MathProvider, MathProviderHOC } from 'react-native-math-view';
 import * as MathStrings from './math';
 
 YellowBox.ignoreWarnings(['Warning: `flexWrap: `wrap`` is not supported with the `VirtualizedList` components.']);
@@ -12,7 +12,7 @@ const data = require('./tags.json');
 const mathO = _.values({ ...MathStrings.calculus, ...MathStrings.trig }).filter((obj) => obj.math);
 const cacheMirror = _.filter(data, o => _.has(o, 'renderingData')).map(o => ({ ...o.renderingData, math: o.math }));
 
-//MathJaxProvider.CacheManager.addToCache(cacheMirror)
+//MathProvider.CacheManager.addToCache(cacheMirror)
 const chem = `\\documentclass{article}
 \\usepackage[version = 3]{ mhchem }
 \\begin{ document }
@@ -56,18 +56,18 @@ export default class App extends Component {
             i: 0
         }
 
-        MathJaxProvider.CacheManager.setMaxTimeout(7000);
-        MathJaxProvider.CacheManager.disableWarnings();
+        MathProvider.CacheManager.setMaxTimeout(7000);
+        MathProvider.CacheManager.disableWarnings();
     }
     
     async componentDidMount() {
         const tags = MathStrings.calculus.filter((obj) => obj.math);
-        setTimeout(async () => console.log('isCached', await MathJaxProvider.CacheManager.isCached(cachePreloadRequest[0])), 5000);
+        setTimeout(async () => console.log('isCached', await MathProvider.CacheManager.isCached(cachePreloadRequest[0])), 5000);
         this.t = setInterval(async () => {
             let i = (this.state.i + 1) % 20;
 
             const tag = tags[i % tags.length];
-            //const data = await MathJaxProvider.CacheManager.fetch(tag.string);
+            //const data = await MathProvider.CacheManager.fetch(tag.string);
             
             this.setState({
                 i,
@@ -75,8 +75,8 @@ export default class App extends Component {
                 tag,
                 mip: true
             });
-            //console.log('getMathJax1', await MathJaxProvider.CacheManager.fetch(tags[i % tags.length].string));
-            //console.log('getMathJaxAll', await MathJaxProvider.CacheManager.fetch(tags.map(t => t.string)));
+            //console.log('getMathJax1', await MathProvider.CacheManager.fetch(tags[i % tags.length].string));
+            //console.log('getMathJaxAll', await MathProvider.CacheManager.fetch(tags.map(t => t.string)));
         }, interval);
     }
 
@@ -134,41 +134,47 @@ export default class App extends Component {
         const i = this.state.i + 1;
         const frac = this.getFrac(`x+${i}`, i);
 
-        console.log('Dynamic values cached?', MathJaxProvider.CacheManager.isCached(taylor) && MathJaxProvider.CacheManager.isCached(rFrac));
+        console.log('Dynamic values cached?', MathProvider.CacheManager.isCached(taylor) && MathProvider.CacheManager.isCached(rFrac));
         return (
-            <ScrollView style={{ flex: 1 }}>
-                <Text>resizeMode: 'contain'</Text>
-                {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: true, resizeMode: 'contain' })}
-                <Text>resizeMode: 'center'</Text>
-                {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: false, resizeMode: 'center' })}
-                <Text>resizeMode: 'cover'</Text>
-                <View>
-                    <ScrollView
-                        horizontal
-                        style={{ flexDirection: 'column' }}
-                        onStartShouldSetResponderCapture={() => true}
-                        onMoveShouldSetResponderCapture={() => true}
-                        scrollEnabled
-                        onScroll={e => console.log(e.nativeEvent)}
-                    >
-                        <View pointerEvents="none">
-                            {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: false, resizeMode: 'cover' })}
-                        </View>
-                    </ScrollView>
-                </View>
-                <Text>resizeMode: 'stretch'</Text>
-                {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: true, resizeMode: 'stretch', style: { minHeight: 150, flex: 1  } })}
-                <View style={{ width: 200, height: 200, justifyContent: 'center', alignItems: 'stretch', borderColor: 'pink', borderWidth: 2, borderStyle: 'dashed', margin: 5 }} collapsable={false}>
-                    {this.renderItem(frac, { backgroundColor: 'blue', color: 'white', resizeMode: 'stretch' })}
-                </View>
-                <Text>resizeMode: 'contain'</Text>
-                {this.renderItem(rFrac, { backgroundColor: 'blue', color: 'white', resizeMode: 'contain', scaleToFit: true })}
-                <Text>resizeMode: 'cover'</Text>
-                {this.renderItem(rFrac, { backgroundColor: 'blue', color: 'white', resizeMode: 'cover', scaleToFit: false })}
-                <Text>resizeMode: 'stretch'</Text>
-                {this.renderItem(rFrac, { backgroundColor: 'blue', color: 'white', resizeMode: 'stretch', style: { minHeight: 300, flex: 1 } })}
-                {this.renderItem(chem, { backgroundColor: 'blue', color: 'white', resizeMode: 'contain', scaleToFit: true })}
-            </ScrollView>
+            <MathProvider.Provider
+                preload={cachePreloadRequest}
+                style={{ flex: 1 }}
+                ref={ref => ref && ref.getCacheManager().disableWarnings()}
+            >
+                <ScrollView style={{ flex: 1 }}>
+                    <Text>resizeMode: 'contain'</Text>
+                    {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: true, resizeMode: 'contain' })}
+                    <Text>resizeMode: 'center'</Text>
+                    {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: false, resizeMode: 'center' })}
+                    <Text>resizeMode: 'cover'</Text>
+                    <View>
+                        <ScrollView
+                            horizontal
+                            style={{ flexDirection: 'column' }}
+                            onStartShouldSetResponderCapture={() => true}
+                            onMoveShouldSetResponderCapture={() => true}
+                            scrollEnabled
+                            onScroll={e => console.log(e.nativeEvent)}
+                        >
+                            <View pointerEvents="none">
+                                {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: false, resizeMode: 'cover' })}
+                            </View>
+                        </ScrollView>
+                    </View>
+                    <Text>resizeMode: 'stretch'</Text>
+                    {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: true, resizeMode: 'stretch', style: { minHeight: 150, flex: 1 } })}
+                    <View style={{ width: 200, height: 200, justifyContent: 'center', alignItems: 'stretch', borderColor: 'pink', borderWidth: 2, borderStyle: 'dashed', margin: 5 }} collapsable={false}>
+                        {this.renderItem(frac, { backgroundColor: 'blue', color: 'white', resizeMode: 'stretch' })}
+                    </View>
+                    <Text>resizeMode: 'contain'</Text>
+                    {this.renderItem(rFrac, { backgroundColor: 'blue', color: 'white', resizeMode: 'contain', scaleToFit: true })}
+                    <Text>resizeMode: 'cover'</Text>
+                    {this.renderItem(rFrac, { backgroundColor: 'blue', color: 'white', resizeMode: 'cover', scaleToFit: false })}
+                    <Text>resizeMode: 'stretch'</Text>
+                    {this.renderItem(rFrac, { backgroundColor: 'blue', color: 'white', resizeMode: 'stretch', style: { minHeight: 300, flex: 1 } })}
+                    {this.renderItem(chem, { backgroundColor: 'blue', color: 'white', resizeMode: 'contain', scaleToFit: true })}
+                </ScrollView>
+            </MathProvider.Provider>
         );
     }
     
@@ -241,11 +247,7 @@ export default class App extends Component {
 
     render() {
         return (
-            <MathJaxProvider.Provider
-                preload={cachePreloadRequest}
-                style={{ flex: 1 }}
-                ref={ref=>ref && ref.getCacheManager().disableWarnings()}
-            >
+            <>
                 <View style={{ flex: 1 }}>
                     {this[`render${this.state.state}`]()}
                 </View>
@@ -261,12 +263,12 @@ export default class App extends Component {
                     onPress={async () => {
                         const state = this.state.state;
                         this.setState({ state: 4 });
-                        await MathJaxProvider.CacheManager.clearCache();
+                        await MathProvider.CacheManager.clearCache();
                         this.setState({ state });
                     }}
                     title={`clear cache`}
                 />
-            </MathJaxProvider.Provider>
+            </>
         );
     }
 }

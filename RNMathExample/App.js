@@ -9,7 +9,11 @@ YellowBox.ignoreWarnings(['Warning: `flexWrap: `wrap`` is not supported with the
 
 const data = require('./tags.json');
 
-const cachePreloadRequest = 'x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}';
+const mathO = _.values({ ...MathStrings.calculus, ...MathStrings.trig }).filter((obj) => obj.math);
+const cacheMirror = _.filter(data, o => _.has(o, 'renderingData')).map(o => ({ ...o.renderingData, math: o.math }));
+
+//MathJaxProvider.CacheManager.addToCache(cacheMirror)
+const cachePreloadRequest = ['x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}', ...mathO.map(o => o.string)];
 
 const numStates = 4;
 
@@ -34,7 +38,7 @@ export default class App extends Component {
             ],
             width: Dimensions.get('window').width,
             fontScale: 1,
-            state: 3,
+            state: 0,
             tag: MathStrings.calculus.filter((obj) => obj.math)[0],
             mip: false,
             singleton: false,
@@ -47,7 +51,7 @@ export default class App extends Component {
     
     async componentDidMount() {
         const tags = MathStrings.calculus.filter((obj) => obj.math);
-        setTimeout(async () => console.log('isCached', await MathJaxProvider.CacheManager.isCached(cachePreloadRequest)), 5000);
+        setTimeout(async () => console.log('isCached', await MathJaxProvider.CacheManager.isCached(cachePreloadRequest[0])), 5000);
         this.t = setInterval(async () => {
             let i = (this.state.i + 1) % 20;
 
@@ -87,7 +91,7 @@ export default class App extends Component {
 
     getRecursiveFrac() {
         const a = new Array(this.state.i + 1).fill(0);
-        return { string: a.reduce((acc, val, index) => this.getFrac(acc, index + 1).string, `x^{${this.state.i + 1}}`) }
+        return { string: a.reduce((acc, val, index) => this.getFrac(acc, index + 1).string, `x^{${this.state.i + 1}}`) };
     }
     
     renderItem(item, props = {}) {
@@ -144,7 +148,7 @@ export default class App extends Component {
                 </View>
                 {this.renderItem(rFrac, { backgroundColor: 'blue', color: 'white', resizeMode: 'contain', scaleToFit: true })}
                 {this.renderItem(rFrac, { backgroundColor: 'blue', color: 'white', resizeMode: 'cover', scaleToFit: false })}
-                {this.renderItem(rFrac, { backgroundColor: 'blue', color: 'white', resizeMode: 'stretch', style: {minHeight: 300,flex:1} })}
+                {this.renderItem(rFrac, { backgroundColor: 'blue', color: 'white', resizeMode: 'stretch', style: { minHeight: 300, flex: 1 } })}
             </ScrollView>
         );
     }
@@ -202,13 +206,17 @@ export default class App extends Component {
         return <View style={{ flex: 1, justifyContent:'center' }}>{this.renderItem(this.state.tag, { backgroundColor: 'blue', color: 'white' })}</View>;
     }
 
+    render4() {
+        return null;
+    }
+
     get title() {
         const m = (this.state.state + 1) % numStates;
         switch (m) {
             case 0: return 'Stanalone View';
             case 1: return 'Flex SectionList';
             case 2: return 'FlexWrap SectionList';
-            case 3: return 'Changing on the Fly';
+            case 3: return 'Rendering on the Fly';
         }
     }
 
@@ -217,6 +225,7 @@ export default class App extends Component {
             <MathJaxProvider.Provider
                 preload={cachePreloadRequest}
                 style={{ flex: 1 }}
+                ref={ref=>ref && ref.getCacheManager().disableWarnings()}
             >
                 <View style={{ flex: 1 }}>
                     {this[`render${this.state.state}`]()}
@@ -227,6 +236,17 @@ export default class App extends Component {
                         return { state: (prev.state + 1) % numStates };
                     })}
                     title={`change to ${this.title}`}
+                />
+                <Button
+                    //style={{bottom: 0}}
+                    onPress={async () => {
+                        this.setState({ state: 4 });
+                        await MathJaxProvider.CacheManager.clearCache();
+                        await MathJaxProvider.CacheManager.getCache();
+                        //MathJaxProvider.CacheManager.addToCache(cacheMirror)
+                        this.setState({ state: 0 });
+                    }}
+                    title={`reset`}
                 />
             </MathJaxProvider.Provider>
         );

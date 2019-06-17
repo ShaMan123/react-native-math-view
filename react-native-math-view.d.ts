@@ -2,7 +2,7 @@
 // TypeScript Version: 2.6.2
 
 declare module 'react-native-math-view' {
-    import * as React from 'react';
+    import { Context, Component } from 'react';
     import {
         ViewProperties,
         Insets,
@@ -10,7 +10,8 @@ declare module 'react-native-math-view' {
         StyleProp,
         View,
         ViewProps,
-        ImageResizeMode
+        ImageResizeMode,
+        
     } from 'react-native';
 
     /*
@@ -67,7 +68,7 @@ declare module 'react-native-math-view' {
         export interface MathJaxProviderProps {
             preload?: string | Array<string>
         }
-        export class Provider extends React.Component<MathJaxProviderProps> {
+        export class Provider extends Component<MathJaxProviderProps> {
             /**preload math for later use */
             preload(): void
 
@@ -76,6 +77,8 @@ declare module 'react-native-math-view' {
 
             getCacheManager(): CacheHandler
         }
+
+        export const Context: Context<CacheHandler>;
     }
 
     export type ResizeMode = 'center' | 'cover' | 'contain';
@@ -115,7 +118,7 @@ declare module 'react-native-math-view' {
         resizeMode?: ResizeMode
     }
 
-    export default class MathView extends React.Component<MathViewProps> {
+    export default class MathView extends Component<MathViewProps> {
         /**
          * Android only
          * @param alignment

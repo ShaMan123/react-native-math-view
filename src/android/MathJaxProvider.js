@@ -34,6 +34,11 @@ class CacheHandler {
     active = false;
     static cache = [];
     static tags = [];
+    static sharedConfig = {
+        disabled: false,
+        warning: true,
+        maxTimeout: 10000
+    }
     disabled = false;
     warning = true;
     maxTimeout = 10000;
@@ -45,6 +50,7 @@ class CacheHandler {
     constructor(isGlobal = false) {
         this.appState = AppState.currentState;
         this.eventEmitter.setMaxListeners(1000);
+        _.map(CacheHandler.sharedConfig, (val, key) => _.set(this, key, val));
         this.getCache();
     }
 
@@ -127,25 +133,29 @@ class CacheHandler {
     }
 
     isCached(key) {
-        return _.find(CacheHandler.cache, (val) => _.isEqual(val.math, key));
+        return !_.isNil(_.find(CacheHandler.cache, (val) => val && _.isEqual(val.math, key)));
     }
 
     enable() {
         this.disabled = false;
+        if (this.isGlobal) CacheHandler.sharedConfig.disabled = false;
     }
 
     disable() {
         this.disabled = true;
+        if (this.isGlobal) CacheHandler.sharedConfig.disabled = true;
     }
 
     //  RequestManager
 
     disableWarnings() {
         this.warning = false;
+        if (this.isGlobal) CacheHandler.sharedConfig.warning = false;
     }
 
     setMaxTimeout(timeout) {
         this.maxTimeout = timeout;
+        if (this.isGlobal) CacheHandler.sharedConfig.maxTimeout = timeout;
     }
 
     async handleRequest(math) {
@@ -190,14 +200,15 @@ class CacheHandler {
             ]);
         }
 
-        const response = _.map(arr, (val) => _.find(CacheHandler.cache, (o) => _.isEqual(o.math, val)));
+        const response = _.map(arr, (val) => _.find(CacheHandler.cache, (o) => o && _.isEqual(o.math, val)));
         return isArr ? response : response[0];
     }
 
     setViewTag(next, prev) {
         _.pull(CacheHandler.tags, prev);
+        if (next) CacheHandler.tags.push(next);
         this.viewTag = next;
-        if (CacheManager.viewTag === prev) CacheManager.viewTag = next;
+        if (CacheManager.viewTag === prev) CacheManager.viewTag = CacheHandler.tags[0];
         this.eventEmitter.emit('provider', this.viewTag);
     }
 }

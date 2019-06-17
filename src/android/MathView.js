@@ -13,13 +13,15 @@ class MathView extends React.Component {
         return (
             <Context.Consumer>
                 {
-                    cacheManager => (
-                        <SVGMathView
-                            {...this.props}
-                            ref={this.props.forwardedRef}
-                            cacheManager={cacheManager}
-                        />
-                    )
+                    (cacheManager) => {
+                        return (
+                            <SVGMathView
+                                {...this.props}
+                                ref={this.props.forwardedRef}
+                                cacheManager={cacheManager}
+                            />
+                        );
+                    }
                 }
             </Context.Consumer>
         );

@@ -124,6 +124,7 @@ class CacheHandler {
     updateCache(data) {
         const response = _.filter(data, (val) => _.has(val, 'svg'));
         CacheHandler.cache.push(...response);
+        response.map((val) => this.eventEmitter.emit(val.math, val));
         return Promise.resolve(AsyncStorage && !this.disabled ? _.map(response, (val) => this.setDatabaseItem(val)) : false);
     }
 
@@ -204,6 +205,27 @@ class CacheHandler {
         return isArr ? response : response[0];
     }
 
+    onReady(math, callback) {
+        const result = _.find(CacheHandler.cache, (val) => val.math === math);
+
+        if (result) {
+            callback(result);
+            return () => { };
+        }
+        else {
+            this.eventEmitter.once(math, callback);
+            this.fetch(math);
+            return () => {
+                try {
+                    this.eventEmitter.removeListener(math, callback);
+                }
+                catch (err) {
+                    console.log(err);
+                }
+            };
+        }
+    }
+
     setViewTag(next, prev) {
         _.pull(CacheHandler.tags, prev);
         if (next) CacheHandler.tags.push(next);
@@ -227,7 +249,7 @@ export class Provider extends Component {
 
     constructor(props) {
         super(props);
-        this.cacheManager = new CacheHandler();
+        this.cacheManager = new CacheHandler();        
         props.preload && this.cacheManager.fetch(props.preload);
     }
 

@@ -3,6 +3,7 @@
 
 declare module 'react-native-math-view' {
     import { Context, Component } from 'react';
+    import EventEmitter from 'events';
     import {
         ViewProperties,
         Insets,
@@ -25,8 +26,12 @@ declare module 'react-native-math-view' {
     }
     */
 
+    export type ReadyCallback = (response: MathJaxResponse) => any;
+    export type Disposer = () => void;
+
     export module MathJaxProvider {
         class CacheHandler {
+            private eventEmitter: EventEmitter
             private getCache(): Promise<MathJaxResponse[]>
             public addToCache(data: Array<MathJaxResponse>): Promise<void>
             /**
@@ -53,6 +58,14 @@ declare module 'react-native-math-view' {
             private handleRequest(math: string | string[]): MathJaxResponse[]
             protected fetch(math: Array<string>, timeout?: number): MathJaxResponse[]
             protected fetch(math: string, timeout?: number): MathJaxResponse
+
+            /**
+             * subscribe to this event
+             * once MathJax has a response ready the callback will be invoked
+             * @param math
+             * @param callback
+             */
+            public onReady(math: string, callback: ReadyCallback): Disposer;
         }
         export const CacheManager: CacheHandler;
 

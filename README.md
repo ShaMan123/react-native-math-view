@@ -31,7 +31,7 @@ render() {
     
     // Android only:
     // Android MathView depends on MathJaxProvider.Provider
-    // Render this element once at the top of your app as soon as possible
+    // Render this element once (you can render more) at the top of your app as soon as possible (it takes 3000-5000ms to get the Provider running)
     // Use `preload` to enhance performance. To make this work install '@react-native-community/async-storage'
     <MathJaxProvider.Provider
         preload={['\\cos\\left(x\\right)=\\frac{b}{c}']}

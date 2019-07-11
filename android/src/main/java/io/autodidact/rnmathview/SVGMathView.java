@@ -1,4 +1,4 @@
-package com.autodidact.rnmathview;
+package io.autodidact.rnmathview;
 
 import android.graphics.Canvas;
 import android.graphics.Picture;

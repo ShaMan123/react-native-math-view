@@ -1,10 +1,7 @@
-package com.autodidact.rnmathview;
+package io.autodidact.rnmathview;
 
-import android.util.Log;
 import android.webkit.JavascriptInterface;
-import android.webkit.ValueCallback;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 
 public class JavaScriptUtility {
     private WebView mWebView;

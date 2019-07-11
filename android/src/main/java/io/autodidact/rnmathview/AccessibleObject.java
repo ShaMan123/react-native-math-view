@@ -1,16 +1,13 @@
-package com.autodidact.rnmathview;
+package io.autodidact.rnmathview;
 
 import android.arch.core.util.Function;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 public class AccessibleObject {
     private final Object o;

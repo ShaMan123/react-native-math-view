@@ -1,36 +1,20 @@
-package com.autodidact.rnmathview;
+package io.autodidact.rnmathview;
 
-import android.app.Activity;
-import android.os.SystemClock;
-import android.support.annotation.NonNull;
-import android.util.Log;
 import android.widget.ImageView;
 
-import com.caverock.androidsvg.SVG;
 import com.caverock.androidsvg.PreserveAspectRatio;
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableArray;
-import com.facebook.react.bridge.WritableArray;
-import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.MapBuilder;
-import com.facebook.react.uimanager.NativeViewHierarchyManager;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIBlock;
-import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.annotations.ReactProp;
-import com.facebook.react.views.view.ReactViewGroup;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import static com.autodidact.rnmathview.MathJaxProvider.TAG;
 
 public class RNSVGMathViewManager extends SimpleViewManager<SVGMathView> {
     public final String PROPS_SVG_STRING = "svg";

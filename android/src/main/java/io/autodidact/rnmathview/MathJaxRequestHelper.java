@@ -1,10 +1,7 @@
-package com.autodidact.rnmathview;
-
-import android.util.Log;
+package io.autodidact.rnmathview;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
-import com.facebook.react.bridge.PromiseImpl;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;

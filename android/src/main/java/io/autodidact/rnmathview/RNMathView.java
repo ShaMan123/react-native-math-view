@@ -1,32 +1,19 @@
-package com.autodidact.rnmathview;
+package io.autodidact.rnmathview;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Canvas;
-import android.graphics.Picture;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.MotionEvent;
-import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.RelativeLayout;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.ThemedReactContext;
-import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
-import com.facebook.react.views.view.*;
-
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Collection;
 
 import io.github.kexanie.library.MathView;
 

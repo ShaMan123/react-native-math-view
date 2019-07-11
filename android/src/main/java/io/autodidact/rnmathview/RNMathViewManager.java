@@ -1,8 +1,5 @@
-package com.autodidact.rnmathview;
+package io.autodidact.rnmathview;
 
-import android.view.View;
-
-import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;

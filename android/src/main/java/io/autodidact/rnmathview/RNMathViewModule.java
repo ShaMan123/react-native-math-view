@@ -1,34 +1,15 @@
-package com.autodidact.rnmathview;
+package io.autodidact.rnmathview;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.support.annotation.Nullable;
-import android.util.Log;
-
-import com.facebook.common.activitylistener.BaseActivityListener;
-import com.facebook.react.bridge.ActivityEventListener;
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Dynamic;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
-import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.WritableArray;
-import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.NativeViewHierarchyManager;
-import com.facebook.react.uimanager.PixelUtil;
-import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIBlock;
 import com.facebook.react.uimanager.UIManagerModule;
-import com.facebook.react.views.view.ReactViewGroup;
-
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 public class RNMathViewModule extends ReactContextBaseJavaModule {
     public static final String TAG = "RNMathViewModule";

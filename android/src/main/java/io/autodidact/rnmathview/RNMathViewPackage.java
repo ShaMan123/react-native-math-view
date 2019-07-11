@@ -1,6 +1,7 @@
 
-package com.autodidact.rnmathview;
+package io.autodidact.rnmathview;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -17,19 +18,24 @@ public class RNMathViewPackage implements ReactPackage {
     }
 
     @Override
-    public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
-        return Arrays.<NativeModule>asList(
-                new RNMathViewModule(reactContext)
-        );
+    public List<NativeModule> createNativeModules(
+            ReactApplicationContext reactContext) {
+        List<NativeModule> modules = new ArrayList<>();
+
+        modules.add(new RNMathViewModule(reactContext));
+
+        return modules;
     }
 
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
-        return Arrays.<ViewManager>asList(
-                new RNMathViewManager(),
-                new RNSVGMathViewManager(),
-                new MathJaxProviderManager()
-        );
+        List<ViewManager> viewManagers = new ArrayList<>();
+
+        viewManagers.add(new RNMathViewManager());
+        viewManagers.add(new RNSVGMathViewManager());
+        viewManagers.add(new MathJaxProviderManager());
+
+        return viewManagers;
     }
 
     // Deprecated from RN 0.47

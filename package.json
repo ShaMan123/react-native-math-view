@@ -6,11 +6,10 @@
   "types": "react-native-math-view.d.ts",
   "nativePackage": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node MathJaxProvider/testSVG.js",
     "watch": "node_modules/.bin/webpack --watch --dev",
     "build": "node_modules/.bin/webpack --progress",
-    "link": "node MathJaxProvider/link.js",
-    "publish": ""
+    "link": "node MathJaxProvider/link.js"
   },
   "keywords": [
     "react-native",
@@ -37,14 +36,17 @@
   "dependencies": {
     "events": "^3.0.0",
     "lodash": "^4.17.11",
-    "prop-types": "^15.7.2"
+    "prop-types": "^15.7.2",
+    "react-native-webview": "^5.12.1"
   },
   "devDependencies": {
     "@types/events": "^3.0.0",
+    "@types/lodash": "^4.14.134",
     "@types/react": "^16.8.20",
     "@types/react-dom": "^16.8.4",
     "@types/react-native": "^0.57.63",
     "babel-loader": "^8.0.6",
+    "fs-extra": "^8.0.1",
     "is-fullwidth-code-point": "^3.0.0",
     "mathjax": "^2.7.5",
     "path": "^0.12.7",
@@ -54,12 +56,6 @@
     "typescript": "^3.4.5",
     "webpack": "^4.32.0",
     "webpack-cli": "^3.3.2"
-  },
-  "rnpm": {
-    "assets": [
-      "MathJaxProvider/index.html",
-      "MathJaxProvider/dist"
-    ]
   },
   "resolutions": {
     "react": "*",

@@ -1,6 +1,5 @@
 package io.autodidact.rnmathview;
 
-import android.arch.core.util.Function;
 import androidx.annotation.NonNull;
 
 import java.lang.reflect.Constructor;

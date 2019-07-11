@@ -1,6 +1,5 @@
 package io.autodidact.rnmathview;
 
-import com.facebook.react.bridge.Dynamic;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -30,6 +29,7 @@ public class RNMathViewModule extends ReactContextBaseJavaModule {
         try {
             final ReactApplicationContext context = getReactApplicationContext();
             final UIManagerModule uiManager = context.getNativeModule(UIManagerModule.class);
+
             uiManager.addUIBlock(new UIBlock() {
                 public void execute(NativeViewHierarchyManager nvhm) {
                     MathJaxProvider view = (MathJaxProvider) nvhm.resolveView(tag);

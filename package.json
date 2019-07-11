@@ -24,19 +24,19 @@
   "author": "ShaMan123 (https://github.com/ShaMan123)",
   "license": "",
   "peerDependencies": {
-    "@react-native-community/async-storage": "^1.5.1",
     "react": "*",
-    "react-native": "*",
-    "react-native-webview": "^6.3.1"
+    "react-native": "*"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/ShaMan123/react-native-math-view.git"
   },
   "dependencies": {
+    "@react-native-community/async-storage": "^1.5.1",
     "events": "^3.0.0",
     "lodash": "^4.17.11",
-    "prop-types": "^15.7.2"
+    "prop-types": "^15.7.2",
+    "react-native-webview": "^6.3.1"
   },
   "devDependencies": {
     "@types/events": "^3.0.0",

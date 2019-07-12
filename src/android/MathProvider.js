@@ -4,7 +4,7 @@ import EventEmitter from 'events';
 import * as _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
-import { AppState, findNodeHandle, NativeModules, Platform, requireNativeComponent, UIManager, StyleSheet } from 'react-native';
+import { AppState, findNodeHandle, NativeModules, Platform, requireNativeComponent, UIManager } from 'react-native';
 
 const nativeViewName = 'RNMathJaxProvider';
 const RNMathJaxProvider = requireNativeComponent(nativeViewName, Provider, {
@@ -300,7 +300,6 @@ export class Provider extends React.PureComponent {
                     <RNMathJaxProvider
                         ref={this._handleRef}
                         onLayout={this.props.onLayout}
-                        style={styles.base}
                     />
                 }
 
@@ -313,12 +312,5 @@ export class Provider extends React.PureComponent {
         );
     }
 }
-
-
-const styles = StyleSheet.create({
-    base: {
-        flex: 1
-    }
-});
 
 

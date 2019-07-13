@@ -112,7 +112,7 @@ declare module 'react-native-math-view' {
         export const Context: Context<CacheHandler>;
     }
 
-    export type MathProviderHOC<T extends Component> = (WrappedComponent: T, props: MathProvider.MathJaxProviderProps) => T;
+    export function MathProviderHOC<T extends React.ClassType<any, any, any>>(WrappedComponentClass: T, props?: MathProvider.MathJaxProviderProps): T;
 
     export type ResizeMode = 'center' | 'cover' | 'contain';
 

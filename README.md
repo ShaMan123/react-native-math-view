@@ -110,7 +110,7 @@ MathProvider.CacheManager.clearCache();
 ## Running example app
 from the project's directory run:
 ```
-cd RNMathExample
+cd MathExample
 yarn --production=false
 yarn react-native start
 ```

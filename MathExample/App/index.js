@@ -137,7 +137,6 @@ export default class App extends Component {
         
         return (
             <MathProvider.Provider
-                preload={cachePreloadRequest}
                 style={{ flex: 1 }}
                 ref={ref => ref && ref.getCacheManager().disableWarnings()}
                 useGlobalCacheManager={false}
@@ -153,6 +152,7 @@ export default class App extends Component {
                         <Text>resizeMode: 'contain'</Text>
                         <Text>useGlobalCacheManager: false</Text>
                         <Text>clear cache to see the difference</Text>
+                        <Text>preloading {cachePreloadRequest.length} requests</Text>
                         {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: true, resizeMode: 'contain' })}
                     </MathProvider.Provider>
                     <Text>resizeMode: 'center'</Text>
@@ -183,6 +183,7 @@ export default class App extends Component {
                     {this.renderItem(rFrac, { backgroundColor: 'blue', color: 'white', resizeMode: 'cover', scaleToFit: false })}
                     <Text>resizeMode: 'stretch'</Text>
                     {this.renderItem(rFrac, { backgroundColor: 'blue', color: 'white', resizeMode: 'stretch', style: { minHeight: 300, flex: 1 } })}
+                    <Text>chem: not supported yet</Text>
                     {this.renderItem(chem, { backgroundColor: 'blue', color: 'white', resizeMode: 'contain', scaleToFit: true })}
                 </ScrollView>
             </MathProvider.Provider>

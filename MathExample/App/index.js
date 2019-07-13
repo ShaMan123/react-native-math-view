@@ -141,6 +141,7 @@ export default class App extends Component {
                 style={{ flex: 1 }}
                 ref={ref => ref && ref.getCacheManager().disableWarnings()}
                 useGlobalCacheManager={false}
+                componentId='testId'
             >
                 <ScrollView style={{ flex: 1 }}>
                     <MathProvider.Provider

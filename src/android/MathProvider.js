@@ -34,6 +34,7 @@ class CacheHandler {
     viewTag = null;
     eventEmitter = new EventEmitter();
     isGlobal = false
+    pending = [];
 
     constructor(isGlobal = false) {
         this.appState = AppState.currentState;
@@ -112,6 +113,7 @@ class CacheHandler {
     updateCache(data) {
         const response = _.filter(data, (val) => _.has(val, 'svg'));
         CacheHandler.cache.push(...response);
+        _.pullAll(this.pending, _.map(response, 'math'));
         response.map((val) => this.eventEmitter.emit(val.math, val));
         return Promise.resolve(AsyncStorage && !this.disabled ? _.map(response, (val) => this.setDatabaseItem(val)) : false);
     }
@@ -188,7 +190,8 @@ class CacheHandler {
     async fetch(math, timeout = this.maxTimeout) {
         const isArr = Array.isArray(math);
         const arr = isArr ? math : [math];
-        const fetchFromNative = _.reject(arr, this.isCached);
+        const fetchFromNative = _.reject(arr, (m) => this.isCached(m) || !_.isNil(_.find(this.pending, m)));
+        this.pending.push(...fetchFromNative);
         if (_.size(fetchFromNative) > 0) {
             const canResolve = () => !_.every(fetchFromNative, this.isCached);
             await Promise.race([

@@ -107,11 +107,12 @@ function tryPublishAndTag(version) {
 }
 
 function tagAndPublish(newVersion) {
+    const packageJson = readPackageJson();
     console.log(`trying to publish ${newVersion}...`);
     execSync(`npm --no-git-tag-version version ${newVersion}`);
     execSync(`npm publish --tag ${VERSION_TAG} ${_.defaultTo(argv.verbose, false) ? '--verbose' : ''}`, { stdio: [process.stdin, process.stdout, process.stderr] });
     execSync(`git tag -a ${newVersion} -m "${newVersion}"`);
-    execSync(`git push deploy ${newVersion} || true`);
+    execSync(`git push ${packageJson.repository.url} ${getCurrentBranchName()} ${newVersion}`);
     if (isRelease) {
         updatePackageJsonGit(newVersion);
     }
@@ -136,7 +137,7 @@ function updatePackageJsonGit(version) {
     writePackageJson(packageJson);
     execSync(`git add package.json`);
     execSync(`git commit -m"Update package.json version to ${version}"`);
-    execSync(`git push deploy master`);
+    execSync(`git push ${packageJson.repository.url} ${getCurrentBranchName()}`);
 }
 
 run();

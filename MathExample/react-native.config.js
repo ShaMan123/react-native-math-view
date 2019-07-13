@@ -9,7 +9,6 @@ module.exports = {
     dependencies: {
         'react-native-math-view': {
             root,
-            ...config.dependency
         }
     },
 };

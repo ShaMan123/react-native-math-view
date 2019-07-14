@@ -13,7 +13,7 @@ export default function MathProviderHOC(WrappedComponent, props = {}) {
                     {...this.props}
                 >
                     <WrappedComponent
-                        {..._.omit(props, ...providerProps)}
+                        {..._.omit(_.assign({}, this.props, props), ...providerProps)}
                     />
                 </Provider>
             );

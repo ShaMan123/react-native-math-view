@@ -76,11 +76,11 @@ export default class SVGMathView extends React.PureComponent {
     }
     */
 
-    async componentDidMount() {
+    componentDidMount() {
         this.subscribe();
     }
 
-    async componentDidUpdate(prevProps, prevState) {
+    componentDidUpdate(prevProps, prevState) {
         if (!this.props.scaleToFit) {
             const { width, height } = Dimensions.get('window');
             this.setStyle(width, height);
@@ -101,7 +101,13 @@ export default class SVGMathView extends React.PureComponent {
 
     subscribe() {
         this.unsubscribe();
-        this.disposer = this.props.cacheManager.onReady(this.props.source.math, this.update);
+        const { cacheManager } = this.props;
+        if (_.isNil(cacheManager.onReady)) {
+            console.error(`MathView: Did you forget to render <MathProvider /> ?`);
+        }
+        else {
+            this.disposer = cacheManager.onReady(this.props.source.math, this.update);
+        }
     }
 
     unsubscribe() {

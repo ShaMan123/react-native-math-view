@@ -1,6 +1,6 @@
 {
   "name": "react-native-math-view",
-  "version": "2.0.15",
+  "version": "2.0.16",
   "description": "Math view for react-native",
   "main": "src",
   "types": "react-native-math-view.d.ts",

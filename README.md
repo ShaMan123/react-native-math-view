@@ -109,7 +109,7 @@ from the project's directory run:
 ```
 cd MathExample
 yarn --production=false
-yarn react-native start
+npx react-native run-android
 ```
 
 ## Implementation:

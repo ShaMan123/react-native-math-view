@@ -32,7 +32,7 @@ import { name as appName } from './app.json';
 + import { MathProviderHOC } from 'react-native-math-view';
 
 - AppRegistry.registerComponent(appName, () => App);
-+ AppRegistry.registerComponent(appName, () => MathProviderHOC(App));
++ AppRegistry.registerComponent(appName, () => MathProviderHOC(App, props?: MathJaxProviderProps));
 
 ```
 

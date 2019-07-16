@@ -13,13 +13,10 @@ A react native view used to easily display and handle math.
 
 `npm install --save react-native-math-view`
 
+**OR**
+
 `yarn add react-native-math-view`
 
-#### Or for latest:
-
-`npm install --save github:ShaMan123/react-native-math-view`
-
-`yarn add github:ShaMan123/react-native-math-view`
 
 ## Getting Started
 

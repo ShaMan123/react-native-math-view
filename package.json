@@ -10,7 +10,8 @@
     "watch": "node_modules/.bin/webpack --watch --dev",
     "build": "node_modules/.bin/webpack --progress",
     "link": "node MathJaxProvider/link.js",
-    "release": "node publish"
+    "release": "node publish",
+    "start": "cd MathExample && npm start"
   },
   "keywords": [
     "react-native",

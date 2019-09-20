@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Dimensions, NativeModules, requireNativeComponent, StyleSheet, UIManager, View, ViewPropTypes } from 'react-native';
 import { CacheManager } from './MathProvider';
-
+import { TeXToSVG } from '../MathjaxProvider';
 
 const nativeViewName = 'RNSVGMathView';
 const RNMathView = requireNativeComponent(nativeViewName, SVGMathView, {
@@ -25,6 +25,44 @@ const styles = StyleSheet.create({
         minHeight: minDim
     }
 });
+
+async function getInnerStyle(math, layoutParams) {
+    const layoutData = await CacheManager.fetch(math);
+    return SVGMathView.getInnerStyle(layoutData, layoutParams);
+}
+
+function getInnerStyleSync(layoutData, { maxWidth, maxHeight, resizeMode }) {
+    const contain = resizeMode === 'contain';
+    const cover = resizeMode === 'cover';
+    const stretch = resizeMode === 'stretch';
+    const pow = contain ? -1 : 1;
+    const minMax = contain || stretch ? Math.min : Math.max;
+    const aWidth = stretch ? maxWidth : _.get(layoutData, 'apprxWidth', 0);
+    let aHeight = _.get(layoutData, 'apprxHeight', 0);
+    aHeight = stretch ? _.defaultTo(maxHeight, aHeight) : aHeight;
+    const window = Dimensions.get('window');
+    const scaleWidth = Math.min(Math.pow(window.width / (maxWidth - padding * 2), pow), 1);
+    const scaleHeight = Math.min(Math.min(minDim / aHeight), 1);
+    const scale = cover ? 1 : minMax(scaleWidth, scaleHeight);
+
+    const width = aWidth * scale;
+    const height = aHeight * scale;
+
+    return {
+        minWidth: minDim,
+        minHeight: Math.max(height, minDim),
+        flexBasis: Math.max(width, minDim),
+        maxWidth: cover ? width : maxWidth - padding * 2,
+        display: 'flex',
+        elevation: 5,
+        flexDirection: 'row'
+    };
+}
+
+function mip() {
+
+}
+
 
 export default class SVGMathView extends React.PureComponent {
     static propTypes = {
@@ -153,7 +191,8 @@ export default class SVGMathView extends React.PureComponent {
     }
     
     update = (data) => {
-        this.data = data;
+        //this.data = _.set(data, 'svg', TeXToSVG(this.props.source.math));
+        this.data = data //_.set(data, 'svg', TeXToSVG(this.props.source.math));
         this.setNativeProps({ svg: data.svg, style: [this.innerStyle, this.props.style] });
     }
 

@@ -1,13 +1,14 @@
 
-import React, {Component} from 'react';
-import { Platform, StyleSheet, Text, View, TextInput, SectionList, FlatList, UIManager, Alert, Dimensions, ScrollView, YellowBox, Button, TouchableOpacity } from 'react-native';
 import * as _ from 'lodash';
-import MathView, { MathProvider, MathProviderHOC } from 'react-native-math-view';
+import React, { Component } from 'react';
+import { Button, Dimensions, ScrollView, SectionList, StyleSheet, Text, TouchableOpacity, View, YellowBox } from 'react-native';
+import MathView, { MathProvider } from 'react-native-math-view';
 import * as MathStrings from './math';
+import data from './tags';
+import { TeXToSVG} from './mathSVG';
+import { SvgXml } from 'react-native-svg';
 
 YellowBox.ignoreWarnings(['Warning: `flexWrap: `wrap`` is not supported with the `VirtualizedList` components.']);
-
-import data from './tags';
 
 const mathO = _.values({ ...MathStrings.calculus, ...MathStrings.trig }).filter((obj) => obj.math);
 const cacheMirror = _.filter(data, o => _.has(o, 'renderingData')).map(o => ({ ...o.renderingData, math: o.math }));
@@ -55,15 +56,12 @@ export default class App extends Component {
             singleton: false,
             i: 0
         };
-
-        MathProvider.CacheManager
-            .setMaxTimeout(7000)
-            .disableLogging();
+        
     }
     
     async componentDidMount() {
         const tags = MathStrings.calculus.filter((obj) => obj.math);
-        setTimeout(() => console.log('isCached', MathProvider.CacheManager.isCached(cachePreloadRequest[0])), 5000);
+        //setTimeout(() => console.log('isCached', MathProvider.CacheManager.isCached(cachePreloadRequest[0])), 5000);
         this.t = setInterval(async () => {
             let i = (this.state.i + 1) % 20;
 
@@ -115,6 +113,7 @@ export default class App extends Component {
             <TouchableOpacity style={[styles.flexContainer]}>
                 <MathView
                     source={{ math: item.string }}
+                    math={item.string}
                     //style={{maxHeight: 20, maxWidth: 200}}
                     style={null}
                     color={parsedColor()}
@@ -136,17 +135,17 @@ export default class App extends Component {
         const frac = this.getFrac(`x+${i}`, i);
         
         return (
-            <MathProvider.Provider
+            <View
                 style={{ flex: 1 }}
-                ref={ref => ref && ref.getCacheManager().disableWarnings()}
+                //ref={ref => ref && ref.getCacheManager().disableWarnings()}
                 useGlobalCacheManager={false}
                 componentId='testId'
             >
                 <ScrollView style={{ flex: 1 }}>
-                    <MathProvider.Provider
+                    <View
                         preload={cachePreloadRequest}
                         style={{ flex: 1 }}
-                        ref={ref => ref && ref.getCacheManager().disableWarnings()}
+                        //ref={ref => ref && ref.getCacheManager().disableWarnings()}
                         useGlobalCacheManager={false}
                     >
                         <Text>resizeMode: 'contain'</Text>
@@ -154,7 +153,7 @@ export default class App extends Component {
                         <Text>clear cache to see the difference</Text>
                         <Text>preloading {cachePreloadRequest.length} requests</Text>
                         {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: true, resizeMode: 'contain' })}
-                    </MathProvider.Provider>
+                    </View>
                     <Text>resizeMode: 'center'</Text>
                     {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: false, resizeMode: 'center' })}
                     <Text>resizeMode: 'cover'</Text>
@@ -186,7 +185,7 @@ export default class App extends Component {
                     <Text>chem: not supported yet</Text>
                     {this.renderItem(chem, { backgroundColor: 'blue', color: 'white', resizeMode: 'contain', scaleToFit: true })}
                 </ScrollView>
-            </MathProvider.Provider>
+            </View>
         );
     }
     
@@ -247,6 +246,17 @@ export default class App extends Component {
         return null;
     }
 
+    renderRNSvg() {
+        return null;
+        return <SvgXml
+            xml={woops}
+            width='100%'
+            height='100%'
+            stroke='black'
+            fill='black'
+        />
+    }
+
     get title() {
         const m = (this.state.state + 1) % numStates;
         switch (m) {
@@ -265,7 +275,7 @@ export default class App extends Component {
                     onPress={async () => {
                         const state = this.state.state;
                         this.setState({ state: 4 });
-                        await MathProvider.CacheManager.clearCache();
+                       // await MathProvider.CacheManager.clearCache();
                         this.setState({ state });
                     }}
                     title={`clear cache to test first launch`}
@@ -274,7 +284,9 @@ export default class App extends Component {
                 <View style={{ flex: 1 }}>
                     {this[`render${this.state.state}`]()}
                 </View>
-               
+                <View style={{ flex: 1 }}>
+                    {this.renderRNSvg()}
+                </View>
                 <Button
                     //style={{bottom: 0}}
                     onPress={() => this.setState((prev) => {

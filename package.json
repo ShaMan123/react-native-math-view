@@ -2,7 +2,7 @@
   "name": "react-native-math-view",
   "version": "2.0.16",
   "description": "Math view for react-native",
-  "main": "src",
+  "main": "dist",
   "types": "react-native-math-view.d.ts",
   "nativePackage": true,
   "scripts": {
@@ -11,7 +11,8 @@
     "build": "node_modules/.bin/webpack --progress",
     "link": "node MathJaxProvider/link.js",
     "release": "node publish",
-    "start": "cd MathExample && npm start"
+    "start": "cd MathExample && npm start",
+    "postinstall": "tsc"
   },
   "keywords": [
     "react-native",

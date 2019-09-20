@@ -5,6 +5,7 @@ import * as _ from 'lodash';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { AppState, findNodeHandle, NativeModules, Platform, requireNativeComponent, UIManager } from 'react-native';
+import { TeXToSVG } from '../MathjaxProvider';
 
 const nativeViewName = 'RNMathJaxProvider';
 const RNMathJaxProvider = requireNativeComponent(nativeViewName, Provider, {
@@ -172,8 +173,10 @@ class CacheHandler {
             }, this.maxTimeout);
         });
         try {
-            const response = await ViewModule.getMathJax(this.viewTag, request, { timeout: this.maxTimeout });
+            const response = await ViewModule.getMathJax(this.viewTag, request, { timeout: this.maxTimeout });//[TeXToSVG(request[0])]// _.map(request, r=>TeXToSVG(r)) //await ViewModule.getMathJax(this.viewTag, request, { timeout: this.maxTimeout });
             this.updateCache(response);
+            //console.log('mip', _.map(request, (r, i) => ({ svg: TeXToSVG(r), ...response[i] })))
+            //this.updateCache(_.map(request, (r, i) => ({ svg: TeXToSVG(r), ...response[i] })));
             return response;
         }
         catch (err) {

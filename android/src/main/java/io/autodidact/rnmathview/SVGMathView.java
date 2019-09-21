@@ -50,13 +50,22 @@ public class SVGMathView extends SVGImageView {
     public void setColor(String color){
         mColor = color;
         mColorCSS = "* { fill: " + color + "; stroke: " + color + "; } ";
-        super.setCSS(mColorCSS);
+        postCSS(mColorCSS);
+    }
+
+    private void postCSS(final String css){
+        post(new Runnable() {
+            @Override
+            public void run() {
+                SVGMathView.super.setCSS(css);
+            }
+        });
     }
 
     @Override
     public void setCSS(String css) {
         css += mColorCSS;
-        super.setCSS(css);
+        postCSS(css);
     }
 
     public void addCSS(String css) {

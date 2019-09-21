@@ -1,4 +1,4 @@
-package io.autodidact.rnmathview;
+package io.autodidact.mathjaxprovider;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;

@@ -2,7 +2,6 @@
 package io.autodidact.rnmathview;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -11,6 +10,8 @@ import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
 import com.facebook.react.bridge.JavaScriptModule;
+
+import io.autodidact.mathjaxprovider.RNMathJaxProviderManager;
 
 public class RNMathViewPackage implements ReactPackage {
     public RNMathViewPackage() {
@@ -30,9 +31,8 @@ public class RNMathViewPackage implements ReactPackage {
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
         List<ViewManager> viewManagers = new ArrayList<>();
 
-        viewManagers.add(new RNMathViewManager());
         viewManagers.add(new RNSVGMathViewManager());
-        viewManagers.add(new MathJaxProviderManager());
+        viewManagers.add(new RNMathJaxProviderManager());
 
         return viewManagers;
     }

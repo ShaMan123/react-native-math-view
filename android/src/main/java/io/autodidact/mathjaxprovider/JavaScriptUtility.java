@@ -1,4 +1,4 @@
-package io.autodidact.rnmathview;
+package io.autodidact.mathjaxprovider;
 
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;

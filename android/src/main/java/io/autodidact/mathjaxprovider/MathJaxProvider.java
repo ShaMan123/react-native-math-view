@@ -1,4 +1,4 @@
-package io.autodidact.rnmathview;
+package io.autodidact.mathjaxprovider;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

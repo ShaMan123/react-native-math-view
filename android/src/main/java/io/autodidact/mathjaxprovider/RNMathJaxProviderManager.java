@@ -1,12 +1,12 @@
-package io.autodidact.rnmathview;
+package io.autodidact.mathjaxprovider;
 
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 
 import javax.annotation.Nonnull;
 
-public class MathJaxProviderManager extends SimpleViewManager<MathJaxProvider> {
-    public MathJaxProviderManager(){
+public class RNMathJaxProviderManager extends SimpleViewManager<MathJaxProvider> {
+    public RNMathJaxProviderManager(){
         super();
     }
 

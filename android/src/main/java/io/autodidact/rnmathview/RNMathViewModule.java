@@ -10,6 +10,9 @@ import com.facebook.react.uimanager.NativeViewHierarchyManager;
 import com.facebook.react.uimanager.UIBlock;
 import com.facebook.react.uimanager.UIManagerModule;
 
+import io.autodidact.mathjaxprovider.MathJaxProvider;
+import io.autodidact.mathjaxprovider.MathJaxRequestHelper;
+
 public class RNMathViewModule extends ReactContextBaseJavaModule {
     public static final String TAG = "RNMathViewModule";
     private final ReactApplicationContext reactContext;

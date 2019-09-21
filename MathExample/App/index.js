@@ -2,18 +2,18 @@
 import * as _ from 'lodash';
 import React, { Component } from 'react';
 import { Button, Dimensions, ScrollView, SectionList, StyleSheet, Text, TouchableOpacity, View, YellowBox } from 'react-native';
-import MathView, { MathProvider } from 'react-native-math-view';
+import MathView, { MathProvider, useCalculatedStyle } from 'react-native-math-view';
 import * as MathStrings from './math';
 import data from './tags';
-import { TeXToSVG} from './mathSVG';
 import { SvgXml } from 'react-native-svg';
+import { SvgFromXml } from './rnsvg'
 
 YellowBox.ignoreWarnings(['Warning: `flexWrap: `wrap`` is not supported with the `VirtualizedList` components.']);
 
 const mathO = _.values({ ...MathStrings.calculus, ...MathStrings.trig }).filter((obj) => obj.math);
 const cacheMirror = _.filter(data, o => _.has(o, 'renderingData')).map(o => ({ ...o.renderingData, math: o.math }));
 
-//MathProvider.CacheManager.addToCache(cacheMirror)
+
 const chem = `\\documentclass{article}
 \\usepackage[version = 3]{ mhchem }
 \\begin{ document }
@@ -25,11 +25,35 @@ const chem = `\\documentclass{article}
 \\noindent Subscript: \\\\
 \\ce{ 2H + {}_{ (aq) } + CO3 ^ { 2-}{ } _{ (aq) } -> CO2{ } _{ (g) } + H2O{ } _{ (l) } }
 \\end{ document }`;
-const cachePreloadRequest = ['x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}', ...mathO.map(o => o.string)];
+
+const pip = 'x_{1,2}=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}';
+//const cachePreloadRequest = ['x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}', ...mathO.map(o => o.string)];
 
 const numStates = 4;
 
 const interval = 3000;
+
+function MathItem(props) {
+    const getColor = () => Math.round(Math.random() * 255);
+    const getPixel = () => [getColor(), getColor(), getColor()].join(',');
+    const parsedColor = () => `rgb(${getPixel()})`;
+    //
+    return (
+        <TouchableOpacity
+            style={props.containerStyle}
+        >
+            <MathView
+                //style={{maxHeight: 20, maxWidth: 200}}
+                color={parsedColor()}
+                scaleToFit
+                resizeMode='contain'
+                {...props}
+            />
+        </TouchableOpacity>
+    );
+}
+
+
 
 export default class App extends Component {
     constructor(props) {
@@ -61,7 +85,6 @@ export default class App extends Component {
     
     async componentDidMount() {
         const tags = MathStrings.calculus.filter((obj) => obj.math);
-        //setTimeout(() => console.log('isCached', MathProvider.CacheManager.isCached(cachePreloadRequest[0])), 5000);
         this.t = setInterval(async () => {
             let i = (this.state.i + 1) % 20;
 
@@ -92,45 +115,22 @@ export default class App extends Component {
     getTaylor() {
         const exp = new Array(this.state.i + 1).fill(0).map((val, index) => index + 2);
         const rest = exp.map((val) => `{\\frac {x^{${val}}}{${val}!}}`).join('+');
-        return { string: `{\\displaystyle e^{x}=\\sum _{n=0}^{\\infty }{\\frac {x^{n}}{n!}}=1+x+${rest}+\\cdots }` };
+        return `{\\displaystyle e^{x}=\\sum _{n=0}^{\\infty }{\\frac {x^{n}}{n!}}=1+x+${rest}+\\cdots }`;
     }
 
     getFrac(a, b) {
-        return { string: `\\frac{${a}}{${b}}` };
+        return `\\frac{${a}}{${b}}`;
     }
 
     getRecursiveFrac() {
         const a = new Array(this.state.i + 1).fill(0);
-        return { string: a.reduce((acc, val, index) => this.getFrac(acc, index + 1).string, `x^{${this.state.i + 1}}`) };
-    }
-    
-    renderItem(item, props = {}) {
-        const getColor = () => Math.round(Math.random() * 255);
-        const getPixel = () => [getColor(), getColor(), getColor()].join(',');
-        const parsedColor = () => `rgb(${getPixel()})`;
-        //
-        return (
-            <TouchableOpacity style={[styles.flexContainer]}>
-                <MathView
-                    source={{ math: item.string }}
-                    math={item.string}
-                    //style={{maxHeight: 20, maxWidth: 200}}
-                    style={null}
-                    color={parsedColor()}
-                    scaleToFit
-                    {...props}
-                />
-            </TouchableOpacity>
-        );
-    }
-
-    renderStat(item) {
-        return this.renderItem(item);
+        return a.reduce((acc, val, index) => this.getFrac(acc, index + 1), `x^{${this.state.i + 1}}`)
     }
 
     render3() {
         const taylor = this.getTaylor();
         const rFrac = this.getRecursiveFrac();
+        console.log(rFrac)
         const i = this.state.i + 1;
         const frac = this.getFrac(`x+${i}`, i);
         
@@ -143,47 +143,96 @@ export default class App extends Component {
             >
                 <ScrollView style={{ flex: 1 }}>
                     <View
-                        preload={cachePreloadRequest}
+                        //preload={cachePreloadRequest}
                         style={{ flex: 1 }}
                         //ref={ref => ref && ref.getCacheManager().disableWarnings()}
                         useGlobalCacheManager={false}
                     >
                         <Text>resizeMode: 'contain'</Text>
-                        <Text>useGlobalCacheManager: false</Text>
-                        <Text>clear cache to see the difference</Text>
-                        <Text>preloading {cachePreloadRequest.length} requests</Text>
-                        {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: true, resizeMode: 'contain' })}
+                        <MathItem
+                            math={taylor}
+                            backgroundColor='blue'
+                            color='white'
+                            scaleToFit={true}
+                            resizeMode='contain'
+                        />
                     </View>
                     <Text>resizeMode: 'center'</Text>
-                    {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: false, resizeMode: 'center' })}
+                    <MathItem
+                        math={taylor}
+                        backgroundColor='blue'
+                        color='white'
+                        scaleToFit={false}
+                        resizeMode='center'
+                    />
                     <Text>resizeMode: 'cover'</Text>
                     <View>
                         <ScrollView
                             horizontal
                             style={{ flexDirection: 'column' }}
-                            onStartShouldSetResponderCapture={() => true}
-                            onMoveShouldSetResponderCapture={() => true}
                             scrollEnabled
                         //onScroll={e => console.log(e.nativeEvent)}
                         >
-                            <View pointerEvents="none">
-                                {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: false, resizeMode: 'cover' })}
-                            </View>
+                            <MathItem
+                                math={taylor}
+                                backgroundColor='blue'
+                                color='white'
+                                scaleToFit={false}
+                                resizeMode='cover'
+                            />
                         </ScrollView>
                     </View>
                     <Text>resizeMode: 'stretch'</Text>
-                    {this.renderItem(taylor, { backgroundColor: 'blue', color: 'white', scaleToFit: true, resizeMode: 'stretch', style: { minHeight: 150, flex: 1 } })}
+                    <MathItem
+                        math={taylor}
+                        backgroundColor='blue'
+                        color='white'
+                        scaleToFit
+                        resizeMode='stretch'
+                        style={{ minHeight: 150, flex: 1 }}
+                    />
                     <View style={{ width: 200, height: 200, justifyContent: 'center', alignItems: 'stretch', borderColor: 'pink', borderWidth: 2, borderStyle: 'dashed', margin: 5 }} collapsable={false}>
-                        {this.renderItem(frac, { backgroundColor: 'blue', color: 'white', resizeMode: 'stretch' })}
+                        <MathItem
+                            math={frac}
+                            backgroundColor='blue'
+                            color='white'
+                            resizeMode='stretch'
+                        />
                     </View>
                     <Text>resizeMode: 'contain'</Text>
-                    {this.renderItem(rFrac, { backgroundColor: 'blue', color: 'white', resizeMode: 'contain', scaleToFit: true })}
+                    <MathItem
+                        math={rFrac}
+                        backgroundColor='blue'
+                        color='white'
+                        scaleToFit
+                        resizeMode='contain'
+                        config={{ex: 50, em:200, }}
+                    />
                     <Text>resizeMode: 'cover'</Text>
-                    {this.renderItem(rFrac, { backgroundColor: 'blue', color: 'white', resizeMode: 'cover', scaleToFit: false })}
+                    <MathItem
+                        math={rFrac}
+                        backgroundColor='blue'
+                        color='white'
+                        scaleToFit={false}
+                        resizeMode='cover'
+                    />
                     <Text>resizeMode: 'stretch'</Text>
-                    {this.renderItem(rFrac, { backgroundColor: 'blue', color: 'white', resizeMode: 'stretch', style: { minHeight: 300, flex: 1 } })}
-                    <Text>chem: not supported yet</Text>
-                    {this.renderItem(chem, { backgroundColor: 'blue', color: 'white', resizeMode: 'contain', scaleToFit: true })}
+                    <MathItem
+                        math={rFrac}
+                        backgroundColor='blue'
+                        color='white'
+                        resizeMode='stretch'
+                        style={{ minHeight: 300, flex: 1}}
+                    />
+                    <Text>chem: not fully supported</Text>
+                    <MathItem
+                        math={`\\ce{ 2H + {}_{ (aq) } + CO3 ^ { 2-}{ } _{ (aq) } -> CO2{ } _{ (g) } + H2O{ } _{ (l) } }`}
+                        backgroundColor='blue'
+                        color='white'
+                        scaleToFit
+                        resizeMode='contain'
+                        style={{ flex: 1, minHeight: 200 }}
+                    />
                 </ScrollView>
             </View>
         );
@@ -195,8 +244,13 @@ export default class App extends Component {
             contentContainerStyle: { flexWrap: 'wrap', display: 'flex', flexDirection: 'row' },
             renderSectionHeader: ({ section: { title } }) => (<Text style={[styles.sectionHeader,{ minWidth: Dimensions.get('window').width}]}>{title}</Text>),
             renderItem: ({ item }) => {
-                const innerStyle = MathView.getInnerStyleSync(this.findData(item.string), { maxWidth: this.state.width, resizeMode: 'contain' });
-                return React.cloneElement(this.renderItem(item, { style: innerStyle, resizeMode:'contain' }), { style: styles.flexWrapContainer });
+                return (
+                    <MathItem
+                        math={item.string}
+                        resizeMode='contain'
+                        containerStyle={styles.flexWrapContainer}
+                    />
+                );
             }
         });
     }
@@ -204,7 +258,7 @@ export default class App extends Component {
     render1() {
         return (
             <SectionList
-                renderItem={({ item, index, section }) => this.renderStat(item)}
+                renderItem={({ item, index, section }) => <MathItem math={item.string} />}
                 renderSectionHeader={({ section: { title } }) => <Text style={styles.sectionHeader}>{title}</Text>}
                 sections={this.state.singleton ? [
                     {
@@ -239,7 +293,13 @@ export default class App extends Component {
     }
 
     render0() {
-        return <View style={{ flex: 1, justifyContent:'center' }}>{this.renderItem(this.state.tag, { backgroundColor: 'blue', color: 'white' })}</View>;
+        return <View style={{ flex: 1, justifyContent: 'center' }}>
+            <MathItem
+                math={this.state.tag.string}
+                backgroundColor='blue'
+                color='white'
+            />
+        </View>;
     }
 
     render4() {
@@ -247,9 +307,9 @@ export default class App extends Component {
     }
 
     renderRNSvg() {
-        return null;
-        return <SvgXml
-            xml={woops}
+        return <SvgFromXml
+            //style={{flex:1}}
+            xml={MathProvider.TeXToSVG(`ax^2+bx+c`).svg}
             width='100%'
             height='100%'
             stroke='black'
@@ -283,9 +343,6 @@ export default class App extends Component {
                 
                 <View style={{ flex: 1 }}>
                     {this[`render${this.state.state}`]()}
-                </View>
-                <View style={{ flex: 1 }}>
-                    {this.renderRNSvg()}
                 </View>
                 <Button
                     //style={{bottom: 0}}
@@ -328,3 +385,7 @@ const styles = StyleSheet.create({
         elevation: 5
     }
 });
+
+MathItem.defaultProps = {
+    containerStyle: styles.flexContainer
+}

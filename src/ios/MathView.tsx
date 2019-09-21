@@ -1,17 +1,29 @@
 'use strict';
 import * as React from 'react';
-import { UIManager, requireNativeComponent, NativeModules } from 'react-native';
+import { NativeModules, requireNativeComponent, UIManager, ViewProps } from 'react-native';
 
 const nativeViewName = 'RNMathView';
 const RNMathView = requireNativeComponent(nativeViewName);
 const MathViewManager = NativeModules.RNMathViewManager || {};
 export const { Constants } = UIManager.getViewManagerConfig ? UIManager.getViewManagerConfig(nativeViewName) : UIManager[nativeViewName];
 
-export default function MathView(props: MathViewProps) {
+export interface MathViewProps extends ViewProps {
+    math: string,
+
+    /**
+     * set text color
+     * can be set via `setNativeProps`
+     * */
+    color?: string,
+}
+
+function MathView(props: MathViewProps, ref: any) {
     return (
         <RNMathView
-            {...this.props}
-            math={this.props.source.math}
+            {...props}
+            ref={ref}
         />
     );
 }
+
+export default React.forwardRef(MathView);

@@ -1,7 +1,7 @@
 
 import * as _ from 'lodash';
 import React, { Component } from 'react';
-import { Button, Dimensions, ScrollView, SectionList, StyleSheet, Text, TouchableOpacity, View, YellowBox } from 'react-native';
+import { Button, Dimensions, ScrollView, SectionList, StyleSheet, Text, TouchableOpacity, View, YellowBox, I18nManager } from 'react-native';
 import MathView, { MathProvider, useCalculatedStyle } from 'react-native-math-view';
 import * as MathStrings from './math';
 import data from './tags';
@@ -239,7 +239,7 @@ export default class App extends Component {
         return React.cloneElement(this.render1(), {
             style: { flex: 1},
             contentContainerStyle: { flexWrap: 'wrap', display: 'flex', flexDirection: 'row' },
-            renderSectionHeader: ({ section: { title } }) => (<Text style={[styles.sectionHeader,{ minWidth: Dimensions.get('window').width}]}>{title}</Text>),
+            renderSectionHeader: ({ section: { title } }) => (<Text style={[styles.sectionHeader,{ minWidth: _.maxBy(_.values(_.pick(Dimensions.get('window'), 'width','height')))}]}>{title}</Text>),
             renderItem: ({ item }) => {
                 return (
                     <MathItem
@@ -329,17 +329,6 @@ export default class App extends Component {
     render() {
         return (
             <>
-                <Button
-                    //style={{bottom: 0}}
-                    onPress={async () => {
-                        const state = this.state.state;
-                        this.setState({ state: 4 });
-                       // await MathProvider.CacheManager.clearCache();
-                        this.setState({ state });
-                    }}
-                    title={`clear cache to test first launch`}
-                />
-                
                 <View style={{ flex: 1 }}>
                     {this[`render${this.state.state}`]()}
                 </View>
@@ -381,7 +370,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'blue',
         color: 'white',
         flex: 1,
-        elevation: 5
+        elevation: 5,
+        textAlign: 'left'//I18nManager.isRTL ? 'right' : 'left'
     }
 });
 

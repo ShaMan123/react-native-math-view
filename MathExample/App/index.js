@@ -308,7 +308,7 @@ export default class App extends Component {
     renderRNSvg() {
         return <SvgFromXml
             //style={{flex:1}}
-            xml={MathProvider.TeXToSVG(`ax^2+bx+c`).svg}
+            xml={MathProvider.mathToSVG(`ax^2+bx+c`).svg}
             width='100%'
             height='100%'
             stroke='black'

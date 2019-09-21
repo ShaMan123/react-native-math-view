@@ -8,7 +8,9 @@
     "lib": [ "es2015", "dom" ],
     "jsx": "react",
     "allowJs": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "noEmitOnError": false,
+    "watch": true
   },
   "include": [ "src" ],
   "compileOnSave": true

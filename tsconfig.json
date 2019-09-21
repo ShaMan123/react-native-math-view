@@ -10,7 +10,8 @@
     "allowJs": true,
     "baseUrl": ".",
     "noEmitOnError": false,
-    "watch": true
+    "watch": true,
+    "declaration": true
   },
   "include": [ "src" ],
   "compileOnSave": true

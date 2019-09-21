@@ -1,8 +1,8 @@
 'use strict';
 
 import * as _ from 'lodash';
-import React, { forwardRef, useCallback, useMemo, useState, useEffect } from 'react';
-import { Dimensions, LayoutChangeEvent, NativeModules, requireNativeComponent, StyleSheet, UIManager, View, ViewProps, Animated, ViewStyle } from 'react-native';
+import React, { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
+import { Animated, Dimensions, LayoutChangeEvent, NativeModules, requireNativeComponent, ScaledSize, StyleSheet, UIManager, View, ViewProps, ViewStyle } from 'react-native';
 import { useCalculatedStyle } from '../CalculatedStyle';
 import { MathToSVGConfig, ResizeMode } from '../Config';
 import { mathToSVG } from '../MathProvider';
@@ -65,18 +65,22 @@ function MathView(props: MathViewProps, ref: any) {
                 initialized: true
             });
         }
-    }, [props.scaleToFit, flexWrap]);
+    }, [props.scaleToFit, flexWrap, setLayout]);
 
-    useEffect(() => Dimensions.addEventListener('change', ({ window }) => {
-        const { width, height } = window;
-        setLayout({
-            width: defaultPropSize(fStyle, 'maxWidth', width),
-            height: defaultPropSize(fStyle, 'maxHeight', height),
-            windowWidth: width,
-            windowHeight: height,
-            initialized: false
-        })
-    }), [fStyle]);
+    useEffect(() => {
+        const handler = ({ window }: { window: ScaledSize }) => {
+            const { width, height } = window;
+            setLayout({
+                width: defaultPropSize(fStyle, 'maxWidth', width),
+                height: defaultPropSize(fStyle, 'maxHeight', height),
+                windowWidth: width,
+                windowHeight: height,
+                initialized: false
+            })
+        }
+        Dimensions.addEventListener('change', handler);
+        return () => Dimensions.removeEventListener('change', handler);
+    }, [fStyle, setLayout]);
     
     const opacity = useMemo(() => new Animated.Value(0), []);
     useEffect(() => {

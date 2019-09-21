@@ -52,6 +52,6 @@ export function calculateStyle(mathOrResponse: string | MathProviderResponse, co
 }
 
 export function useCalculatedStyle(mathOrResponse: string | MathProviderResponse, config: Partial<CalculatedStyleConfig> = {}) {
-    return useMemo(() => calculateStyle(mathOrResponse, config), [mathOrResponse, ..._.values(config)]);
+    return useMemo(() => calculateStyle(mathOrResponse, config), [mathOrResponse, config]);
 }
 

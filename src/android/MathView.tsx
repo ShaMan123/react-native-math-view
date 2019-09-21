@@ -51,8 +51,7 @@ function MathView(props: MathViewProps, ref: any) {
             width: defaultPropSize(fStyle, 'maxWidth', width),
             height: defaultPropSize(fStyle, 'maxHeight', height),
             windowWidth: width,
-            windowHeight: height,
-            initialized: false
+            windowHeight: height
         };
     });
     const onLayout = useCallback((e: LayoutChangeEvent) => {
@@ -61,8 +60,7 @@ function MathView(props: MathViewProps, ref: any) {
             setLayout({
                 ...layout,
                 width,
-                height,
-                initialized: true
+                height
             });
         }
     }, [props.scaleToFit, flexWrap, setLayout]);
@@ -74,8 +72,7 @@ function MathView(props: MathViewProps, ref: any) {
                 width: defaultPropSize(fStyle, 'maxWidth', width),
                 height: defaultPropSize(fStyle, 'maxHeight', height),
                 windowWidth: width,
-                windowHeight: height,
-                initialized: false
+                windowHeight: height
             })
         }
         Dimensions.addEventListener('change', handler);

@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { useMemo } from 'react';
-import { Dimensions } from 'react-native';
+import { Dimensions, ViewStyle } from 'react-native';
 import { ResizeMode, MathToSVGConfig, StylingConfig, mathToSVGDefaultConfig, stylingDefaultConfig } from './Config';
 import { mathToSVG, MathProviderResponse } from './MathProvider';
 
@@ -13,7 +13,7 @@ export type CalculatedStyleConfig = MathToSVGConfig & StylingConfig & {
     windowHeight: number,
 }
 
-export function calculateStyle(mathOrResponse: string | MathProviderResponse, config: Partial<CalculatedStyleConfig> = {}) {
+export function calculateStyle(mathOrResponse: string | MathProviderResponse, config: Partial<CalculatedStyleConfig> = {}): ViewStyle {
     const __config = _.defaultsDeep(config, mathToSVGDefaultConfig, stylingDefaultConfig, {
         maxWidth: config.windowWidth,
         minWidth: stylingDefaultConfig.minSize,

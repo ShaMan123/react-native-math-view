@@ -20,11 +20,8 @@ A react native view used to easily display and handle math.
 
 ## Getting Started
 
-```
-
-### Rendering `MathView`
 ```js
-import MathView, { MathProvider } from 'react-native-math-view';
+import MathView from 'react-native-math-view';
 
 render() {
   return (

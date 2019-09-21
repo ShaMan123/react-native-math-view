@@ -51,3 +51,8 @@ buck-out/
 ignore
       
 android-preX.zip
+
+dist
+dist/**/*
+
+**/deprecated/**

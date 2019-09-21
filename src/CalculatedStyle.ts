@@ -1,10 +1,12 @@
 import * as _ from 'lodash';
 import { useMemo } from 'react';
 import { Dimensions } from 'react-native';
-import defaultConfig, { ResizeMode, TeX2SVGConfig } from './Config';
-import { TeXToSVG, MathProviderResponse } from './MathProvider';
+import { ResizeMode, MathToSVGConfig, StylingConfig, mathToSVGDefaultConfig, stylingDefaultConfig } from './Config';
+import { mathToSVG, MathProviderResponse } from './MathProvider';
 
-export interface CalculatedStyleConfig extends TeX2SVGConfig {
+export type CalculatedStyleConfig = MathToSVGConfig & StylingConfig & {
+    minWidth: number,
+    minHeight: number,
     maxWidth: number,
     maxHeight: number,
 }
@@ -12,9 +14,13 @@ export interface CalculatedStyleConfig extends TeX2SVGConfig {
 export function useCalculatedStyle(mathOrResponse: string | MathProviderResponse, config: Partial<CalculatedStyleConfig> = {}) {
     const window = Dimensions.get('window');
     return useMemo(() => {
-        _.defaultsDeep(config, defaultConfig, { maxWidth: window.width });
-        const mathProviderResponse = _.isString(mathOrResponse) ? TeXToSVG(mathOrResponse, config) : mathOrResponse;
-        const { maxWidth, maxHeight, resizeMode } = config;
+        const __config = _.defaultsDeep(config, mathToSVGDefaultConfig, stylingDefaultConfig, {
+            maxWidth: window.width,
+            minWidth: stylingDefaultConfig.minSize,
+            minHeight: stylingDefaultConfig.minSize
+        }) as CalculatedStyleConfig;
+        const mathProviderResponse = _.isString(mathOrResponse) ? mathToSVG(mathOrResponse, __config) : mathOrResponse;
+        const { maxWidth, maxHeight, resizeMode } = __config;
         const contain = resizeMode === 'contain';
         const cover = resizeMode === 'cover';
         const stretch = resizeMode === 'stretch';
@@ -24,18 +30,18 @@ export function useCalculatedStyle(mathOrResponse: string | MathProviderResponse
         let aHeight = _.get(mathProviderResponse, 'height', 0);
         aHeight = stretch ? _.defaultTo(maxHeight, aHeight) : aHeight;
 
-        const scaleWidth = Math.min(Math.pow(window.width / (maxWidth - config.padding * 2), pow), 1);
-        const scaleHeight = Math.min(Math.min(config.minSize / aHeight), 1);
+        const scaleWidth = Math.min(Math.pow(window.width / (maxWidth - __config.padding * 2), pow), 1);
+        const scaleHeight = Math.min(Math.min(__config.minHeight / aHeight), 1);
         const scale = cover ? 1 : minMax(scaleWidth, scaleHeight);
 
         const width = aWidth * scale;
         const height = aHeight * scale;
 
         return {
-            minWidth: config.minSize,
-            minHeight: Math.max(height, config.minSize),
-            flexBasis: Math.max(width, config.minSize),
-            maxWidth: cover ? width : maxWidth - config.padding * 2,
+            minWidth: Math.max(width, __config.minWidth),// __config.minWidth,
+            minHeight: Math.max(height, __config.minHeight),
+            flexBasis: Math.max(width, __config.minWidth),
+            maxWidth: cover ? width : maxWidth - __config.padding * 2,
             display: 'flex',
             elevation: 5,
             flexDirection: 'row'

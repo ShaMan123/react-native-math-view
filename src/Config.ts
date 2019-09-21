@@ -2,7 +2,7 @@ import { AllPackages } from 'mathjax-full/js/input/tex/AllPackages';
 
 export type ResizeMode = 'center' | 'cover' | 'contain' | 'stretch';
 
-export interface TeX2SVGConfig {
+export interface MathToSVGConfig {
     /** 
      *  process as inline math
      *  default: true
@@ -44,7 +44,9 @@ export interface TeX2SVGConfig {
      * default: true 
      * */
     fontCache: boolean,
+}
 
+export interface StylingConfig {
     /**
      * minimum width/height of view
      * default: 35 
@@ -63,15 +65,18 @@ export interface TeX2SVGConfig {
     resizeMode: ResizeMode
 }
 
-export default {
+export const mathToSVGDefaultConfig = {
     inline: true,
     em: 16,
     ex: 8,
     width: 80 * 16,
     packages: AllPackages,
     css: false,
-    fontCache: true,
+    fontCache: true
+} as MathToSVGConfig;
+
+export const stylingDefaultConfig = {
     minSize: 35,
     padding: 10,
     resizeMode: 'center'
-} as TeX2SVGConfig
+} as StylingConfig;

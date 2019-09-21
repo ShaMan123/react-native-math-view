@@ -4,7 +4,7 @@ import { RegisterHTMLHandler } from 'mathjax-full/js/handlers/html';
 import { TeX } from 'mathjax-full/js/input/tex';
 import { mathjax } from 'mathjax-full/js/mathjax';
 import { SVG } from 'mathjax-full/js/output/svg';
-import defaultConfig, { TeX2SVGConfig } from './Config';
+import { MathToSVGConfig, mathToSVGDefaultConfig } from './Config';
 
 export interface MathProviderResponse {
     math: string,
@@ -13,7 +13,7 @@ export interface MathProviderResponse {
     height: number
 }
 
-function parseSize(size: string | number, config: Partial<TeX2SVGConfig> = {}) {
+function parseSize(size: string | number, config: Partial<MathToSVGConfig> = {}) {
     if (typeof size === 'number') return size;
     const unit = size.substr(-2);
     return _.get(config, unit, 1) * parseFloat(size);
@@ -24,8 +24,8 @@ function parseSize(size: string | number, config: Partial<TeX2SVGConfig> = {}) {
  * @param math
  * @param config
  */
-function toSVG(math: string, config: Partial<TeX2SVGConfig> = {}) {
-    const opts = _.defaultsDeep(config, defaultConfig);
+function toSVG(math: string, config: Partial<MathToSVGConfig> = {}) {
+    const opts = _.defaultsDeep(config, mathToSVGDefaultConfig);
     //
     //  Create DOM adaptor and register it for HTML documents
     //
@@ -69,4 +69,4 @@ function toSVG(math: string, config: Partial<TeX2SVGConfig> = {}) {
     };
 }
 
-export const TeXToSVG = _.memoize(toSVG);
+export const mathToSVG = _.memoize(toSVG);

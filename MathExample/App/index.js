@@ -73,10 +73,8 @@ export default class App extends Component {
                 }
             ],
             width: Dimensions.get('window').width,
-            fontScale: 1,
-            state: 3,
+            state: 2,
             tag: MathStrings.calculus.filter((obj) => obj.math)[0],
-            mip: false,
             singleton: false,
             i: 0
         };
@@ -95,7 +93,6 @@ export default class App extends Component {
                 i,
                 //width: Math.min(Dimensions.get('window').width * (i % 4 + 1) * 0.25, Dimensions.get('window').width),
                 tag,
-                mip: true
             });
             //console.log('getMathJax1', await MathProvider.CacheManager.fetch(tags[i % tags.length].string));
             //console.log('getMathJaxAll', await MathProvider.CacheManager.fetch(tags.map(t => t.string)));
@@ -240,7 +237,7 @@ export default class App extends Component {
     
     render2() {
         return React.cloneElement(this.render1(), {
-            style: {flex:1},
+            style: { flex: 1},
             contentContainerStyle: { flexWrap: 'wrap', display: 'flex', flexDirection: 'row' },
             renderSectionHeader: ({ section: { title } }) => (<Text style={[styles.sectionHeader,{ minWidth: Dimensions.get('window').width}]}>{title}</Text>),
             renderItem: ({ item }) => {
@@ -248,7 +245,9 @@ export default class App extends Component {
                     <MathItem
                         math={item.string}
                         resizeMode='contain'
-                        containerStyle={styles.flexWrapContainer}
+                        containerStyle={[styles.flexWrapContainer]}
+                        style={{/*maxWidth:200, minHeight:50,*/ flexWrap: 'wrap'}}
+                        //scaleToFit={false}
                     />
                 );
             }

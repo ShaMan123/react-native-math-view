@@ -1,3 +1,4 @@
 import MathView from './android/MathView';
 import * as MathProvider from './MathProvider';
-export { MathView as default, MathProvider };
+import { useCalculatedStyle } from './CalculatedStyle';
+export { MathView as default, MathProvider, useCalculatedStyle };

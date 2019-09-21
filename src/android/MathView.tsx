@@ -12,7 +12,6 @@ const RNMathView = requireNativeComponent(nativeViewName);
 const MathViewManager = NativeModules.RNMathViewManager || {};
 export const { Constants } = UIManager.getViewManagerConfig ? UIManager.getViewManagerConfig(nativeViewName) : UIManager[nativeViewName];
 
-
 export interface MathViewProps extends ViewProps {
     math: string,
 
@@ -51,14 +50,16 @@ function MathView(props: MathViewProps, ref: any) {
         return {
             width: defaultPropSize(fStyle, 'maxWidth', width),
             height: defaultPropSize(fStyle, 'maxHeight', height),
+            windowWidth: width,
+            windowHeight: height,
             initialized: false
         };
     });
     const onLayout = useCallback((e: LayoutChangeEvent) => {
         const { width, height } = e.nativeEvent.layout;
-        
         if (props.scaleToFit && (flexWrap === 'nowrap' || flexWrap === '')) {
             setLayout({
+                ...layout,
                 width,
                 height,
                 initialized: true
@@ -66,6 +67,17 @@ function MathView(props: MathViewProps, ref: any) {
         }
     }, [props.scaleToFit, flexWrap]);
 
+    useEffect(() => Dimensions.addEventListener('change', ({ window }) => {
+        const { width, height } = window;
+        setLayout({
+            width: defaultPropSize(fStyle, 'maxWidth', width),
+            height: defaultPropSize(fStyle, 'maxHeight', height),
+            windowWidth: width,
+            windowHeight: height,
+            initialized: false
+        })
+    }), [fStyle]);
+    
     const opacity = useMemo(() => new Animated.Value(0), []);
     useEffect(() => {
         Animated
@@ -83,6 +95,8 @@ function MathView(props: MathViewProps, ref: any) {
         minHeight: _.get(fStyle, 'minHeight', undefined),
         maxWidth: defaultPropSize(fStyle, 'maxWidth', layout.width),
         maxHeight: defaultPropSize(fStyle, 'maxHeight', layout.height),
+        windowWidth: layout.windowWidth,
+        windowHeight: layout.windowHeight,
         resizeMode: props.resizeMode,
         padding: _.get(fStyle, 'padding', undefined)
     });

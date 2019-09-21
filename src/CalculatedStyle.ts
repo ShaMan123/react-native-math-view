@@ -9,13 +9,14 @@ export type CalculatedStyleConfig = MathToSVGConfig & StylingConfig & {
     minHeight: number,
     maxWidth: number,
     maxHeight: number,
+    windowWidth: number,
+    windowHeight: number,
 }
 
 export function useCalculatedStyle(mathOrResponse: string | MathProviderResponse, config: Partial<CalculatedStyleConfig> = {}) {
-    const window = Dimensions.get('window');
     return useMemo(() => {
         const __config = _.defaultsDeep(config, mathToSVGDefaultConfig, stylingDefaultConfig, {
-            maxWidth: window.width,
+            maxWidth: config.windowWidth,
             minWidth: stylingDefaultConfig.minSize,
             minHeight: stylingDefaultConfig.minSize
         }) as CalculatedStyleConfig;
@@ -30,7 +31,7 @@ export function useCalculatedStyle(mathOrResponse: string | MathProviderResponse
         let aHeight = _.get(mathProviderResponse, 'height', 0);
         aHeight = stretch ? _.defaultTo(maxHeight, aHeight) : aHeight;
 
-        const scaleWidth = Math.min(Math.pow(window.width / (maxWidth - __config.padding * 2), pow), 1);
+        const scaleWidth = Math.min(Math.pow(__config.windowWidth / (maxWidth - __config.padding * 2), pow), 1);
         const scaleHeight = Math.min(Math.min(__config.minHeight / aHeight), 1);
         const scale = cover ? 1 : minMax(scaleWidth, scaleHeight);
 
@@ -46,6 +47,6 @@ export function useCalculatedStyle(mathOrResponse: string | MathProviderResponse
             elevation: 5,
             flexDirection: 'row'
         };
-    }, [mathOrResponse, config, window]);
+    }, [mathOrResponse, config]);
 }
 

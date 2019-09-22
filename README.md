@@ -53,7 +53,7 @@ npx react-native run-android
 #### Develope:
 From root run:
 ```
-npm start
+npm run dev
 ```
 This will watch `ts` files and start bundler.
 

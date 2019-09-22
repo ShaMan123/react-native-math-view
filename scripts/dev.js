@@ -7,7 +7,7 @@ const procConfig = {
     cwd: path.resolve(__dirname, '..')
 };
 
-const start = 'cd MathExample && npm start';
+const start = 'npm start';
 const tsc = 'tsc --watch';
 
 if (process.platform === 'darwin') {

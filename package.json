@@ -7,7 +7,8 @@
   "nativePackage": true,
   "scripts": {
     "release": "node ./scripts/publish",
-    "start": "node ./scripts/dev",
+    "start": "cd MathExample && npm start",
+    "dev": "node ./scripts/dev",
     "postinstall": "node ./scripts/compileMathjax && tsc"
   },
   "keywords": [

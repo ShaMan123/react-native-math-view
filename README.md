@@ -43,12 +43,20 @@ render() {
 
 
 ## Running example app
-from the project's directory run:
+From the project's directory run:
 ```
 cd MathExample
 yarn --production=false
 npx react-native run-android
 ```
+
+#### Develope:
+From root run:
+```
+npm run dev
+```
+This will watch `ts` files and start bundler.
+
 
 ## Implementation:
   - [ ] [iOS native MathView](https://github.com/kostub/iosMath) - linked native! Need to create RN component

@@ -5,7 +5,7 @@ const fs = require('fs');
 
 const processConfig = {
     stdio: 'inherit',
-    cwd: __dirname
+    cwd: path.resolve(__dirname, '..')
 };
 
 const innerPathToFile = 'input/tex/mhchem/mhchem_parser.js';
@@ -16,6 +16,6 @@ try {
 }
 catch (e) { };
 //child_process.execSync('cd node_modules/mathjax-full && npm run postcompile', processConfig);
-fs.copyFileSync(path.resolve(__dirname, pathToModule, 'ts', innerPathToFile), path.resolve(__dirname, pathToModule, 'js', innerPathToFile));
+fs.copyFileSync(path.resolve(processConfig.cwd, pathToModule, 'ts', innerPathToFile), path.resolve(processConfig.cwd, pathToModule, 'js', innerPathToFile));
 
 console.log(chalk.bold('compiled mathjax successfully'));

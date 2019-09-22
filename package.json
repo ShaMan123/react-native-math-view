@@ -6,9 +6,9 @@
   "types": "react-native-math-view.d.ts",
   "nativePackage": true,
   "scripts": {
-    "release": "node publish",
-    "start": "cd MathExample && npm start",
-    "postinstall": "tsc"
+    "release": "node ./scripts/publish",
+    "start": "node ./scripts/dev",
+    "postinstall": "node ./scripts/compileMathjax && tsc"
   },
   "keywords": [
     "react-native",
@@ -37,6 +37,7 @@
     "@react-native-community/async-storage": "^1.5.1",
     "events": "^3.0.0",
     "lodash": "^4.17.11",
+    "mathjax-full": "^3.0.0",
     "prop-types": "^15.7.2",
     "react-native-webview": "^6.3.1"
   },
@@ -49,7 +50,6 @@
     "babel-loader": "^8.0.6",
     "fs-extra": "^8.0.1",
     "is-fullwidth-code-point": "^3.0.0",
-    "mathjax": "^2.7.5",
     "path": "^0.12.7",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",

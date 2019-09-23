@@ -128,18 +128,17 @@ export const math = [
 ];
 
 export function getTaylor(n: number) {
-    const exp = new Array(n + 1).fill(0).map((val, index) => index + 2);
+    const exp = _.map(new Array(n + 1), (val, index) => index + 2);
     const rest = exp.map((val) => `{\\frac {x^{${val}}}{${val}!}}`).join('+');
     return `{\\displaystyle e^{x}=\\sum _{n=0}^{\\infty }{\\frac {x^{n}}{n!}}=1+x+${rest}+\\cdots }`;
 }
 
-export function getFrac(a: number, b: number) {
+export function getFrac(a: number | string, b: number | string) {
     return `\\frac{${a}}{${b}}`;
 }
 
 export function getRecursiveFrac(n: number) {
-    const a = new Array(n+ 1).fill(0);
-    return a.reduce((acc, val, index) => getFrac(acc, index + 1), `x^{${n+ 1}}`)
+    return _.reduce(_.fill(new Array(n + 1), 0), (acc, val, index) => getFrac(acc, index + 1), `x^{${n + 1}}`);
 }
 
 export default {

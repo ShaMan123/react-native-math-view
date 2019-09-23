@@ -40,7 +40,7 @@ export default function MathSectionList(props: Partial<SectionListProps<typeof M
     
     return (
         <SectionList
-            renderItem={({ item, index, section }) => <MathItem math={item} style={{flex:1}} />}
+            renderItem={({ item, index, section }) => <MathItem math={item} />}
             renderSectionHeader={({ section: { title } }) => <Text style={styles.sectionHeader}>{title}</Text>}
             sections={sections}
             onRefresh={onRefresh}

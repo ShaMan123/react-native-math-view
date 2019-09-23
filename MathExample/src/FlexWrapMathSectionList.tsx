@@ -12,7 +12,7 @@ export default function FlexWrapMathSectionList() {
     const renderHeader = useCallback(({ section: { title } }) => {
         return (
             <Text
-                style={[styles.sectionHeader, { minWidth: _.maxBy(_.values(_.pick(Dimensions.get('window'), 'width', 'height'))) }]}
+                style={styles.sectionHeader}
             >
                 {title}
             </Text>
@@ -25,7 +25,7 @@ export default function FlexWrapMathSectionList() {
                 math={item}
                 resizeMode='contain'
                 containerStyle={[styles.flexWrapContainer]}
-                style={{/*maxWidth:200, minHeight:50,*/ flexWrap: 'wrap' }}
+                //style={{/*maxWidth:200, minHeight:50,*/ flexWrap: 'wrap' }}
             //scaleToFit={false}
             />
         );

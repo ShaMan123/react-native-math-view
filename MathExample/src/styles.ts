@@ -27,7 +27,8 @@ export default StyleSheet.create({
         color: 'white',
         flex: 1,
         elevation: 5,
-        textAlign: 'left'//I18nManager.isRTL ? 'right' : 'left'
+        textAlign: 'left',//I18nManager.isRTL ? 'right' : 'left'
+        minWidth: '100%'
     },
     default: {
         flex: 1

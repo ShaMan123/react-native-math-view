@@ -51,7 +51,7 @@ export default function DifferentLayouts() {
                 <View>
                     <ScrollView
                         horizontal
-                        style={{ flexDirection: 'column' }}
+                        style={styles.default}
                         scrollEnabled
                     //onScroll={e => console.log(e.nativeEvent)}
                     >
@@ -61,6 +61,7 @@ export default function DifferentLayouts() {
                             color='white'
                             scaleToFit={false}
                             resizeMode='cover'
+                            style={styles.default}
                         />
                     </ScrollView>
                 </View>

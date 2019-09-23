@@ -1,12 +1,14 @@
 package io.autodidact.rnmathview;
 
+import androidx.annotation.Nullable;
+
 import com.facebook.react.uimanager.PixelUtil;
 
 public class SVGAttributes {
     String svg;
     float width;
     float height;
-    static int ex = 8;
+    int ex = 8;
 
     SVGAttributes(String svg) {
         this.svg = svg;
@@ -21,4 +23,9 @@ public class SVGAttributes {
         int startAt = svgXMLDec.indexOf(name);
         return svgXMLDec.substring(svgXMLDec.indexOf("=", startAt) + 2, svgXMLDec.indexOf(" ", startAt) - 1);
     }
+
+    public void setEX(int ex) {
+        this.ex = ex;
+    }
+
 }

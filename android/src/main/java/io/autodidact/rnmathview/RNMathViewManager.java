@@ -4,6 +4,7 @@ import android.widget.ImageView;
 
 import com.caverock.androidsvg.PreserveAspectRatio;
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.LayoutShadowNode;
 import com.facebook.react.uimanager.SimpleViewManager;
@@ -20,6 +21,7 @@ public class RNMathViewManager extends SimpleViewManager<SVGMathView> {
     public static final String PROPS_SVG_STRING = "svg";
     public static final String PROPS_MATH = "math";
     public static final String PROPS_COLOR = "color";
+    public static final String PROPS_CONFIG = "config";
     public static final String PROPS_CSS = "css";
     public static final String PROPS_PRESERVE_ASPECT_RATIO = "preserveAspectRatio";
     public static final String PROPS_SCALE_TYPE = "scaleType";
@@ -62,6 +64,14 @@ public class RNMathViewManager extends SimpleViewManager<SVGMathView> {
     @ReactProp(name = PROPS_COLOR)
     public void setColor(SVGMathView viewContainer, String color) {
         viewContainer.setColor(color);
+    }
+
+    @ReactProp(name = PROPS_CONFIG)
+    public void setConfig(SVGMathView viewContainer, @Nullable ReadableMap config) {
+        if(config == null) return;
+        if(config.hasKey("ex")){
+            viewContainer.SVGAttributes.setEX(config.getInt("ex"));
+        }
     }
 
     @ReactProp(name = PROPS_CSS)

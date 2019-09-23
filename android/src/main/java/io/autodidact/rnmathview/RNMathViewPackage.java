@@ -31,7 +31,7 @@ public class RNMathViewPackage implements ReactPackage {
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
         List<ViewManager> viewManagers = new ArrayList<>();
 
-        viewManagers.add(new RNSVGMathViewManager());
+        viewManagers.add(new RNMathViewManager());
         viewManagers.add(new RNMathJaxProviderManager());
 
         return viewManagers;

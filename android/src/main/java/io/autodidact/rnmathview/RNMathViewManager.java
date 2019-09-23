@@ -16,7 +16,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class RNSVGMathViewManager extends SimpleViewManager<SVGMathView> {
+public class RNMathViewManager extends SimpleViewManager<SVGMathView> {
     public static final String PROPS_SVG_STRING = "svg";
     public static final String PROPS_MATH = "math";
     public static final String PROPS_COLOR = "color";
@@ -24,13 +24,13 @@ public class RNSVGMathViewManager extends SimpleViewManager<SVGMathView> {
     public static final String PROPS_PRESERVE_ASPECT_RATIO = "preserveAspectRatio";
     public static final String PROPS_SCALE_TYPE = "scaleType";
 
-    public RNSVGMathViewManager(){
+    public RNMathViewManager(){
         super();
     }
 
     @Override
     public String getName() {
-        return "RNSVGMathView";
+        return "RNMathView";
     }
 
     @Override

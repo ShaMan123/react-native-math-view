@@ -7,7 +7,7 @@ import { useCalculatedStyle } from '../CalculatedStyle';
 import { MathToSVGConfig, ResizeMode } from '../Config';
 import { mathToSVG } from '../MathProvider';
 
-const nativeViewName = 'RNSVGMathView';
+const nativeViewName = 'RNMathView';
 const RNMathView = requireNativeComponent(nativeViewName);
 const MathViewManager = NativeModules.RNMathViewManager || {};
 export const { Constants } = UIManager.getViewManagerConfig ? UIManager.getViewManagerConfig(nativeViewName) : UIManager[nativeViewName];
@@ -126,7 +126,7 @@ function MathView(props: MathViewProps, ref: any) {
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
-        //flex:1
+        //flex:1,
         display: 'flex',
         //flexWrap: 'wrap'
     }

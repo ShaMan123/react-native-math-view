@@ -115,7 +115,7 @@ function MathView(props: MathViewProps, ref: any) {
                 <RNMathView
                     {...props}
                     svg={data.svg}
-                    style={[style, props.style]}
+                    style={[/*style,*/{ minHeight:35 }, props.style]}
                     ref={ref}
                 />
             </Animated.View>
@@ -125,7 +125,10 @@ function MathView(props: MathViewProps, ref: any) {
 
 const styles = StyleSheet.create({
     container: {
-        flexDirection: 'row'
+        flexDirection: 'row',
+        //flex:1
+        display: 'flex',
+        //flexWrap: 'wrap'
     }
 })
 

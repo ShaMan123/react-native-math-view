@@ -5,6 +5,7 @@ import android.widget.ImageView;
 import com.caverock.androidsvg.PreserveAspectRatio;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.common.MapBuilder;
+import com.facebook.react.uimanager.LayoutShadowNode;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
@@ -16,12 +17,12 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class RNSVGMathViewManager extends SimpleViewManager<SVGMathView> {
-    public final String PROPS_SVG_STRING = "svg";
-    public final String PROPS_MATH = "math";
-    public final String PROPS_COLOR = "color";
-    public final String PROPS_CSS = "css";
-    public final String PROPS_PRESERVE_ASPECT_RATIO = "preserveAspectRatio";
-    public final String PROPS_SCALE_TYPE = "scaleType";
+    public static final String PROPS_SVG_STRING = "svg";
+    public static final String PROPS_MATH = "math";
+    public static final String PROPS_COLOR = "color";
+    public static final String PROPS_CSS = "css";
+    public static final String PROPS_PRESERVE_ASPECT_RATIO = "preserveAspectRatio";
+    public static final String PROPS_SCALE_TYPE = "scaleType";
 
     public RNSVGMathViewManager(){
         super();
@@ -30,6 +31,16 @@ public class RNSVGMathViewManager extends SimpleViewManager<SVGMathView> {
     @Override
     public String getName() {
         return "RNSVGMathView";
+    }
+
+    @Override
+    public LayoutShadowNode createShadowNodeInstance() {
+        return new SVGShadowNode();
+    }
+
+    @Override
+    public Class getShadowNodeClass() {
+        return SVGShadowNode.class;
     }
 
     @Override

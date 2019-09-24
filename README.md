@@ -27,12 +27,10 @@ render() {
   return (
     ...
     	<MathView
-		resizeMode='stretch'
-		math='x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}'
+	   math='x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}'
 	/> 
 	<MathView
-		scaleToFit
-		math='\\cos\\left(x\\right)=\\frac{b}{c}'
+	   math='\\cos\\left(x\\right)=\\frac{b}{c}'
 	/> 
     ...
   );
@@ -50,7 +48,7 @@ yarn --production=false
 npx react-native run-android
 ```
 
-#### Develope:
+#### Developing:
 From root run:
 ```
 npm run dev

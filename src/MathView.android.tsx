@@ -1,11 +1,10 @@
 'use strict';
 
 import * as _ from 'lodash';
-import React, { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
-import { Animated, Dimensions, LayoutChangeEvent, NativeModules, requireNativeComponent, ScaledSize, StyleSheet, UIManager, View, ViewProps, ViewStyle } from 'react-native';
-import { useCalculatedStyle } from '../CalculatedStyle';
-import { MathToSVGConfig, ResizeMode } from '../Config';
-import { mathToSVG } from '../MathProvider';
+import React, { forwardRef, useMemo } from 'react';
+import { Animated, NativeModules, requireNativeComponent, StyleSheet, UIManager, ViewProps, ViewStyle } from 'react-native';
+import { MathToSVGConfig, ResizeMode } from './Config';
+import { mathToSVG } from './MathProvider';
 
 const nativeViewName = 'RNMathView';
 const RNMathView = requireNativeComponent(nativeViewName);
@@ -19,15 +18,9 @@ export interface MathViewProps extends ViewProps {
 
     /**
      * set text color
-     * can be set via `setNativeProps`
+     * can be set via `setNativeProps` or passed via `style`
      * */
     color?: string,
-
-    /**
-     * set to `true` to fit the view to it's parent
-     * defaults to `false`
-     * */
-    scaleToFit?: boolean,
 
     /**
      * defaults to 'center'
@@ -45,14 +38,14 @@ function defaultPropSize(flatStyle: ViewStyle, key: keyof ViewStyle, defaultValu
 function MathView(props: MathViewProps, ref: any) {
     if (!props.math) return null;
 
-    const data = useMemo(() => mathToSVG(props.math), [props.math]);
+    const svg = useMemo(() => mathToSVG(props.math), [props.math]);
     const key = useMemo(() => _.uniqueId('MathView'), [props.math]);
 
     return (
         <RNMathView
             {...props}
-            svg={data.svg}
-            style={[styles.container, props.style]}
+            svg={svg}
+            style={[styles.container, props.resizeMode === 'contain' && styles.contain, props.style]}
             ref={ref}
             hardwareAccelerated
             key={key}
@@ -65,18 +58,23 @@ const styles = StyleSheet.create({
         //flexDirection: 'row',
         display: 'flex',
         minHeight: 35
+    },
+    contain: {
+        maxWidth: '100%',
+        maxHeight: '100%'
     }
 })
 
 const MathViewWrapper = forwardRef(MathView);
 
 MathViewWrapper.defaultProps = MathView.defaultProps = {
-    resizeMode: 'center',
-    scaleToFit: false,
+    resizeMode: 'contain',
     config: {}
-} as MathViewProps;
+} as Partial<MathViewProps>;
 
+//@ts-ignore
 MathViewWrapper.Constants = Constants;
+//@ts-ignore
 MathViewWrapper.getPreserveAspectRatio = (alignment: string, scale: string) => `${alignment} ${scale}`;
 
 export default MathViewWrapper;

@@ -1,14 +1,16 @@
 
-import * as _ from 'lodash';
-import React, { useCallback } from 'react';
-import { Dimensions, Text, YellowBox } from 'react-native';
+import React, { useCallback, useContext, useMemo } from 'react';
+import { Text, YellowBox } from 'react-native';
 import MathItem from './MathItem';
 import MathSectionList from './MathSectionList';
 import styles from './styles';
+import AppContext from './Context';
 
 YellowBox.ignoreWarnings(['Warning: `flexWrap: `wrap`` is not supported with the `VirtualizedList` components.']);
 
 export default function FlexWrapMathSectionList() {
+    const { inc } = useContext(AppContext);
+
     const renderHeader = useCallback(({ section: { title } }) => {
         return (
             <Text
@@ -18,18 +20,18 @@ export default function FlexWrapMathSectionList() {
             </Text>
         );
     }, []);
-
+    
     const renderItem = useCallback(({ item }) => {
         return (
             <MathItem
                 math={item}
                 resizeMode='contain'
                 containerStyle={[styles.flexWrapContainer]}
-                //style={{/*maxWidth:200, minHeight:50,*/ flexWrap: 'wrap' }}
-            //scaleToFit={false}
             />
         );
     }, []);
+
+   
 
     return (
         <MathSectionList
@@ -37,6 +39,7 @@ export default function FlexWrapMathSectionList() {
             contentContainerStyle={{ flexWrap: 'wrap', display: 'flex', flexDirection: 'row' }}
             renderSectionHeader={renderHeader}
             renderItem={renderItem}
+            extraData={inc}
         />
     );
 }

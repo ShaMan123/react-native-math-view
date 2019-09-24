@@ -23,12 +23,13 @@ function MathItem(props: MathViewProps) {
     
     return (
         <AnimatedTouchable
-            style={[props.containerStyle, { opacity }]}
+            style={[props.containerStyle, /*{ opacity }*/]}
         >
             <MathView
-                color={parsedColor()}
+                //color={parsedColor()} // can set color in style or directly
                 scaleToFit
                 resizeMode='contain'
+                style={{ color: parsedColor() }} // can use color prop instead
                 {...props}
             />
         </AnimatedTouchable>

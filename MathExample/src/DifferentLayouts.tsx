@@ -1,22 +1,14 @@
 
-import React, { useEffect, useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
-import MathItem from './MathItem';
-import { chemistry, getTaylor, getFrac, getRecursiveFrac } from './math';
 import _ from 'lodash';
+import React, { useContext } from 'react';
+import { ScrollView, Text, View } from 'react-native';
+import AppContext from './Context';
+import { chemistry, getFrac, getRecursiveFrac, getTaylor } from './math';
+import MathItem from './MathItem';
 import styles from './styles';
 
-const interval = 3000;
-
 export default function DifferentLayouts() {
-    const [curr, setCurr] = useState(0);
-    useEffect(() => {
-        const t = setInterval(() => {
-            setCurr((curr + 1) % 20);
-        }, interval);
-
-        return () => clearInterval(t);
-    }, [curr]);
+    const curr = useContext(AppContext).inc % 20;
 
     const taylor = getTaylor(curr);
     const rFrac = getRecursiveFrac(curr);

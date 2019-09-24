@@ -1,7 +1,7 @@
 
 import * as _ from 'lodash';
 import React, { Component, useEffect, useState, useCallback, useMemo } from 'react';
-import { Button, Dimensions, ScrollView, SectionList, StyleSheet, Text, TouchableOpacity, View, YellowBox, I18nManager, SectionListProps } from 'react-native';
+import { Button, Dimensions, ScrollView, SectionList, StyleSheet, Text, TouchableOpacity, View, YellowBox, I18nManager, SectionListProps, Switch } from 'react-native';
 import MathView, { MathProvider, useCalculatedStyle } from 'react-native-math-view';
 import MathStrings, { getFrac, getRecursiveFrac, getTaylor } from './math';
 import data from './tags';
@@ -13,6 +13,8 @@ import FlexWrapMathSectionList from './FlexWrapMathSectionList';
 import MathSectionList from './MathSectionList';
 import Standalone from './Standalone';
 import DifferentLayouts from './DifferentLayouts';
+import AppContext from './Context';
+import { useWidth, useInc } from './Hooks';
 
 
 const numStates = 4;
@@ -34,6 +36,7 @@ function RNSvg() {
 
 export default function App() {
     const [page, setPage] = useState(0);
+
     const incPage = useCallback(() => {
         setPage((page + 1) % numStates);
     }, [page]);
@@ -46,8 +49,11 @@ export default function App() {
             case 3: return 'Rendering on the Fly';
         }
     }, [page]);
+
+    const [switchValue, setSwitchValue] = useState(false);
+
     const el = useMemo(() => {
-        const m = (page + 1) % numStates;
+        const m = (page) % numStates;
         switch (m) {
             case 0: return <Standalone />
             case 1: return <MathSectionList />;
@@ -56,17 +62,32 @@ export default function App() {
             default: null
         }
     }, [page]);
+
+    
     
     return (
         <>
             <View style={styles.default}>
-                {el}
+                <AppContext.Provider
+                    value={{
+                        switch: switchValue,
+                        width: useWidth(switchValue),
+                        inc: useInc(switchValue)
+                    }}
+                >
+                    {el}
+                </AppContext.Provider>
             </View>
             <Button
                 //style={{bottom: 0}}
                 onPress={incPage}
                 title={`change to ${title}`}
             />
+            <Switch
+                onValueChange={setSwitchValue}
+                value={switchValue}
+            />
+            <Text>{switchValue ? 'hyper mode': 'static mode'}</Text>
         </>
     );
 }

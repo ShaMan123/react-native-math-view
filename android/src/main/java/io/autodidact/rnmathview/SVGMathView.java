@@ -1,6 +1,7 @@
 package io.autodidact.rnmathview;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Picture;
 import android.graphics.RectF;
 import android.util.Log;
@@ -89,7 +90,16 @@ public class SVGMathView extends SVGImageView {
         }
     }
 
-    public void setColor(String color){
+    public void setColor(int color) {
+        int A = (color >> 24) & 0xff; // or color >>> 24
+        int R = (color >> 16) & 0xff;
+        int G = (color >>  8) & 0xff;
+        int B = (color      ) & 0xff;
+        //setColor(Color.valueOf(color).toString());
+        setColor("rgba(" + R + ", " + G + ", " + B + ", " + A + ")");
+    }
+
+    private void setColor(String color){
         mColor = color;
         mColorCSS = "* { fill: " + color + "; stroke: " + color + "; } ";
         postCSS(mColorCSS);

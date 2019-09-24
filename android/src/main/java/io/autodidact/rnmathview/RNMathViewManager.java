@@ -11,7 +11,9 @@ import com.facebook.react.uimanager.LayoutShadowNode;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIManagerModule;
+import com.facebook.react.uimanager.ViewProps;
 import com.facebook.react.uimanager.annotations.ReactProp;
+import com.facebook.react.views.text.ReactTextViewManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -75,9 +77,11 @@ public class RNMathViewManager extends SimpleViewManager<SVGMathView> {
 
     }
 
-    @ReactProp(name = PROPS_COLOR)
-    public void setColor(SVGMathView viewContainer, String color) {
-        viewContainer.setColor(color);
+    @ReactProp(name = ViewProps.COLOR, customType = "Color")
+    public void setColor(SVGMathView viewContainer, @Nullable Integer color) {
+        if (color != null) {
+            viewContainer.setColor(color);
+        }
     }
 
     @ReactProp(name = PROPS_CONFIG)

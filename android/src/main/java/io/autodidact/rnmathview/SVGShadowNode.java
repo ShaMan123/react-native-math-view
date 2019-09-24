@@ -4,11 +4,14 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.facebook.react.bridge.JavaOnlyMap;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.uimanager.LayoutShadowNode;
 import com.facebook.react.uimanager.NativeViewHierarchyManager;
+import com.facebook.react.uimanager.ReactStylesDiffMap;
 import com.facebook.react.uimanager.UIBlock;
 import com.facebook.react.uimanager.UIManagerModule;
+import com.facebook.react.uimanager.UIManagerModuleListener;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.yoga.YogaMeasureFunction;
 import com.facebook.yoga.YogaMeasureMode;
@@ -16,8 +19,6 @@ import com.facebook.yoga.YogaMeasureOutput;
 import com.facebook.yoga.YogaNode;
 
 import javax.annotation.Nullable;
-
-import static io.autodidact.mathjaxprovider.MathJaxProvider.TAG;
 
 public class SVGShadowNode extends LayoutShadowNode implements YogaMeasureFunction {
     private String svg;
@@ -32,6 +33,10 @@ public class SVGShadowNode extends LayoutShadowNode implements YogaMeasureFuncti
         setMeasureFunction(this);
     }
 
+    //  This function is in charge of recalculating the view in case "svg" prop has changed
+    //  It is deprecated because it is bad UX
+    //  This is now handled from JS by changing the key prop => much better
+    @Deprecated
     private void invalidate(){
         final UIManagerModule uiManager = getThemedContext().getNativeModule(UIManagerModule.class);
         final int tag = getReactTag();
@@ -42,7 +47,9 @@ public class SVGShadowNode extends LayoutShadowNode implements YogaMeasureFuncti
     public void setSVG(String svg) {
         this.svg = svg;
         svgAttributes.setSVG(svg);
-        invalidate();
+        //  This is handled from JS by changing the key prop
+        //  Results in better UX
+        //invalidate();
     }
 
     @ReactProp(name = RNMathViewManager.PROPS_CONFIG)
@@ -66,7 +73,7 @@ public class SVGShadowNode extends LayoutShadowNode implements YogaMeasureFuncti
                 View.MeasureSpec.AT_MOST);
         final int heightSpec = View.MeasureSpec.makeMeasureSpec(
                 ((int) svgAttributes.height),
-                View.MeasureSpec.UNSPECIFIED);
+                View.MeasureSpec.AT_MOST);
 
         int measuredWidth = View.resolveSize((int) svgAttributes.width, widthSpec);
         int measuredHeight = View.resolveSize((int) svgAttributes.height, heightSpec);

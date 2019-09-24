@@ -46,6 +46,7 @@ function MathView(props: MathViewProps, ref: any) {
     if (!props.math) return null;
 
     const data = useMemo(() => mathToSVG(props.math), [props.math]);
+    const key = useMemo(() => _.uniqueId('MathView'), [props.math]);
 
     return (
         <RNMathView
@@ -54,6 +55,7 @@ function MathView(props: MathViewProps, ref: any) {
             style={[styles.container, props.style]}
             ref={ref}
             hardwareAccelerated
+            key={key}
         />
     );
 }

@@ -10,7 +10,15 @@ public class SVGAttributes {
     float height;
     int ex = 8;
 
+    SVGAttributes() {
+
+    }
+
     SVGAttributes(String svg) {
+        setSVG(svg);
+    }
+
+    public void setSVG(String svg) {
         this.svg = svg;
         SVGLength widthAttr = new SVGLength(getAttr("width"));
         SVGLength heightAttr = new SVGLength(getAttr("height"));

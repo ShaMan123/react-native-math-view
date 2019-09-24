@@ -13,7 +13,10 @@ import com.caverock.androidsvg.*;
 import com.caverock.androidsvg.SVG;
 import com.caverock.androidsvg.SVGImageView;
 import com.caverock.androidsvg.SVGParseException;
+import com.facebook.react.uimanager.NativeViewHierarchyManager;
 import com.facebook.react.uimanager.ThemedReactContext;
+import com.facebook.react.uimanager.UIBlock;
+import com.facebook.react.uimanager.UIManagerModule;
 
 import javax.annotation.Nullable;
 
@@ -28,61 +31,48 @@ public class SVGMathView extends SVGImageView {
 
     public SVGMathView(ThemedReactContext context){
         super(context);
+        mSVGAttributes = new SVGAttributes();
 
-        //setLayerType(View.LAYER_TYPE_SOFTWARE, null); //https://bigbadaboom.github.io/androidsvg/use_with_ImageView.html
+        setLayerType(View.LAYER_TYPE_HARDWARE, null); //https://bigbadaboom.github.io/androidsvg/use_with_ImageView.html
         setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        //setMinimumWidth(300);
-        //setMinimumHeight(100);
+    }
+
+    public SVGAttributes getSVGAttributes() {
+        return mSVGAttributes;
+    }
+
+    private void setDocumentDimensions(){
+        setDocumentDimensions(mSVGAttributes.width, mSVGAttributes.height);
+    }
+
+    private void setDocumentDimensions(float width, float height){
+
+        //mSVG.setDocumentWidth(getsu());
+        //mSVG.setDocumentHeight(getHeight());
+/*
+        mSVG.setDocumentWidth(width);
+        mSVG.setDocumentHeight(height);
+*/
+        //mSVG.setDocumentWidth("100%");
+        //mSVG.setDocumentHeight("100%");
     }
 
     public void loadSVG(String svg){
         try{
             mSVG = SVG.getFromString(svg);
-            mSVGAttributes = new SVGAttributes(svg);
+            mSVGAttributes.setSVG(svg);
             mSVG.setRenderDPI(getResources().getDisplayMetrics().xdpi);
             mSVG.setDocumentPreserveAspectRatio(mPreserveAspectRatio);
 
-            mSVG.setDocumentWidth(mSVGAttributes.width);
-            mSVG.setDocumentHeight(mSVGAttributes.height);
-
-            //mSVG.setDocumentWidth("100%");
-            //mSVG.setDocumentHeight("100%");
-
-            //mSVG.setDocumentWidth(300);
-            //mSVG.setDocumentHeight(100);
-            //setMinimumWidth(300);
-            //setMinimumHeight(100);
-/*
-            int width=720;
-            int height=100;
-            final int widthSpec = View.MeasureSpec.makeMeasureSpec(
-                    ((int) width),
-                    View.MeasureSpec.AT_MOST);
-            final int heightSpec = View.MeasureSpec.makeMeasureSpec(
-                    ((int) height),
-                    MeasureSpec.UNSPECIFIED);
-invalidate();
-            measure(widthSpec,heightSpec);
-
-            Log.d(TAG, "loadSVG: "  + getMeasuredWidth() + "  " + getMeasuredHeight());
-
-
-
-            requestLayout();
-*/
-
+            //setDocumentDimensions();
+            mSVG.setDocumentWidth("100%");
+            mSVG.setDocumentHeight("100%");
 
             setSVG(mSVG);
         }
         catch (SVGParseException err){
             Log.e(TAG, "Failed to parse svg", err);
         }
-    }
-
-    @Override
-    public void requestLayout() {
-        Log.d(TAG, "requestLayout: " + isInLayout());
-        super.requestLayout();
     }
 
     public void setColor(String color){
@@ -125,6 +115,9 @@ invalidate();
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
         Log.d(TAG, "onLayout: " +  left + "  " + top+ "  " + right+ "  " +  bottom);
+        Log.d(TAG, "setDocumentDimensions: " + (right - left - getPaddingLeft() - getPaddingRight()) + "  " + (bottom - top - getPaddingTop() - getPaddingBottom()));
+        setImageAlpha(1);
+        setDocumentDimensions(right - left - getPaddingLeft() - getPaddingRight(), bottom - top - getPaddingTop() - getPaddingBottom());
     }
 
     @Override
@@ -132,5 +125,7 @@ invalidate();
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         //setMeasuredDimension(600, 200);
         Log.d(TAG, "onMeasure" + widthMeasureSpec + "  heightSpec  " + heightMeasureSpec);
+        int q= getParent() !=null?((ViewGroup) getParent()).getMeasuredWidth():-1;
+        Log.d(TAG, "setDocumentDimensions: " + q);
     }
 }

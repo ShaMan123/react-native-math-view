@@ -3,12 +3,14 @@ package io.autodidact.rnmathview;
 import android.widget.ImageView;
 
 import com.caverock.androidsvg.PreserveAspectRatio;
+import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.LayoutShadowNode;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
+import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.annotations.ReactProp;
 
 import java.util.HashMap;
@@ -26,8 +28,14 @@ public class RNMathViewManager extends SimpleViewManager<SVGMathView> {
     public static final String PROPS_PRESERVE_ASPECT_RATIO = "preserveAspectRatio";
     public static final String PROPS_SCALE_TYPE = "scaleType";
 
+    private ReactApplicationContext context;
+
     public RNMathViewManager(){
         super();
+    }
+    public RNMathViewManager(ReactApplicationContext context){
+        super();
+        this.context = context;
     }
 
     @Override
@@ -70,7 +78,7 @@ public class RNMathViewManager extends SimpleViewManager<SVGMathView> {
     public void setConfig(SVGMathView viewContainer, @Nullable ReadableMap config) {
         if(config == null) return;
         if(config.hasKey("ex")){
-            viewContainer.SVGAttributes.setEX(config.getInt("ex"));
+            viewContainer.getSVGAttributes().setEX(config.getInt("ex"));
         }
     }
 

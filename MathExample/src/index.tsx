@@ -1,20 +1,17 @@
 
 import * as _ from 'lodash';
-import React, { Component, useEffect, useState, useCallback, useMemo } from 'react';
-import { Button, Dimensions, ScrollView, SectionList, StyleSheet, Text, TouchableOpacity, View, YellowBox, I18nManager, SectionListProps, Switch } from 'react-native';
-import MathView, { MathProvider, useCalculatedStyle } from 'react-native-math-view';
-import MathStrings, { getFrac, getRecursiveFrac, getTaylor } from './math';
-import data from './tags';
-import { SvgXml } from 'react-native-svg';
-import { SvgFromXml } from './rnsvg'
-import MathItem from './MathItem';
-import styles from './styles';
+import React, { useCallback, useMemo, useState } from 'react';
+import { Button, Switch, Text, View } from 'react-native';
+import { MathProvider } from 'react-native-math-view';
+import Svg, { SvgXml, SvgFromXml, Use, G } from 'react-native-svg';
+import AppContext from './Context';
+import DifferentLayouts from './DifferentLayouts';
 import FlexWrapMathSectionList from './FlexWrapMathSectionList';
+import { useInc, useWidth } from './Hooks';
+import MathStrings from './math';
 import MathSectionList from './MathSectionList';
 import Standalone from './Standalone';
-import DifferentLayouts from './DifferentLayouts';
-import AppContext from './Context';
-import { useWidth, useInc } from './Hooks';
+import styles from './styles';
 
 
 const numStates = 4;
@@ -23,38 +20,47 @@ const interval = 3000;
 
 const allMath = _.flatten(_.values(MathStrings));
 
-function RNSvg() {
-    return <SvgFromXml
-        //style={{flex:1}}
-        xml={MathProvider.mathToSvg(`ax^2+bx+c`).svg}
-        width='100%'
-        height='100%'
-        stroke='black'
-        fill='black'
-    />
+function getTitle(index: number) {
+    switch (index % numStates) {
+        case -1: return 'Back To Menu';
+        case 0: return 'Stanalone View';
+        case 1: return 'Flex SectionList';
+        case 2: return 'FlexWrap SectionList';
+        case 3: return 'Rendering on the Fly';
+        default: return '';
+    }
 }
 
 export default function App() {
-    const [page, setPage] = useState(0);
+    const [page, setPage] = useState(-1);
 
     const incPage = useCallback(() => {
         setPage((page + 1) % numStates);
     }, [page]);
-    const title = useMemo(() => {
-        const m = (page + 1) % numStates;
-        switch (m) {
-            case 0: return 'Stanalone View';
-            case 1: return 'Flex SectionList';
-            case 2: return 'FlexWrap SectionList';
-            case 3: return 'Rendering on the Fly';
-        }
-    }, [page]);
 
     const [switchValue, setSwitchValue] = useState(false);
+
+    const PageSelector = useCallback(({ index }: { index: number }) => {
+        return (
+            <Button
+                onPress={() => setPage(index)}
+                title={getTitle(index)}
+            />
+        );
+    }, []);
 
     const el = useMemo(() => {
         const m = (page) % numStates;
         switch (m) {
+            case -1:
+                return (
+                    <View style={{ flex: 1, justifyContent: 'space-evenly' }}>
+                        <PageSelector index={0} />
+                        <PageSelector index={1} />
+                        <PageSelector index={2} />
+                        <PageSelector index={3} />
+                    </View>
+                );
             case 0: return <Standalone />
             case 1: return <MathSectionList />;
             case 2: return <FlexWrapMathSectionList />;
@@ -63,8 +69,6 @@ export default function App() {
         }
     }, [page]);
 
-    
-    
     return (
         <>
             <View style={styles.default}>
@@ -78,16 +82,20 @@ export default function App() {
                     {el}
                 </AppContext.Provider>
             </View>
-            <Button
-                //style={{bottom: 0}}
-                onPress={incPage}
-                title={`change to ${title}`}
-            />
-            <Switch
-                onValueChange={setSwitchValue}
-                value={switchValue}
-            />
-            <Text>{switchValue ? 'hyper mode': 'static mode'}</Text>
+            {
+                page !== -1 &&
+                <View style={{ borderColor: 'darkblue', borderWidth: 2 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+                        <Switch
+                            onValueChange={setSwitchValue}
+                            value={switchValue}
+                        />
+                        <Text style={{ fontWeight: switchValue ? 'bold' : 'normal' }}>{switchValue ? 'HYPER mode' : 'static mode'}</Text>
+                    </View>
+                    <PageSelector index={-1} />
+                </View>
+            }
+
         </>
     );
 }

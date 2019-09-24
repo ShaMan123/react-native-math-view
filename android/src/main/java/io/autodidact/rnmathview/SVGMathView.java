@@ -22,6 +22,8 @@ import javax.annotation.Nullable;
 
 public class SVGMathView extends SVGImageView {
     private static String TAG = "RNSVGMathView";
+    private String mSVGString;
+    private boolean mIsDirty;
     private SVG mSVG;
     private SVGAttributes mSVGAttributes;
     private PreserveAspectRatio mPreserveAspectRatio = PreserveAspectRatio.LETTERBOX;
@@ -46,9 +48,6 @@ public class SVGMathView extends SVGImageView {
     }
 
     private void setDocumentDimensions(float width, float height){
-
-        //mSVG.setDocumentWidth(getsu());
-        //mSVG.setDocumentHeight(getHeight());
 /*
         mSVG.setDocumentWidth(width);
         mSVG.setDocumentHeight(height);
@@ -57,10 +56,25 @@ public class SVGMathView extends SVGImageView {
         //mSVG.setDocumentHeight("100%");
     }
 
-    public void loadSVG(String svg){
+    public void setSVGString(String svg) {
+        if(mSVGString == null || mSVGString != svg) mIsDirty = true;
+        mSVGString = svg;
+    }
+
+    public void updateView() {
+        if(mIsDirty) loadSVG();
+        mIsDirty = false;
+    }
+
+    private void loadSVG(String svg) {
+        setSVGString(svg);
+        loadSVG();
+    }
+
+    private void loadSVG(){
         try{
-            mSVG = SVG.getFromString(svg);
-            mSVGAttributes.setSVG(svg);
+            mSVG = SVG.getFromString(mSVGString);
+            mSVGAttributes.setSVG(mSVGString);
             mSVG.setRenderDPI(getResources().getDisplayMetrics().xdpi);
             mSVG.setDocumentPreserveAspectRatio(mPreserveAspectRatio);
 
@@ -82,12 +96,15 @@ public class SVGMathView extends SVGImageView {
     }
 
     private void postCSS(final String css){
+        super.setCSS(css);
+        /*
         post(new Runnable() {
             @Override
             public void run() {
                 SVGMathView.super.setCSS(css);
             }
         });
+         */
     }
 
     @Override
@@ -109,23 +126,5 @@ public class SVGMathView extends SVGImageView {
     public void setPreserveAspectRatio(String preserveAspectRatio){
         mPreserveAspectRatio = PreserveAspectRatio.of(preserveAspectRatio);
         if(mSVG != null) mSVG.setDocumentPreserveAspectRatio(mPreserveAspectRatio);
-    }
-
-    @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        super.onLayout(changed, left, top, right, bottom);
-        Log.d(TAG, "onLayout: " +  left + "  " + top+ "  " + right+ "  " +  bottom);
-        Log.d(TAG, "setDocumentDimensions: " + (right - left - getPaddingLeft() - getPaddingRight()) + "  " + (bottom - top - getPaddingTop() - getPaddingBottom()));
-        setImageAlpha(1);
-        setDocumentDimensions(right - left - getPaddingLeft() - getPaddingRight(), bottom - top - getPaddingTop() - getPaddingBottom());
-    }
-
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        //setMeasuredDimension(600, 200);
-        Log.d(TAG, "onMeasure" + widthMeasureSpec + "  heightSpec  " + heightMeasureSpec);
-        int q= getParent() !=null?((ViewGroup) getParent()).getMeasuredWidth():-1;
-        Log.d(TAG, "setDocumentDimensions: " + q);
     }
 }

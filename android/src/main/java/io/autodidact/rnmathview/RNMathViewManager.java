@@ -59,9 +59,15 @@ public class RNMathViewManager extends SimpleViewManager<SVGMathView> {
         return view;
     }
 
+    @Override
+    protected void onAfterUpdateTransaction(@Nonnull SVGMathView view) {
+        super.onAfterUpdateTransaction(view);
+        view.updateView();
+    }
+
     @ReactProp(name = PROPS_SVG_STRING)
     public void setSVG(SVGMathView viewContainer, String value) {
-        viewContainer.loadSVG(value);
+        viewContainer.setSVGString(value);
     }
 
     @ReactProp(name = PROPS_MATH)

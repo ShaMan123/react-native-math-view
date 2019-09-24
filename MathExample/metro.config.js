@@ -13,6 +13,7 @@ const pkg = require('./package.json');
 
 module.exports = {
     resolver: {
+        sourceExts: ['ts', 'tsx', 'js'],
         blacklistRE: blacklist([
             path.resolve(__dirname, '../node_modules'),
         ]),
@@ -28,6 +29,7 @@ module.exports = {
     },
     watchFolders: [path.resolve(__dirname, '..')],
     transformer: {
+        babelTransformerPath: require.resolve('react-native-typescript-transformer'),
         getTransformOptions: async () => ({
             transform: {
                 experimentalImportSupport: false,

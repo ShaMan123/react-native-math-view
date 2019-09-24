@@ -12,7 +12,7 @@ export interface MathViewProps extends ViewProps {
 
     /**
      * set text color
-     * can be set via `setNativeProps`
+     * can be set via `setNativeProps` or passed via `style`
      * */
     color?: string,
 }

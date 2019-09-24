@@ -4,27 +4,60 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.facebook.react.bridge.JavaOnlyMap;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.uimanager.LayoutShadowNode;
+import com.facebook.react.uimanager.NativeViewHierarchyManager;
+import com.facebook.react.uimanager.ReactStylesDiffMap;
+import com.facebook.react.uimanager.UIBlock;
+import com.facebook.react.uimanager.UIManagerModule;
+import com.facebook.react.uimanager.UIManagerModuleListener;
+import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.yoga.YogaMeasureFunction;
 import com.facebook.yoga.YogaMeasureMode;
 import com.facebook.yoga.YogaMeasureOutput;
 import com.facebook.yoga.YogaNode;
 
-import static io.autodidact.mathjaxprovider.MathJaxProvider.TAG;
+import javax.annotation.Nullable;
 
 public class SVGShadowNode extends LayoutShadowNode implements YogaMeasureFunction {
-
-    private int mWidth;
-    private int mHeight;
-    private boolean mMeasured;
+    private String svg;
+    private SVGAttributes svgAttributes;
 
     SVGShadowNode() {
+        svgAttributes = new SVGAttributes();
         initMeasureFunction();
     }
 
     private void initMeasureFunction() {
         setMeasureFunction(this);
+    }
 
+    //  This function is in charge of recalculating the view in case "svg" prop has changed
+    //  It is deprecated because it is bad UX
+    //  This is now handled from JS by changing the key prop => much better
+    @Deprecated
+    private void invalidate(){
+        final UIManagerModule uiManager = getThemedContext().getNativeModule(UIManagerModule.class);
+        final int tag = getReactTag();
+        uiManager.invalidateNodeLayout(tag);
+    }
+
+    @ReactProp(name = RNMathViewManager.PROPS_SVG_STRING)
+    public void setSVG(String svg) {
+        this.svg = svg;
+        svgAttributes.setSVG(svg);
+        //  This is handled from JS by changing the key prop
+        //  Results in better UX
+        //invalidate();
+    }
+
+    @ReactProp(name = RNMathViewManager.PROPS_CONFIG)
+    public void setConfig(@Nullable ReadableMap config) {
+        if(config == null) return;
+        if(config.hasKey("ex")){
+            svgAttributes.setEX(config.getInt("ex"));
+        }
     }
 
     @Override
@@ -33,21 +66,17 @@ public class SVGShadowNode extends LayoutShadowNode implements YogaMeasureFuncti
             float width,
             YogaMeasureMode widthMode,
             float height,
-            YogaMeasureMode heightMode) {
-        if (!mMeasured) {
-            SVGMathView mathView = new SVGMathView(getThemedContext());
-            final int spec = View.MeasureSpec.makeMeasureSpec(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    View.MeasureSpec.UNSPECIFIED);
-            mathView.measure(spec, spec);
-            mWidth = mathView.getMeasuredWidth();
-            mHeight = mathView.getMeasuredHeight();
-            mMeasured = true;
+            YogaMeasureMode heightMode
+    ) {
+        final int widthSpec = View.MeasureSpec.makeMeasureSpec(
+                ((int) svgAttributes.width),
+                View.MeasureSpec.AT_MOST);
+        final int heightSpec = View.MeasureSpec.makeMeasureSpec(
+                ((int) svgAttributes.height),
+                View.MeasureSpec.AT_MOST);
 
-            super.getParent().calculateLayout();
-            Log.d(TAG, "measure: " + width + "  " + height + "  "+super.getParent().getLayoutWidth());
-        }
-
-        return YogaMeasureOutput.make(mWidth, mHeight);
+        int measuredWidth = View.resolveSize((int) svgAttributes.width, widthSpec);
+        int measuredHeight = View.resolveSize((int) svgAttributes.height, heightSpec);
+        return YogaMeasureOutput.make(measuredWidth, measuredHeight);
     }
 }

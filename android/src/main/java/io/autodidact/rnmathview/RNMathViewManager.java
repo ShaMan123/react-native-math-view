@@ -3,11 +3,17 @@ package io.autodidact.rnmathview;
 import android.widget.ImageView;
 
 import com.caverock.androidsvg.PreserveAspectRatio;
+import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.common.MapBuilder;
+import com.facebook.react.uimanager.LayoutShadowNode;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
+import com.facebook.react.uimanager.UIManagerModule;
+import com.facebook.react.uimanager.ViewProps;
 import com.facebook.react.uimanager.annotations.ReactProp;
+import com.facebook.react.views.text.ReactTextViewManager;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,21 +21,38 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class RNSVGMathViewManager extends SimpleViewManager<SVGMathView> {
-    public final String PROPS_SVG_STRING = "svg";
-    public final String PROPS_MATH = "math";
-    public final String PROPS_COLOR = "color";
-    public final String PROPS_CSS = "css";
-    public final String PROPS_PRESERVE_ASPECT_RATIO = "preserveAspectRatio";
-    public final String PROPS_SCALE_TYPE = "scaleType";
+public class RNMathViewManager extends SimpleViewManager<SVGMathView> {
+    public static final String PROPS_SVG_STRING = "svg";
+    public static final String PROPS_MATH = "math";
+    public static final String PROPS_COLOR = "color";
+    public static final String PROPS_CONFIG = "config";
+    public static final String PROPS_CSS = "css";
+    public static final String PROPS_PRESERVE_ASPECT_RATIO = "preserveAspectRatio";
+    public static final String PROPS_SCALE_TYPE = "scaleType";
 
-    public RNSVGMathViewManager(){
+    private ReactApplicationContext context;
+
+    public RNMathViewManager(){
         super();
+    }
+    public RNMathViewManager(ReactApplicationContext context){
+        super();
+        this.context = context;
     }
 
     @Override
     public String getName() {
-        return "RNSVGMathView";
+        return "RNMathView";
+    }
+
+    @Override
+    public LayoutShadowNode createShadowNodeInstance() {
+        return new SVGShadowNode();
+    }
+
+    @Override
+    public Class getShadowNodeClass() {
+        return SVGShadowNode.class;
     }
 
     @Override
@@ -38,9 +61,15 @@ public class RNSVGMathViewManager extends SimpleViewManager<SVGMathView> {
         return view;
     }
 
+    @Override
+    protected void onAfterUpdateTransaction(@Nonnull SVGMathView view) {
+        super.onAfterUpdateTransaction(view);
+        view.updateView();
+    }
+
     @ReactProp(name = PROPS_SVG_STRING)
     public void setSVG(SVGMathView viewContainer, String value) {
-        viewContainer.loadSVG(value);
+        viewContainer.setSVGString(value);
     }
 
     @ReactProp(name = PROPS_MATH)
@@ -48,9 +77,19 @@ public class RNSVGMathViewManager extends SimpleViewManager<SVGMathView> {
 
     }
 
-    @ReactProp(name = PROPS_COLOR)
-    public void setColor(SVGMathView viewContainer, String color) {
-        viewContainer.setColor(color);
+    @ReactProp(name = ViewProps.COLOR, customType = "Color")
+    public void setColor(SVGMathView viewContainer, @Nullable Integer color) {
+        if (color != null) {
+            viewContainer.setColor(color);
+        }
+    }
+
+    @ReactProp(name = PROPS_CONFIG)
+    public void setConfig(SVGMathView viewContainer, @Nullable ReadableMap config) {
+        if(config == null) return;
+        if(config.hasKey("ex")){
+            viewContainer.getSVGAttributes().setEX(config.getInt("ex"));
+        }
     }
 
     @ReactProp(name = PROPS_CSS)

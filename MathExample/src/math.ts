@@ -1,3 +1,5 @@
+import * as _ from "lodash";
+
 export const trig = [
     {
         "string": "\\sin\\left(2\\alpha\\right)=2\\sin\\left(\\alpha\\right)\\cos\\left(\\alpha\\right)",
@@ -104,3 +106,44 @@ export const calculus = [
         "parents": { "-LAsMZHfNgCQuq6Kasmv": 0 }
     }
 ]
+
+export const chemistry = [
+    `\\documentclass{article}
+                \\usepackage[version = 3]{ mhchem }
+                \\begin{ document }
+                \\noindent IUPAC recommendation: \\\\
+                \\ce{ 2H + (aq) + CO3 ^ { 2-}(aq) -> CO2(g) + H2O(l) }
+
+                \\bigskip
+
+                \\noindent Subscript: \\\\
+                \\ce{ 2H + {}_{ (aq) } + CO3 ^ { 2-}{ } _{ (aq) } -> CO2{ } _{ (g) } + H2O{ } _{ (l) } }
+                \\end{ document }`,
+    `\\ce{ 2H + (aq) + CO3 ^ { 2-}(aq) -> CO2(g) + H2O(l) }`,
+    `\\ce{ 2H + {}_{ (aq) } + CO3 ^ { 2-}{ } _{ (aq) } -> CO2{ } _{ (g) } + H2O{ } _{ (l) } }`
+];
+
+export const math = [
+    'x_{1,2}=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}'
+];
+
+export function getTaylor(n: number) {
+    const exp = _.map(new Array(n + 1), (val, index) => index + 2);
+    const rest = exp.map((val) => `{\\frac {x^{${val}}}{${val}!}}`).join('+');
+    return `{\\displaystyle e^{x}=\\sum _{n=0}^{\\infty }{\\frac {x^{n}}{n!}}=1+x+${rest}+\\cdots }`;
+}
+
+export function getFrac(a: number | string, b: number | string) {
+    return `\\frac{${a}}{${b}}`;
+}
+
+export function getRecursiveFrac(n: number) {
+    return _.reduce(_.fill(new Array(n + 1), 0), (acc, val, index) => getFrac(acc, index + 1), `x^{${n + 1}}`);
+}
+
+export default {
+    trig: _.map(_.filter(trig, 'math'), 'string'),
+    calculus: _.map(_.filter(calculus, 'math'), 'string'),
+    chemistry,
+    math
+}

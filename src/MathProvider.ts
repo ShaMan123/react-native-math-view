@@ -22,7 +22,7 @@ function parseSize(size: string | number, config: Partial<MathToSVGConfig> = {})
  * @param math
  * @param config
  */
-function toSVG(math: string, config: Partial<MathToSVGConfig> = {pip:false}) {
+function toSVG(math: string, config: Partial<MathToSVGConfig> = {}) {
     const opts = _.defaultsDeep(config, mathToSVGDefaultConfig);
     //
     //  Create DOM adaptor and register it for HTML documents

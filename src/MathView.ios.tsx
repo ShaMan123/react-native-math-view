@@ -15,6 +15,7 @@ export interface MathViewProps extends ViewProps {
      * can be set via `setNativeProps` or passed via `style`
      * */
     color?: string,
+    style?: ViewProps['style'] & { color: any }
 }
 
 function MathView(props: MathViewProps, ref: any) {

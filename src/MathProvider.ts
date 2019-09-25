@@ -22,7 +22,7 @@ function parseSize(size: string | number, config: Partial<MathToSVGConfig> = {})
  * @param math
  * @param config
  */
-function toSVG(math: string, config: Partial<MathToSVGConfig> = {}) {
+function toSVG(math: string, config: Partial<MathToSVGConfig> = {pip:false}) {
     const opts = _.defaultsDeep(config, mathToSVGDefaultConfig);
     //
     //  Create DOM adaptor and register it for HTML documents
@@ -61,9 +61,53 @@ function toSVG(math: string, config: Partial<MathToSVGConfig> = {}) {
     const height = parseSize(adaptor.getAttribute(svgNode, 'height'), config);
     */
 
+    const nodeList = buildMathSVGArray(adaptor.clone(adaptor.firstChild(node)));
+    const response = _.map(nodeList, node => _.replace(adaptor.outerHTML(node), /xlink:xlink/g, 'xlink'))
+    
+   // console.log(response,'____________________________________________________________________________')
+
     const stringSVG = _.replace(opts.css ? adaptor.textContent(svg.styleSheet(html)) : adaptor.innerHTML(node), /xlink:xlink/g, 'xlink');
 
-    return stringSVG;
+    return config.pip ? response: stringSVG;
+}
+
+function buildMathSVGArray(node: any) {
+    let pathToDefs: Array<number | string> = [0];
+    const response: any[] = [];
+    recurseThroughTree(node, (childNode, path) => {
+        if (childNode.kind === 'defs') pathToDefs = path;
+        else if (_.startsWith(_.join(path), _.join(pathToDefs))) return;
+
+        if (childNode.kind === 'use') {
+            console.log(path, childNode.attributes)
+            const treeNodeList = _.map(_.without(path, 'children'), (key, index, collection) => {
+                const p = _.slice(collection, 0, index + 1);
+                console.log('ptpt', p)
+                return _.get(node, _.flatten(_.map(p, seg => (['children', seg]))));
+            });
+            
+            const tree = _.reduceRight(_.initial(treeNodeList), (prev, curr, index, list) => {
+                return _.assign({}, curr, { children: [prev] });
+            }, _.last(treeNodeList));
+            
+            response.push(_.set(_.assign({}, node), 'children', [_.get(node, `children.0`), tree]));
+
+            //console.log(adaptor.outerHTML(tree))
+          //  return tree;
+        }
+        //console.log(node.kind, _.size(node.children) === 0, _.isEqual(node, _.get(svgNode, path)))
+    });
+
+    return response;
+}
+
+function recurseThroughTree(node: any, callback: (node: string, path: string[]) => any, path: string[] = []) {
+    path.push('children');
+    _.map(node.children, (child, key) => {
+        const p = _.concat(path, key);
+        callback(child, p)
+        recurseThroughTree(child, callback, p)
+    });
 }
 
 export const mathToSVG = _.memoize(toSVG);

@@ -6,6 +6,9 @@ import { RegisterHTMLHandler } from 'mathjax-full/js/handlers/html';
 //@ts-ignore
 import { TeX } from 'mathjax-full/js/input/tex';
 //@ts-ignore
+import ParseUtil from 'mathjax-full/js/input/tex/ParseUtil';
+import TexParser from 'mathjax-full/js/input/tex/TexParser';
+//@ts-ignore
 import { mathjax } from 'mathjax-full/js/mathjax';
 //@ts-ignore
 import { SVG } from 'mathjax-full/js/output/svg';
@@ -36,9 +39,48 @@ function toSVG(math: string, config: Partial<MathToSVGConfig> = {}) {
     const tex = new TeX({ packages: opts.packages });
     const svg = new SVG({ fontCache: (opts.fontCache ? 'local' : 'none') });
     const html = mathjax.document('', { InputJax: tex, OutputJax: svg });
+    //console.log(tex.findMath(['$$\\cos(x)$$', 'asdddsac $$x+5$$']))
+    
+    try {
+        TexParser.prototype.Parse = function() {
+            let c: string;
+            let n: number;
+            while (this.i < this.string.length) {
+                c = this.string.charAt(this.i++);
+                n = c.charCodeAt(0);
+                if (n >= 0xD800 && n < 0xDC00) {
+                    c += this.string.charAt(this.i++);
+                }
 
+                this.parse('character', [this, c]);
+            }
+        }
+        
+        let parser = new TexParser(math,
+            { display: true, isInner: false },
+            tex.parseOptions);
+        //parser.Parse()
+        parser.i = 0;
+        while (parser.i < parser.string.length) {
+            console.log(parser.GetArgument(math, true))
+        }
+        //parser.Parse();
+        console.log('fffff', tex.parseOptions.handlers.get('character').parse([parser, '2']))
+        
+        /*
+        console.log(parser.string)
+        console.log(parser.i)
+        console.log('next',parser.GetNext())
+        //console.log(parser.GetArgument)
+        
+        */
+    }
+    catch (err) {
+        console.log(err)
+    }
+    
     //
-    //  Typeset the math from the command line
+    //  Typeset the math
     //
     
     const node = html.convert(math, {
@@ -47,7 +89,6 @@ function toSVG(math: string, config: Partial<MathToSVGConfig> = {}) {
         ex: opts.ex,
         containerWidth: opts.width
     });
-
     //
     //  If the --css option was specified, output the CSS,
     //  Otherwise, typeset the math and output the HTML
@@ -72,7 +113,7 @@ function toSVG(math: string, config: Partial<MathToSVGConfig> = {}) {
 function buildMathSVGArray(node: any) {
     let pathToDefs: Array<number | string> = [0];
     const response: any[] = [];
-    console.log( node.attributes)
+    //console.log( node.attributes)
     recurseThroughTree(node, (childNode, path) => {
         if (childNode.kind === 'defs') pathToDefs = path;
         else if (_.startsWith(_.join(path), _.join(pathToDefs))) return;

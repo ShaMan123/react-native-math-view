@@ -41,44 +41,6 @@ function toSVG(math: string, config: Partial<MathToSVGConfig> = {}) {
     const html = mathjax.document('', { InputJax: tex, OutputJax: svg });
     //console.log(tex.findMath(['$$\\cos(x)$$', 'asdddsac $$x+5$$']))
     
-    try {
-        TexParser.prototype.Parse = function() {
-            let c: string;
-            let n: number;
-            while (this.i < this.string.length) {
-                c = this.string.charAt(this.i++);
-                n = c.charCodeAt(0);
-                if (n >= 0xD800 && n < 0xDC00) {
-                    c += this.string.charAt(this.i++);
-                }
-
-                this.parse('character', [this, c]);
-            }
-        }
-        
-        let parser = new TexParser(math,
-            { display: true, isInner: false },
-            tex.parseOptions);
-        //parser.Parse()
-        parser.i = 0;
-        while (parser.i < parser.string.length) {
-            console.log(parser.GetArgument(math, true))
-        }
-        //parser.Parse();
-        console.log('fffff', tex.parseOptions.handlers.get('character').parse([parser, '2']))
-        
-        /*
-        console.log(parser.string)
-        console.log(parser.i)
-        console.log('next',parser.GetNext())
-        //console.log(parser.GetArgument)
-        
-        */
-    }
-    catch (err) {
-        console.log(err)
-    }
-    
     //
     //  Typeset the math
     //
@@ -89,28 +51,45 @@ function toSVG(math: string, config: Partial<MathToSVGConfig> = {}) {
         ex: opts.ex,
         containerWidth: opts.width
     });
-    //
-    //  If the --css option was specified, output the CSS,
-    //  Otherwise, typeset the math and output the HTML
-    //
 
-    /*
-     * handled in native (android)
-     * 
-    const svgNode = adaptor.firstChild(node);
-    const width = parseSize(adaptor.getAttribute(svgNode, 'width'), config);
-    const height = parseSize(adaptor.getAttribute(svgNode, 'height'), config);
-    */
+    const response = adaptor.innerHTML(node);  //   css option won't be used in react-native context    //   opts.css ? adaptor.textContent(svg.styleSheet(html)) : adaptor.innerHTML(node);
+
     /*
     const nodeList = buildMathSVGArray(adaptor.clone(adaptor.firstChild(node)));
     const response = _.map(nodeList, node => _.replace(adaptor.outerHTML(node), /xlink:xlink/g, 'xlink'))
     */
-    const stringSVG = _.replace(opts.css ? adaptor.textContent(svg.styleSheet(html)) : adaptor.innerHTML(node), /xlink:xlink/g, 'xlink');
+
+    const stringSVG = _.replace(response, /xlink:xlink/g, 'xlink');
 
     return stringSVG;
 }
 
-function buildMathSVGArray(node: any) {
+export function splitMath(math: string, parseOptions: any) {
+    let parser = new TexParser(math,
+        { display: true, isInner: false },
+        parseOptions);
+
+    parser.i = 0;   //  reset parser
+    const response = [];
+    while (parser.i < parser.string.length) {
+        response.push(parser.GetArgument(math, true))
+    }
+    return response;
+}
+
+function pip(math: string, config: Partial<MathToSVGConfig> = {}) {
+
+}
+
+
+
+/**
+ * This method iterate through the entire node and breaks it up into seperate SVG node,
+ * each containing a single leaf and it's entire tree
+ * This was developed in order to manage seperate symbols in a math string
+ * @param node adaptor.firstChild(node)
+ */
+function breakIntoSeperateTrees(node: any) {
     let pathToDefs: Array<number | string> = [0];
     const response: any[] = [];
     //console.log( node.attributes)
@@ -119,16 +98,16 @@ function buildMathSVGArray(node: any) {
         else if (_.startsWith(_.join(path), _.join(pathToDefs))) return;
 
         if (childNode.kind === 'use') {
-            
+
             const treeNodeList = _.map(_.without(path, 'children'), (key, index, collection) => {
                 const p = _.slice(collection, 0, index + 1);
                 return _.get(node, _.flatten(_.map(p, seg => (['children', seg]))));
             });
-            
+
             const tree = _.reduceRight(_.initial(treeNodeList), (prev, curr, index, list) => {
                 return _.assign({}, curr, { children: [prev] });
             }, _.last(treeNodeList));
-            
+
             response.push(_.set(_.assign({}, node), 'children', [_.get(node, `children.0`), tree]));
         }
     });
@@ -136,7 +115,7 @@ function buildMathSVGArray(node: any) {
     return response;
 }
 
-function recurseThroughTree(node: any, callback: (node: string, path: string[]) => any, path: string[] = []) {
+function recurseThroughTree(node: any, callback: (node: any, path: string[]) => any, path: string[] = []) {
     path.push('children');
     _.map(node.children, (child, key) => {
         const p = _.concat(path, key);
@@ -145,4 +124,4 @@ function recurseThroughTree(node: any, callback: (node: string, path: string[]) 
     });
 }
 
-export const mathToSVG = _.memoize(toSVG);
+export const mathToSVG = toSVG//_.memoize(toSVG);

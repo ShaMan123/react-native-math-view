@@ -20,7 +20,7 @@ const numStates = 4;
 const interval = 3000;
 
 const allMath = _.flatten(_.values(MathStrings));
-const test = allMath[1]//'\\frac{\\cos\\left(x\\right)}{\\sin\\left(x\\right)}'// allMath[0];//'\\cos\\left(x\\right)';
+const test = allMath[4]//'\\frac{\\cos\\left(x\\right)}{\\sin\\left(x\\right)}'// allMath[0];//'\\cos\\left(x\\right)';
 
 function getTitle(index: number) {
     switch (index) {
@@ -56,7 +56,7 @@ export default function App() {
     useEffect(() => {
         MathjaxFactory().preload(_.slice(allMath, 0, 5));
     }, [])
-    const [page, setPage] = useState(4);
+    const [page, setPage] = useState(-1);
 
     const [switchValue, setSwitchValue] = useState(false);
 

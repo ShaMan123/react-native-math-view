@@ -1,15 +1,14 @@
 
-import React, { useMemo, useEffect } from 'react';
-import { TouchableOpacity, StyleSheet, Animated, TouchableOpacityProps, ViewProps } from 'react-native';
-import MathView, { MathViewProps } from 'react-native-math-view';
+import React, { useEffect, useMemo } from 'react';
+import { Animated, TouchableOpacity, TouchableOpacityProps, ViewProps } from 'react-native';
+import MathView, { MathViewProps } from 'react-native-math-view/src';
+import { useColor } from './Hooks';
 import styles from './styles';
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
-function MathItem(props: MathViewProps & TouchableOpacityProps & { containerStyle?: ViewProps['style']}) {
-    const getColor = () => Math.round(Math.random() * 255);
-    const getPixel = () => [getColor(), getColor(), getColor()].join(',');
-    const parsedColor = () => `rgb(${getPixel()})`;
+function MathItem(props: MathViewProps & TouchableOpacityProps & { containerStyle?: ViewProps['style'] }) {
+    const color = useColor();
 
     const opacity = useMemo(() => new Animated.Value(0), []);
     useEffect(() => {
@@ -29,7 +28,7 @@ function MathItem(props: MathViewProps & TouchableOpacityProps & { containerStyl
             <MathView
                 //color={parsedColor()} // can set color in style or directly
                 resizeMode='contain'
-                style={{ color: parsedColor() }} // can use color prop instead
+                style={{ color }} // can use color prop instead
                 {...props}
             />
         </AnimatedTouchable>

@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useContext } from "react";
 import { Animated } from "react-native";
+import AppContext from "./Context";
 
 const interval = 3000;
 
@@ -42,4 +43,14 @@ export function useInc(switchValue: boolean) {
     }, [curr, switchValue]);
 
     return curr;
+}
+
+const getColor = () => Math.round(Math.random() * 255);
+const getPixel = () => [getColor(), getColor(), getColor()].join(',');
+export const color = () => `rgb(${getPixel()})`;
+export function useColor() {
+    const context = useContext(AppContext);
+    const start = useMemo(() => color(), [])
+    return useMemo(() => context.switch ? color() : start, [context.switch, context.inc]);
+    //return useMemo(() => color(), [context.switch]);
 }

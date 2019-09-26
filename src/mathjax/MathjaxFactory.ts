@@ -21,7 +21,8 @@ export interface MathFragmentResponse {
         variant: string,
         charCode: string
     },
-    viewBox: LayoutRectangle
+    viewBox: LayoutRectangle,
+    index: number
 }
 
 function parseSize(size: string | number, config: Partial<MathToSVGConfig> = {}) {
@@ -114,7 +115,7 @@ export class MathjaxAdaptor {
         const viewBoxes = _.map(transforms, (mat, index, collection) => {
             const box = _.clone(viewBox);
             const x = mat.e;
-            const y = box[1]// mat.e;
+            const y = box[1]// mat.f;
             const width = _.get(collection, `${index + 1}.e`, viewBox[2]) - mat.e;
             const height = box[3];
             
@@ -128,10 +129,7 @@ export class MathjaxAdaptor {
         const responseArr = _.map(useCollection, (node, index) => {
             const n = this.adaptor.clone(node);
             const transform = this.accTransformations(node);
-            
-            //const x = transform.e;
-            //this.adaptor.setAttribute(n, 'x', transform.e);
-            //transform.e = 0;
+
             const xlinkHref = _.get(node.attributes, 'xlink:xlink:href', _.get(node.attributes, 'xlink:href'));
             const idHints = _.split(xlinkHref, '-');
 
@@ -139,14 +137,14 @@ export class MathjaxAdaptor {
 
             const clone = this.adaptor.clone(svgNode);
             clone.children = [clone.children[0], n];
-            console.log(String.fromCharCode(_.last(idHints)))
 
             //this.adaptor.setAttribute(clone, 'viewBox', viewBoxes[index]);
             //console.log(clone.attributes['viewBox'], viewBoxes[index])
             return {
                 node: clone,
                 svg: MathjaxAdaptor.parseSVG(this.adaptor.outerHTML(clone)),
-                namespace: _.zipObject(['ns', 'localCahceId', 'input', 'variant', 'charCode'], idHints)
+                namespace: _.zipObject(['ns', 'localCahceId', 'input', 'variant', 'charCode'], idHints),
+                index
             };
         });
 

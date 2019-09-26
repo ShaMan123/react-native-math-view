@@ -1,3 +1,3 @@
-import MathView from './MathView.ios';
-import MathjaxFactory from './MathjaxFactory';
+import MathView from './ios/MathView';
+const MathjaxFactory = {};
 export { MathView as default, MathjaxFactory };

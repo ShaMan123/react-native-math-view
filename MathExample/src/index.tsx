@@ -1,27 +1,27 @@
 
 import * as _ from 'lodash';
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
-import { Button, StyleSheet, Switch, Text, View } from 'react-native';
-import { MathjaxFactory } from 'react-native-math-view';
-import { FactoryMemoize } from 'react-native-math-view/dist/MathjaxFactory';
-import { ControlledMathView } from 'react-native-math-view/dist/MathView.android';
+import { Button, StyleSheet, Switch, Text, View, TouchableOpacity, LayoutRectangle } from 'react-native';
+import { MathjaxFactory } from 'react-native-math-view/src';
+import { FactoryMemoize } from 'react-native-math-view/src/MathjaxFactory';
+import { ControlledMathView } from 'react-native-math-view/src/MathView.android';
 import AppContext from './Context';
 import DifferentLayouts from './DifferentLayouts';
 import FlexWrapMathSectionList from './FlexWrapMathSectionList';
-import { useInc, useWidth } from './Hooks';
+import { useInc, useWidth, useColor, color } from './Hooks';
 import MathStrings, { getRecursiveFrac, getTaylor } from './math';
 import MathItem from './MathItem';
 import MathSectionList from './MathSectionList';
 import Standalone from './Standalone';
 import styles from './styles';
-
+import { parse } from 'svg-parser';
 
 const numStates = 4;
 
 const interval = 3000;
 
 const allMath = _.flatten(_.values(MathStrings));
-const test = allMath[0];//'\\cos\\left(x\\right)';
+const test = allMath[0]//'\\frac{\\cos\\left(x\\right)}{\\sin\\left(x\\right)}'// allMath[0];//'\\cos\\left(x\\right)';
 
 function getTitle(index: number) {
     switch (index) {
@@ -34,11 +34,116 @@ function getTitle(index: number) {
     }
 }
 
+function MathFragment() {
+    //const color = useColor();
+    const [layout, setLayout] = useState<LayoutRectangle>({});
+    const data = MathjaxFactory().toSVGArray(test);
+    console.log(String.fromCharCode(73))
+    //const splitData = MathjaxFactory().splitMath(test);
+    //console.log(parse(data[0].svg).children)
+    return (
+        <View  style={{ alignItems: 'flex-end', direction: 'ltr' }}>
+            <MathItem
+                math={test}
+                containerStyle={{ backgroundColor: 'red', opacity: 0 }}
+                onLayout={e => setLayout(e.nativeEvent.layout)}
+                onPress={e => {
+                    const { locationX, locationY } = e.nativeEvent;
+                    
+                    const hitSlop = {
+                        left: 0,
+                        top: -20,
+                        right: 0,
+                        bottom: 20
+                    };
+                    _.map(data, ({ layoutRect }, index) => {
+                        const left = layout.x + layoutRect.x * layout.width;
+                        const top = layout.y + layoutRect.y * layout.height;
+                        const width = layoutRect.width * layout.width;
+                        const height = layoutRect.height * layout.height;
+                        const right = left + width;
+                        const bottom = top + height;
+
+                        const inside = locationX >= left + hitSlop.left && locationX <= right + hitSlop.right && locationY >= top + hitSlop.top && locationY <= bottom + hitSlop.bottom;
+                        inside && console.log(index, String.fromCharCode(data[index].namespace.charCode))
+                        //console.log(locationX, left, right, inside, layoutRect)
+                    })
+                    
+                }}
+            />
+           
+                {_.map(data, ({ svg, layoutRect }, index) => {
+
+                return (
+                    <View
+                        pointerEvents='none'
+                        key={`MEditable${index}`}
+                        style={[StyleSheet.absoluteFill, [styles.flexContainer, { margin: 0 }],{ alignItems: 'flex-end', flexDirection: 'row-reverse' }]}
+                    >
+                        <ControlledMathView
+                       
+                            //math='abc' 
+                            //math={math}
+                            svg={svg}
+                            containerStyle={[styles.flexContainer, { margin: 0 }]}
+                            style={[styles.flexContainer, { color: color() }]}
+                            //onLayout={e=>console.log(e.nativeEvent)}
+                        />
+                    </View>
+                )
+            })}
+            
+        </View>
+    );
+
+    return (
+        <View style={{ alignItems: 'flex-end', direction: 'ltr' }}>
+            <MathItem math={test} containerStyle={{ backgroundColor: 'red' }} />
+
+            {_.map(_.reject(MathjaxFactory().splitMath(test), math => false/*math.match(/((\\left)|(\\right))|(\\frac)/)*/), (math, index) => {
+                const svg = MathjaxFactory().toSVG(math);
+                console.log(math, svg)
+                return (
+                    <View key={`MEditable${index}`} style={[StyleSheet.absoluteFill, { alignItems: 'flex-end', flexDirection: 'row-reverse', margin: 5 }]}>
+                        <ControlledMathView
+
+                            //math='abc' 
+                            //math={math}
+                            svg={svg}
+                            containerStyle={[styles.flexContainer, { margin: 0 }]}
+                            style={{ color: `rgb(${Math.pow(index, 2) % 255}, 255,0)` }}
+                            onPress={e => console.log(index)}
+                        />
+                    </View>
+                )
+            })}
+
+        </View>
+    );
+    /*
+
+return (
+        <View style={{alignItems: 'flex-end', direction:'ltr'}}>
+            <MathItem math={test} />
+            <View style={[StyleSheet.absoluteFill, { alignItems: 'flex-end', flexDirection:'row-reverse' ,margin:5}]}>
+                <MathItem math={'\\cos'} containerStyle={[styles.flexContainer, { margin: 0 }]} onPress={e=>console.log('cos')} />
+                <MathItem math={'\\left(x\\right)'} containerStyle={[styles.flexContainer, { margin: 0 }]} />
+                </View>
+            </View>
+        );
+    */
+    return (
+        <View style={{ alignItems: 'flex-end', direction: 'ltr' }}>
+            <MathItem math={test} />
+        </View>
+    );
+}
+
 export default function App() {
     useEffect(() => {
         MathjaxFactory().preload(_.slice(allMath, 0, 5));
     }, [])
-    const [page, setPage] = useState(-1);
+    const [page, setPage] = useState(4);
 
     const [switchValue, setSwitchValue] = useState(false);
 
@@ -80,72 +185,8 @@ export default function App() {
             case 1: return <MathSectionList />;
             case 2: return <FlexWrapMathSectionList />;
             case 3: return <DifferentLayouts />;
-            case 4:
-
-                return (
-                    <View style={{ alignItems: 'flex-end', direction: 'ltr' }}>
-                        <MathItem math={test} />
-                        
-                        {_.map(MathjaxFactory().toSVGArray(test), (svg, index) => {
-
-                            return (
-                                <View
-                                    key={`MEditable${index}`}
-                                    style={[StyleSheet.absoluteFill, { alignItems: 'flex-end', flexDirection: 'row-reverse', margin: 5 }]}
-                                >
-                                    <ControlledMathView
-                                        
-                                        //math='abc' 
-                                        //math={math}
-                                        svg={svg}
-                                        containerStyle={[styles.flexContainer, { margin: 0 }]}
-                                        style={{color:`rgb(${Math.pow(index,2)%255}, 255,0)`}}
-                                        onPress={e => console.log(index)}
-                                    />
-                                </View>
-                                )
-                            })}
-                      
-                    </View>
-                );
-
-                return (
-                    <View style={{ alignItems: 'flex-end', direction: 'ltr' }}>
-                        <MathItem math={test} />
-
-                        {_.map(_.reject(MathjaxFactory().splitMath(test), math=>math.match(/((\\left)|(\\right))/)), (math, index) => {
-                            return (
-                                <View key={`MEditable${index}`} style={[StyleSheet.absoluteFill, { alignItems: 'flex-end', flexDirection: 'row-reverse', margin: 5 }]}>
-                                    <MathItem
-
-                                        //math='abc' 
-                                        math={math}
-                                        containerStyle={[styles.flexContainer, { margin: 5 }]}
-                                        onPress={e => console.log(index)}
-                                    />
-                                </View>
-                            )
-                        })}
-
-                    </View>
-                );
-                /*
-
-return (
-                    <View style={{alignItems: 'flex-end', direction:'ltr'}}>
-                        <MathItem math={test} />
-                        <View style={[StyleSheet.absoluteFill, { alignItems: 'flex-end', flexDirection:'row-reverse' ,margin:5}]}>
-                            <MathItem math={'\\cos'} containerStyle={[styles.flexContainer, { margin: 0 }]} onPress={e=>console.log('cos')} />
-                            <MathItem math={'\\left(x\\right)'} containerStyle={[styles.flexContainer, { margin: 0 }]} />
-                            </View>
-                        </View>
-                    );
-                */
-                return (
-                    <View style={{alignItems: 'flex-end', direction:'ltr'}}>
-                        <MathItem math={test} />
-                        </View>
-                    );
+            case 4: return <MathFragment />
+                
             default: null
         }
     }, [page]);

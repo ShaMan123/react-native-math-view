@@ -2,9 +2,9 @@
 import * as _ from 'lodash';
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { Button, StyleSheet, Switch, Text, View, TouchableOpacity, LayoutRectangle } from 'react-native';
-import { MathjaxFactory } from 'react-native-math-view/src';
-import { FactoryMemoize } from 'react-native-math-view/src/MathjaxFactory';
-import { ControlledMathView } from 'react-native-math-view/src/MathView.android';
+//import { MathjaxFactory } from 'react-native-math-view/src';
+import MathjaxFactory, { FactoryMemoize } from 'react-native-math-view/src/mathjax';
+import MathView, { ControlledMathView } from 'react-native-math-view/src';
 import AppContext from './Context';
 import DifferentLayouts from './DifferentLayouts';
 import FlexWrapMathSectionList from './FlexWrapMathSectionList';
@@ -185,7 +185,7 @@ export default function App() {
             case 1: return <MathSectionList />;
             case 2: return <FlexWrapMathSectionList />;
             case 3: return <DifferentLayouts />;
-            case 4: return <MathFragment />
+            case 4: return <MathView math={test} action='edit' />
                 
             default: null
         }

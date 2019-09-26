@@ -13,14 +13,14 @@ import MathItem from './MathItem';
 import MathSectionList from './MathSectionList';
 import Standalone from './Standalone';
 import styles from './styles';
-import { TapGestureHandler } from 'react-native-gesture-handler';
+import { TapGestureHandler, RectButton } from 'react-native-gesture-handler';
 
 const numStates = 4;
 
 const interval = 3000;
 
 const allMath = _.flatten(_.values(MathStrings));
-const test = allMath[0]//'\\frac{\\cos\\left(x\\right)}{\\sin\\left(x\\right)}'// allMath[0];//'\\cos\\left(x\\right)';
+const test = allMath[1]//'\\frac{\\cos\\left(x\\right)}{\\sin\\left(x\\right)}'// allMath[0];//'\\cos\\left(x\\right)';
 
 function getTitle(index: number) {
     switch (index) {
@@ -39,10 +39,9 @@ function MEEM() {
         <TapGestureHandler
             onHandlerStateChange={e => {
                 console.log('go go go', e.nativeEvent)
-                ref.current.__test(e.nativeEvent.absoluteX, e.nativeEvent.absoluteY)
+                ref.current.__test(e.nativeEvent.x, e.nativeEvent.y)
             }}
             enabled
-            
         >
             <MathView
                 math={test}
@@ -63,10 +62,12 @@ export default function App() {
 
     const PageSelector = useCallback(({ index }: { index: number }) => {
         return (
-            <Button
+            <RectButton
                 onPress={() => setPage(index)}
-                title={getTitle(index)}
-            />
+                
+            >
+                <Text style={[styles.defaultColorTheme, { padding: 10, margin: 20, textAlign: 'center' }]}>{getTitle(index)}</Text>
+            </RectButton>
         );
     }, []);
 

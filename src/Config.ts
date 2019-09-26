@@ -55,5 +55,5 @@ export const mathToSVGDefaultConfig = {
     width: 80 * 16,
     packages: AllPackages,
     //css: false,
-    fontCache: true
+    fontCache: true,
 } as MathToSVGConfig;

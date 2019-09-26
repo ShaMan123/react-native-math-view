@@ -1,10 +1,10 @@
 'use strict';
 
 import * as _ from 'lodash';
-import React, { forwardRef, useMemo } from 'react';
+import React, { forwardRef, useMemo, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Animated, NativeModules, requireNativeComponent, StyleSheet, UIManager, ViewProps, ViewStyle } from 'react-native';
-import { MathToSVGConfig, ResizeMode } from './Config';
-import MathjaxFactory from './MathProvider';
+import { MathToSVGConfig, ResizeMode, mathToSVGDefaultConfig } from './Config';
+import MathjaxFactory, { MathjaxAdaptor } from './MathjaxFactory';
 
 const nativeViewName = 'RNMathView';
 const RNMathView = requireNativeComponent(nativeViewName);
@@ -31,18 +31,42 @@ export interface MathViewProps extends ViewProps {
     config?: MathToSVGConfig
 }
 
-function defaultPropSize(flatStyle: ViewStyle, key: keyof ViewStyle, defaultValue: number) {
-    const propVal = _.get(flatStyle, key, '');
-    return _.isNumber(propVal) ? Math.min(defaultValue, propVal) : defaultValue;
-}
+const mathjaxGlobal = MathjaxFactory();
 
+/**
+ * uses async rendering for better performance in combination with memoization
+ * read more in source files
+ * @param props
+ * @param ref
+ */
 function MathView(props: MathViewProps, ref: any) {
     if (!props.math) return null;
-
     const mathjax = useMemo(() => MathjaxFactory(props.config), [props.config]);
-    const svg = useMemo(() => mathjax.toSVG(props.math), [props.math, mathjax]);
-    const key = useMemo(() => _.uniqueId('MathView'), [props.math]);
 
+    //  Async Rendering
+    //  -----------------------------------------------------------------------------------------------------------------------------------------------
+    //  better performance
+    //  uses memoize to improve first draw:
+    //  if `math` prop didn't mount yet (no memoized value) revert to async rendering, otherwise use memoized value (prevents an unnecessary render and wait)
+    const [svg, setSVG] = useState(mathjax.toSVG.cache.has(props.math) ? mathjax.toSVG.cache.get(props.math): undefined);
+    useEffect(() => {
+        setSVG(mathjax.toSVG(props.math));
+    }, [props.math, mathjax]);
+
+    //  -----------------------------------------------------------------------------------------------------------------------------------------------
+
+    //  Sync Rendering  
+    //  -----------------------------------------------------------------------------------------------------------------------------------------------
+    //  poor performance in first draw, causes js thread to hold for 2-3 seconds on initial mounts
+    //  uncomment this line and comment async rendering section to test sync rendering
+    //const svg = useMemo(() => mathjax.toSVG(props.math), [props.math, mathjax]);
+
+    //  Layout Task Manager
+    //  -----------------------------------------------------------------------------------------------------------------------------------------------
+    //  used to remount RNMathView in order to recompute layout properly 
+    //  occurs after props.math changes svg
+    const key = useMemo(() => _.uniqueId('MathView'), [svg]);
+    
     return (
         <RNMathView
             {...props}

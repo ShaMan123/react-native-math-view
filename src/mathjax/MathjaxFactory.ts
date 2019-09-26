@@ -114,8 +114,9 @@ export class MathjaxAdaptor {
 
         const viewBoxes = _.map(transforms, (mat, index, collection) => {
             const box = _.clone(viewBox);
-            const x = mat.e;
-            const y = box[1]// mat.f;
+            console.log(mat)
+            const x = mat.e - collection[0].e;
+            const y = mat.f - collection[0].f;
             const width = _.get(collection, `${index + 1}.e`, viewBox[2]) - mat.e;
             const height = box[3];
             

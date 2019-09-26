@@ -16,8 +16,8 @@ function useLayout() {
 }
 
 function getFragmentRect(layout: LayoutRectangle, viewBox: LayoutRectangle, hitSlop: number | Insets = 0) {
-    const left = layout.x + viewBox.x * layout.width;
-    const top = layout.y + viewBox.y * layout.height;
+    const left = viewBox.x * layout.width;
+    const top = viewBox.y * layout.height;
     const width = viewBox.width * layout.width;
     const height = viewBox.height * layout.height;
     const right = left + width;
@@ -39,8 +39,10 @@ function getFragmentRect(layout: LayoutRectangle, viewBox: LayoutRectangle, hitS
         width,
         height,
         test(x: number, y: number) {
+            
             const h = (x >= hitRect.left) && (x <= hitRect.right);
             const v = y >= hitRect.top && y <= hitRect.bottom;
+            console.log(h && v);
             return h && v;
         }
     }
@@ -82,87 +84,111 @@ const defaultHitSlop = {
     bottom: 20
 };
 
-function MathFragment() {
-    return (
-        <Animated.View
-            pointerEvents='none'
-            key={`MathFragment${index}`}
-            style={[StyleSheet.absoluteFill, styles.flexContainer, { transform: [{ scale: anima[index] }] },/* { alignItems: 'flex-end', flexDirection: 'row-reverse' }*/]}
-        >
-            <ControlledMathView
-
-                //math='abc' 
-                //math={math}
-                {...props}
-                svg={svg}
-                //containerStyle={[styles.flexContainer, { margin: 0 }]}
-                style={[{ color: color() }]}
-            //onLayout={e=>console.log(e.nativeEvent)}
-            />
-        </Animated.View>
-    )
-}
-
 function FragmentedMathView(props: MathViewProps, ref: any) {
     const [layoutRef, onLayout] = useLayout();
     const data = MathjaxFactory().toSVGArray(props.math); 
     const test = useRef<ReturnType<typeof HitTestFactory>>(() => { });
     useEffect(() => { _.set(test, 'current', HitTestFactory(layoutRef, data, props.hitSlop)) }, [layoutRef, data, props.hitSlop]);
-
-    useImperativeHandle(ref, () => ({
+    /*
+    useImperativeHandle(ref, () => _.set(React.createRef(), 'current', {
         test,
-        data
-    }), [test, data]);
+        data,
+        __test: (x, y) => {
+            console.log(x, y)
+            _.map(test.current(x, y), ({ namespace, index }) => {
+                //console.log(index)
+                anima[index].setValue(2);
+                Animated.spring(anima[index], { toValue: 1, useNativeDriver: true, delay: 100 }).start();
+                //String.fromCharCode(namespace.charCode)
+            });
+        }
+    }).current, [test, data]);
+    */
 
-    const onPress = useCallback((e: GestureResponderEvent) => {
-        const { pageX: x, pageY: y } = e.nativeEvent;
-        console.log(x,y)
-        _.map(test.current(x, y), ({ namespace, index }) => {
-            //console.log(index)
-            anima[index].setValue(2);
-            Animated.spring(anima[index], { toValue: 1, useNativeDriver: true, delay: 100 }).start();
-            //String.fromCharCode(namespace.charCode)
-        });
-    }, [layoutRef, data, props.hitSlop]);
+    const __ref = useRef();
+    const anima = useMemo(() => _.map(new Array(_.size(data)), () => new Animated.Value(1)), []);
 
-    const anima = useMemo(() => _.map(new Array(_.size(data)), ()=>new Animated.Value(1)), []);
+    useImperativeHandle(ref, () => _.assign(__ref.current, {
+        test,
+        __test: (x: number, y: number) => {
+            console.log(test.current(x, y))
+            _.map(test.current(x, y), ({ namespace, index }) => {
+                //console.log(index)
+                anima[index].setValue(2);
+                Animated.spring(anima[index], { toValue: 1, useNativeDriver: true, delay: 100 }).start();
+                //String.fromCharCode(namespace.charCode)
+            });
+        },
+        __pip() {
+            _.map(new Array(data.length), (a, i) => anima[i].setValue(2))
+            setTimeout(() => {
+                
+            }, 200)
+            Animated.stagger(
+                50,
+                _.concat(
+                    // _.map(new Array(data.length), (a, i) => Animated.spring(anima[i], { toValue: 2, useNativeDriver: true })),
+                    _.map(new Array(data.length), (a, i) => Animated.spring(anima[i], { toValue: 1, useNativeDriver: true, delay:500 })),
+                )
+            ).start();
+        }
+    }));
+
+    useCallback((svg, index) => {
+        return (
+            <Animated.View
+                pointerEvents='none'
+                key={`MathFragment${index}`}
+                style={[StyleSheet.absoluteFill, styles.flexContainer, { transform: [{ scale: anima[index] }] },/* { alignItems: 'flex-end', flexDirection: 'row-reverse' }*/]}
+            >
+                <ControlledMathView
+
+                    //math='abc' 
+                    //math={math}
+                    {...props}
+                    svg={svg}
+                    //containerStyle={[styles.flexContainer, { margin: 0 }]}
+                    style={[{ color: 'blue' }]}
+                //onLayout={e=>console.log(e.nativeEvent)}
+                />
+            </Animated.View>
+        )
+    }, [])
     
     return (
-        <View style={[{ alignItems: 'flex-start', justifyContent: 'flex-start' }]}>
-            <TouchableOpacity
-                style={[styles.flexContainer, { alignItems: 'center', justifyContent: 'center' }]}
-                onPress={onPress}
-            >
-                <MathView
-                    {...props}
-                    //containerStyle={{ backgroundColor: 'red', opacity: 0 }}
-                    onLayout={onLayout}
-                    style={{ color: 'green', backgroundColor: 'red', opacity: 0.3 }}
-                />
+        <Animated.View
+            collapsable={false}
+            style={styles.flexContainer}
+        >
+            <MathView
+                {...props}
+                //containerStyle={{ backgroundColor: 'red', opacity: 0 }}
+                onLayout={onLayout}
+                style={{ color: 'green', backgroundColor: 'red', opacity: 0.3 }}
+                ref={__ref}
+            />
 
-                {_.map(data, ({ svg }, index) => {
-                    return (
-                        <Animated.View
-                            pointerEvents='none'
-                            key={`MathFragment${index}`}
-                            style={[StyleSheet.absoluteFill, styles.flexContainer, { transform: [{ scale: anima[index] }] },/* { alignItems: 'flex-end', flexDirection: 'row-reverse' }*/]}
-                        >
-                            <ControlledMathView
+            {_.map(data, ({ svg }, index) => {
+                return (
+                    <Animated.View
+                        pointerEvents='none'
+                        key={`MathFragment${index}`}
+                        style={[StyleSheet.absoluteFill, styles.flexContainer, { transform: [{ scale: anima[index] }] },/* { alignItems: 'flex-end', flexDirection: 'row-reverse' }*/]}
+                    >
+                        <ControlledMathView
 
-                                //math='abc' 
-                                //math={math}
-                                {...props}
-                                svg={svg}
-                                //containerStyle={[styles.flexContainer, { margin: 0 }]}
-                                //style={[{ color: color() }]}
-                            //onLayout={e=>console.log(e.nativeEvent)}
-                            />
-                        </Animated.View>
-                    )
-                })}
-
-            </TouchableOpacity>
-        </View>
+                            //math='abc' 
+                            //math={math}
+                            {...props}
+                            svg={svg}
+                        //containerStyle={[styles.flexContainer, { margin: 0 }]}
+                        style={[{ color: 'blue' }]}
+                        //onLayout={e=>console.log(e.nativeEvent)}
+                        />
+                    </Animated.View>
+                )
+            })}
+        </Animated.View>
     );
     /*
     return (
@@ -215,8 +241,7 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         //flexWrap: 'wrap',
-        //justifyContent: 'center',
-        //alignItems: 'center',
+        justifyContent: 'center'
         //margin: 5
 
     },

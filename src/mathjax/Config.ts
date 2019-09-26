@@ -1,8 +1,6 @@
 //@ts-ignore 
 import { AllPackages } from 'mathjax-full/js/input/tex/AllPackages';
 
-export type ResizeMode = 'cover' | 'contain';
-
 export interface MathToSVGConfig {
     /** 
      *  process as inline math

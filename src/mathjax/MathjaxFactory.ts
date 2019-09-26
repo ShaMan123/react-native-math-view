@@ -11,6 +11,8 @@ import { MathToSVGConfig, mathToSVGDefaultConfig } from './Config';
 import * as matrixUtil from 'transformation-matrix';
 import { LayoutRectangle } from 'react-native';
 
+const compose = matrixUtil.transform;
+
 export interface MathFragmentResponse {
     node: LiteElement,
     svg: string,
@@ -114,7 +116,6 @@ export class MathjaxAdaptor {
 
         const viewBoxes = _.map(transforms, (mat, index, collection) => {
             const box = _.clone(viewBox);
-            console.log(mat)
             const x = mat.e - collection[0].e;
             const y = mat.f - collection[0].f;
             const width = _.get(collection, `${index + 1}.e`, viewBox[2]) - mat.e;
@@ -206,20 +207,20 @@ export class MathjaxAdaptor {
     transformationToMatrix(node: LiteElement) {
         const transformAttr = _.get(node.attributes, 'transform', null);
         if (!transformAttr) return;
-
-        const mat = matrixUtil.compose(matrixUtil.fromTransformAttribute(transformAttr));
-        
-        switch (mat.type) {
-            case 'matrix':
-                return mat;
-            case 'translate':
-                return matrixUtil.compose(matrixUtil.translate(mat.tx, mat.ty || 0));
-            case 'scale':
-                return matrixUtil.compose(matrixUtil.scale(mat.sx || 1, mat.sy || 1));
-            default:
-                if (_.isString(mat.type)) throw new Error(`Mathjax transformation accumulator unhandled command ${mat.type}`);
-                break;
-        }
+        const matrices = _.map(matrixUtil.fromTransformAttribute(transformAttr), (mat) => {
+            switch (mat.type) {
+                case 'matrix':
+                    return mat;
+                case 'translate':
+                    return compose(matrixUtil.translate(mat.tx, mat.ty || 0));
+                case 'scale':
+                    return compose(matrixUtil.scale(mat.sx || 1, mat.sy || 1));
+                default:
+                    if (_.isString(mat.type)) throw new Error(`Mathjax transformation accumulator unhandled command ${mat.type}`);
+                    break;
+            }
+        })
+        return compose(matrices);
     }
 
     accTransformations(node: LiteElement) {
@@ -230,7 +231,7 @@ export class MathjaxAdaptor {
             n = n.parent;
         }
         
-        return matrixUtil.compose(_.compact(matrices));
+        return compose(_.compact(matrices));
     }
 
 
@@ -276,20 +277,20 @@ export function accumulateTransformations(node: LiteElement, adaptor: LiteAdapto
                 const transformAttr = _.get(node.attributes, 'transform', null);
                 if (!transformAttr) return;
 
-                const mat = matrixUtil.compose(matrixUtil.fromTransformAttribute(transformAttr));
+                const mat = compose(matrixUtil.fromTransformAttribute(transformAttr));
 
                 switch (mat.type) {
                     case 'matrix':
                         return mat;
                     case 'translate':
-                        return matrixUtil.compose(matrixUtil.translate(mat.tx, mat.ty || 0));
+                        return compose(matrixUtil.translate(mat.tx, mat.ty || 0));
                 }
                 return transformAttr && matrixUtil.fromTransformAttribute(transformAttr);
             }));
 
-            //console.log(treeNodeList[0].attributes, matrixUtil.toSVG(matrixUtil.compose(transformations)))
+            //console.log(treeNodeList[0].attributes, matrixUtil.toSVG(compose(transformations)))
 
-            adaptor.setAttribute(treeNodeList[0], 'transform', matrixUtil.toSVG(matrixUtil.compose(transformations)))
+            adaptor.setAttribute(treeNodeList[0], 'transform', matrixUtil.toSVG(compose(transformations)))
            // console.log(_.keys(adaptor))
 
             const tree = _.reduceRight(_.initial(treeNodeList), (prev, curr, index, list) => {

@@ -9,7 +9,19 @@
     "jsx": "react",
     "baseUrl": ".",
     "noEmitOnError": false,
-    "declaration": true
+    "declaration": true,
+    "typeRoots": [
+      "node_modules/mathjax-full",
+      "node_modules/mathjax-full/ts",
+      "node_modules/mathjax-full/js"
+    ],
+    "types": [ "mathjax-full/js/adaptors/liteAdaptor.d.ts" ],
+    "paths": {
+        "*": ["/*/index.d.ts", "@types/*"],
+      "transformation-matrix": [ "node_modules/transformation-matrix/transformation-matrix.d.ts" ],
+      "mathjax-full": [ "node_modules/mathjax-full/js/mathjax.d.ts" ],
+      "mathjax-full/*": [ "node_modules/mathjax-full/*" ]
+    }
   },
   "include": [ "src" ],
   "exclude": ["node_modules"],

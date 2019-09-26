@@ -1,3 +1,6 @@
-import MathView from './MathView.android';
-import MathjaxFactory from './MathjaxFactory';
-export { MathView as default, MathjaxFactory };
+//import MathView from './android';
+export { default } from './android';
+export * from './android';
+export { default as MathjaxFactory } from './mathjax';
+//import MathjaxFactory from './mathjax';
+//export { MathView as default, MathjaxFactory };

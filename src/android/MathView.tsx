@@ -3,15 +3,14 @@
 import * as _ from 'lodash';
 import React, { forwardRef, useMemo, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Animated, NativeModules, requireNativeComponent, StyleSheet, UIManager, ViewProps, ViewStyle } from 'react-native';
-import { MathToSVGConfig, ResizeMode, mathToSVGDefaultConfig } from './Config';
-import MathjaxFactory, { MathjaxAdaptor } from './MathjaxFactory';
+import MathjaxFactory, { MathjaxAdaptor, MathToSVGConfig, mathToSVGDefaultConfig } from '../mathjax';
 
 const nativeViewName = 'RNMathView';
 const RNMathView = requireNativeComponent(nativeViewName);
 const MathViewManager = NativeModules.RNMathViewManager || {};
 export const { Constants } = UIManager.getViewManagerConfig ? UIManager.getViewManagerConfig(nativeViewName) : UIManager[nativeViewName];
 
-const AnimatedMathView = Animated.createAnimatedComponent(RNMathView);
+export type ResizeMode = 'cover' | 'contain';
 
 export interface MathViewProps extends ViewProps {
     math: string,

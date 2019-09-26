@@ -1,16 +1,10 @@
 import * as _ from 'lodash';
-//@ts-ignore
+import { LiteElement } from 'mathjax-full/js/adaptors/lite/Element';
 import { liteAdaptor } from 'mathjax-full/js/adaptors/liteAdaptor';
-//@ts-ignore
 import { RegisterHTMLHandler } from 'mathjax-full/js/handlers/html';
-//@ts-ignore
 import { TeX } from 'mathjax-full/js/input/tex';
-//@ts-ignore
-import ParseUtil from 'mathjax-full/js/input/tex/ParseUtil';
 import TexParser from 'mathjax-full/js/input/tex/TexParser';
-//@ts-ignore
 import { mathjax } from 'mathjax-full/js/mathjax';
-//@ts-ignore
 import { SVG } from 'mathjax-full/js/output/svg';
 import { MathToSVGConfig, mathToSVGDefaultConfig } from './Config';
 
@@ -21,12 +15,11 @@ function parseSize(size: string | number, config: Partial<MathToSVGConfig> = {})
 }
 
 /**
- * 
- * @param math
+ * init Mathjax classes
  * @param config
  */
-function toSVG(math: string, config: Partial<MathToSVGConfig> = {}) {
-    const opts = _.defaultsDeep(config, mathToSVGDefaultConfig);
+export default function MathjaxFactory(config?: Partial<MathToSVGConfig>) {
+    const options = _.defaultsDeep(config || {}, mathToSVGDefaultConfig) as MathToSVGConfig;
     //
     //  Create DOM adaptor and register it for HTML documents
     //
@@ -36,51 +29,55 @@ function toSVG(math: string, config: Partial<MathToSVGConfig> = {}) {
     //
     //  Create input and output jax and a document using them on the content from the HTML file
     //
-    const tex = new TeX({ packages: opts.packages });
-    const svg = new SVG({ fontCache: (opts.fontCache ? 'local' : 'none') });
+    const tex = new TeX({ packages: options.packages });
+    const svg = new SVG({ fontCache: (options.fontCache ? 'local' : 'none') });
     const html = mathjax.document('', { InputJax: tex, OutputJax: svg });
-    //console.log(tex.findMath(['$$\\cos(x)$$', 'asdddsac $$x+5$$']))
-    
-    //
-    //  Typeset the math
-    //
-    
-    const node = html.convert(math, {
-        display: !opts.inline,
-        em: opts.em,
-        ex: opts.ex,
-        containerWidth: opts.width
-    });
 
-    const response = adaptor.innerHTML(node);  //   css option won't be used in react-native context    //   opts.css ? adaptor.textContent(svg.styleSheet(html)) : adaptor.innerHTML(node);
-
-    /*
-    const nodeList = buildMathSVGArray(adaptor.clone(adaptor.firstChild(node)));
-    const response = _.map(nodeList, node => _.replace(adaptor.outerHTML(node), /xlink:xlink/g, 'xlink'))
-    */
-
-    const stringSVG = _.replace(response, /xlink:xlink/g, 'xlink');
-
-    return stringSVG;
-}
-
-export function splitMath(math: string, parseOptions: any) {
-    let parser = new TexParser(math,
-        { display: true, isInner: false },
-        parseOptions);
-
-    parser.i = 0;   //  reset parser
-    const response = [];
-    while (parser.i < parser.string.length) {
-        response.push(parser.GetArgument(math, true))
+    const convertOptions = {
+        display: !options.inline,
+        em: options.em,
+        ex: options.ex,
+        containerWidth: options.width
     }
-    return response;
+    
+    return {
+        html,
+        tex,    //  html.inputJax
+        svg,    //  html.outputJax
+        options,
+        parseSVG(svg: string) {
+            return _.replace(svg, /xlink:xlink/g, 'xlink');
+        },
+        convert(math: string) {
+            return html.convert(math, convertOptions) as LiteElement
+        },
+        splitMath(math: string) {
+            let parser = new TexParser(
+                math,
+                { display: true, isInner: false },
+                tex.parseOptions
+            );
+
+            parser.i = 0;   //  reset parser
+            const response = [];
+            while (parser.i < parser.string.length) {
+                response.push(parser.GetArgument(math, true))
+            }
+            return response;
+        },
+        toSVG(math: string) {
+            const node = this.convert(math);
+            return this.parseSVG(adaptor.innerHTML(node)); //   css option won't be used in react-native context    //   opts.css ? adaptor.textContent(svg.styleSheet(html)) : adaptor.innerHTML(node);
+        },
+        toSVGArray(math: string) {
+            return _.map(this.splitMath(math), this.convert);
+            /*
+            const nodeList = breakIntoSeperateTrees(adaptor.clone(adaptor.firstChild(this.convert(math)));
+            const response = _.map(nodeList, node => this.parseSVG(adaptor.outerHTML(node)));
+            */
+        }
+    };
 }
-
-function pip(math: string, config: Partial<MathToSVGConfig> = {}) {
-
-}
-
 
 
 /**
@@ -89,7 +86,7 @@ function pip(math: string, config: Partial<MathToSVGConfig> = {}) {
  * This was developed in order to manage seperate symbols in a math string
  * @param node adaptor.firstChild(node)
  */
-function breakIntoSeperateTrees(node: any) {
+export function breakIntoSeperateTrees(node: any) {
     let pathToDefs: Array<number | string> = [0];
     const response: any[] = [];
     //console.log( node.attributes)
@@ -124,4 +121,3 @@ function recurseThroughTree(node: any, callback: (node: any, path: string[]) => 
     });
 }
 
-export const mathToSVG = toSVG//_.memoize(toSVG);

@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import React, { forwardRef, useMemo } from 'react';
 import { Animated, NativeModules, requireNativeComponent, StyleSheet, UIManager, ViewProps, ViewStyle } from 'react-native';
 import { MathToSVGConfig, ResizeMode } from './Config';
-import { mathToSVG } from './MathProvider';
+import MathjaxFactory from './MathProvider';
 
 const nativeViewName = 'RNMathView';
 const RNMathView = requireNativeComponent(nativeViewName);
@@ -39,7 +39,8 @@ function defaultPropSize(flatStyle: ViewStyle, key: keyof ViewStyle, defaultValu
 function MathView(props: MathViewProps, ref: any) {
     if (!props.math) return null;
 
-    const svg = useMemo(() => mathToSVG(props.math), [props.math]);
+    const mathjax = useMemo(() => MathjaxFactory(props.config), [props.config]);
+    const svg = useMemo(() => mathjax.toSVG(props.math), [props.math, mathjax]);
     const key = useMemo(() => _.uniqueId('MathView'), [props.math]);
 
     return (

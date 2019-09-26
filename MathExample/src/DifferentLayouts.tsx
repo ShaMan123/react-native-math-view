@@ -66,7 +66,7 @@ export default function DifferentLayouts() {
                 <MathItem
                     math={rFrac}
                     style={styles.defaultColorTheme}
-                    //config={{ ex: 50, em: 200, }}
+                    config={{ ex: 50, em: 200, }}
                 />
                 <Text>resizeMode: 'cover'</Text>
                 <MathItem

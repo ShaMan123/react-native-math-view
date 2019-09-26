@@ -1,30 +1,33 @@
 ﻿const child_process = require('child_process');
 const path = require('path');
 const chalk = require('chalk');
-const fs = require('fs');
+const fs = require('fs-extra');
+const _ = require('lodash');
+//const yargs = require('yargs');
 
-const procConfig = {
+const processConfig = {
     cwd: path.resolve(__dirname, '..')
 };
 
 const start = 'npm start';
 const tsc = 'tsc --watch';
 
-if (process.platform === 'darwin') {
-    child_process.spawnSync('open', [tsc], procConfig);
-    child_process.spawnSync('open', [start], procConfig);
+fs.emptyDirSync(path.resolve(processConfig.cwd, 'dist'));
+runCommand(tsc);
+runCommand(start, _.assign(processConfig, { detached: false, stdio: 'inherit' }));
 
-} else if (process.platform === 'linux') {
-    procConfig.detached = true;
-    child_process.spawn('sh', [tsc], procConfig);
-    child_process.spawn('sh', [start], procConfig);
+function runCommand(command, procConfig = processConfig) {
+    if (process.platform === 'darwin') {
+        child_process.spawnSync('open', [command], procConfig);
 
-} else if (/^win/.test(process.platform)) {
-    procConfig.detached = true;
-    procConfig.stdio = 'ignore';
-    child_process.spawn('cmd.exe', ['/C', tsc], procConfig);
-    child_process.spawn('cmd.exe', ['/C', start], procConfig);
-    
-} else {
-    console.log(chalk.red(`Cannot start the packager. Unknown platform ${process.platform}`));
+    } else if (process.platform === 'linux') {
+        child_process.spawn('sh', [command], _.defaultsDeep(procConfig, { detached: true }));
+
+    } else if (/^win/.test(process.platform)) {
+        child_process.spawn('cmd.exe', ['/C', command], _.defaultsDeep(procConfig, { detached: true, stdio: 'ignore' }));
+
+    } else {
+        console.log(chalk.red(`Cannot start the packager. Unknown platform ${process.platform}`));
+    }
 }
+

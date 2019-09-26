@@ -23,6 +23,7 @@ module.exports = {
             'lodash': path.resolve(__dirname, 'node_modules/lodash'),
             'prop-types': path.resolve(__dirname, 'node_modules/prop-types'),
             'events': path.resolve(__dirname, 'node_modules/events'),
+            'transformation-matrix': path.resolve(__dirname, '../node_modules/transformation-matrix'),
             //'@react-native-community/async-storage': path.resolve(__dirname, '../node_modules/@react-native-community/async-storage'),
             //'react-native-webview': path.resolve(__dirname, '../node_modules/react-native-webview'),
         }

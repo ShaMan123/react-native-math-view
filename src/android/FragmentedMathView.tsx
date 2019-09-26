@@ -1,6 +1,6 @@
 
 import * as _ from 'lodash';
-import React, { useState, useCallback, useRef, useMemo, MutableRefObject, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useMemo, MutableRefObject, useEffect, useImperativeHandle } from 'react';
 import { LayoutRectangle, StyleSheet, View, LayoutChangeEvent, Insets, TouchableOpacity, TouchableOpacityProps, GestureResponderEvent, I18nManager, Animated } from 'react-native';
 import MathjaxFactory, { MathFragmentResponse } from '../mathjax/MathjaxFactory';
 import MathView, { ControlledMathView, MathViewProps } from './MathView';
@@ -82,22 +82,45 @@ const defaultHitSlop = {
     bottom: 20
 };
 
-const getColor = () => Math.round(Math.random() * 255);
-const getPixel = () => [getColor(), getColor(), getColor()].join(',');
-export const color = () => `rgb(${getPixel()})`;
+function MathFragment() {
+    return (
+        <Animated.View
+            pointerEvents='none'
+            key={`MathFragment${index}`}
+            style={[StyleSheet.absoluteFill, styles.flexContainer, { transform: [{ scale: anima[index] }] },/* { alignItems: 'flex-end', flexDirection: 'row-reverse' }*/]}
+        >
+            <ControlledMathView
 
-function FragmentedMathView(props: MathViewProps) {
+                //math='abc' 
+                //math={math}
+                {...props}
+                svg={svg}
+                //containerStyle={[styles.flexContainer, { margin: 0 }]}
+                style={[{ color: color() }]}
+            //onLayout={e=>console.log(e.nativeEvent)}
+            />
+        </Animated.View>
+    )
+}
+
+function FragmentedMathView(props: MathViewProps, ref: any) {
     const [layoutRef, onLayout] = useLayout();
     const data = MathjaxFactory().toSVGArray(props.math); 
     const test = useRef<ReturnType<typeof HitTestFactory>>(() => { });
-    useEffect(() => { _.set(test, 'current', HitTestFactory(layoutRef, data, props.hitSlop)) }, [layoutRef, data, props.hitSlop])
+    useEffect(() => { _.set(test, 'current', HitTestFactory(layoutRef, data, props.hitSlop)) }, [layoutRef, data, props.hitSlop]);
+
+    useImperativeHandle(ref, () => ({
+        test,
+        data
+    }), [test, data]);
 
     const onPress = useCallback((e: GestureResponderEvent) => {
         const { pageX: x, pageY: y } = e.nativeEvent;
+        console.log(x,y)
         _.map(test.current(x, y), ({ namespace, index }) => {
-            console.log(index)
+            //console.log(index)
             anima[index].setValue(2);
-            Animated.spring(anima[index], { toValue: 1, useNativeDriver: true }).start();
+            Animated.spring(anima[index], { toValue: 1, useNativeDriver: true, delay: 100 }).start();
             //String.fromCharCode(namespace.charCode)
         });
     }, [layoutRef, data, props.hitSlop]);
@@ -105,40 +128,41 @@ function FragmentedMathView(props: MathViewProps) {
     const anima = useMemo(() => _.map(new Array(_.size(data)), ()=>new Animated.Value(1)), []);
     
     return (
-        <TouchableOpacity
-            style={[styles.flexContainer]}
-            onPress={onPress}
-        >
-            <MathView
-                {...props}
-                //containerStyle={{ backgroundColor: 'red', opacity: 0 }}
-                onLayout={onLayout}
-                style={{color:'green', backgroundColor: 'red'}}
-            />
+        <View style={[{ alignItems: 'flex-start', justifyContent: 'flex-start' }]}>
+            <TouchableOpacity
+                style={[styles.flexContainer, { alignItems: 'center', justifyContent: 'center' }]}
+                onPress={onPress}
+            >
+                <MathView
+                    {...props}
+                    //containerStyle={{ backgroundColor: 'red', opacity: 0 }}
+                    onLayout={onLayout}
+                    style={{ color: 'green', backgroundColor: 'red', opacity: 0.3 }}
+                />
 
-            {_.map(data, ({ svg }, index) => {
-                console.log(index)
-                return (
-                    <Animated.View
-                        pointerEvents='none'
-                        key={`MEditable${index}`}
-                        style={[StyleSheet.absoluteFill, styles.flexContainer, { transform: [{ scale: anima[index] }] },/* { alignItems: 'flex-end', flexDirection: 'row-reverse' }*/]}
-                    >
-                        <ControlledMathView
+                {_.map(data, ({ svg }, index) => {
+                    return (
+                        <Animated.View
+                            pointerEvents='none'
+                            key={`MathFragment${index}`}
+                            style={[StyleSheet.absoluteFill, styles.flexContainer, { transform: [{ scale: anima[index] }] },/* { alignItems: 'flex-end', flexDirection: 'row-reverse' }*/]}
+                        >
+                            <ControlledMathView
 
-                            //math='abc' 
-                            //math={math}
-                            {...props}
-                            svg={svg}
-                            //containerStyle={[styles.flexContainer, { margin: 0 }]}
-                            style={[{ color:color() }]}
-                        //onLayout={e=>console.log(e.nativeEvent)}
-                        />
-                    </Animated.View>
-                )
-            })}
+                                //math='abc' 
+                                //math={math}
+                                {...props}
+                                svg={svg}
+                                //containerStyle={[styles.flexContainer, { margin: 0 }]}
+                                //style={[{ color: color() }]}
+                            //onLayout={e=>console.log(e.nativeEvent)}
+                            />
+                        </Animated.View>
+                    )
+                })}
 
-        </TouchableOpacity>
+            </TouchableOpacity>
+        </View>
     );
     /*
     return (
@@ -196,12 +220,13 @@ const styles = StyleSheet.create({
         //margin: 5
 
     },
-})
+});
 
-FragmentedMathView.defaultProps = {
-    //style: styles.flexContainer,
+const FragmentedMathViewWrapper = React.forwardRef(FragmentedMathView);
+
+FragmentedMathViewWrapper.defaultProps = FragmentedMathView.defaultProps = {
     resizeMode: 'contain',
     hitSlop: defaultHitSlop
-}
+} as Partial<FragmentedMathViewProps>;
 
-export default FragmentedMathView;
+export default FragmentedMathViewWrapper;

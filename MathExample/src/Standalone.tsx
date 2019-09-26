@@ -5,6 +5,7 @@ import { View } from 'react-native';
 import AppContext from './Context';
 import MathStrings from './math';
 import MathItem from './MathItem';
+import styles from './styles';
 
 const allMath = _.flatten(_.values(MathStrings));
 export default function Standalone() {
@@ -15,8 +16,7 @@ export default function Standalone() {
         <View style={{ flex: 1, justifyContent: 'center' }}>
             <MathItem
                 math={tag}
-                backgroundColor='blue'
-                color='white'
+                style={styles.defaultColorTheme}
             />
         </View>
     );

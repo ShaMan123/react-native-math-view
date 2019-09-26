@@ -25,19 +25,14 @@ export default function DifferentLayouts() {
                     <Text>resizeMode: 'contain'</Text>
                     <MathItem
                         math={taylor}
-                        backgroundColor='blue'
-                        color='white'
-                        scaleToFit={true}
-                        resizeMode='contain'
+                        style={styles.defaultColorTheme}
                     />
                 </View>
                 <Text>resizeMode: 'center'</Text>
                 <MathItem
                     math={taylor}
-                    backgroundColor='blue'
-                    color='white'
-                    scaleToFit={false}
-                    resizeMode='center'
+                    style={styles.defaultColorTheme}
+                    resizeMode='cover'
                 />
                 <Text>resizeMode: 'cover'</Text>
                 <View>
@@ -49,64 +44,47 @@ export default function DifferentLayouts() {
                     >
                         <MathItem
                             math={taylor}
-                            backgroundColor='blue'
-                            color='white'
-                            scaleToFit={false}
+                            style={[styles.defaultColorTheme, styles.default]}
                             resizeMode='cover'
-                            style={styles.default}
                         />
                     </ScrollView>
                 </View>
                 <Text>resizeMode: 'stretch'</Text>
                 <MathItem
                     math={taylor}
-                    backgroundColor='blue'
-                    color='white'
-                    scaleToFit
-                    resizeMode='stretch'
-                    style={{ minHeight: 150, flex: 1 }}
+                    resizeMode='cover'
+                    style={[{ minHeight: 150, flex: 1 }, styles.defaultColorTheme]}
                 />
                 <View style={{ width: 200, height: 200, justifyContent: 'center', alignItems: 'stretch', borderColor: 'pink', borderWidth: 2, borderStyle: 'dashed', margin: 5 }} collapsable={false}>
                     <MathItem
                         math={frac}
-                        backgroundColor='blue'
-                        color='white'
-                        resizeMode='stretch'
+                        style={styles.defaultColorTheme}
+                        resizeMode='cover'
                     />
                 </View>
                 <Text>resizeMode: 'contain'</Text>
                 <MathItem
                     math={rFrac}
-                    backgroundColor='blue'
-                    color='white'
-                    scaleToFit
-                    resizeMode='contain'
-                    config={{ ex: 50, em: 200, }}
+                    style={styles.defaultColorTheme}
+                    //config={{ ex: 50, em: 200, }}
                 />
                 <Text>resizeMode: 'cover'</Text>
                 <MathItem
                     math={rFrac}
-                    backgroundColor='blue'
-                    color='white'
-                    scaleToFit={false}
+                    style={styles.defaultColorTheme}
                     resizeMode='cover'
                 />
                 <Text>resizeMode: 'stretch'</Text>
                 <MathItem
                     math={rFrac}
-                    backgroundColor='blue'
-                    color='white'
-                    resizeMode='stretch'
-                    style={{ minHeight: 300, flex: 1 }}
+                    style={[styles.defaultColorTheme, { minHeight: 300, flex: 1 }]}
+                    resizeMode='cover'
                 />
                 <Text>chem: not fully supported</Text>
                 <MathItem
                     math={_.last(chemistry)}
-                    backgroundColor='blue'
-                    color='white'
-                    scaleToFit
+                    style={[styles.defaultColorTheme, { flex: 1, minHeight: 200 }]}
                     resizeMode='contain'
-                    style={{ flex: 1, minHeight: 200 }}
                 />
             </ScrollView>
         </View>

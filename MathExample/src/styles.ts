@@ -32,5 +32,9 @@ export default StyleSheet.create({
     },
     default: {
         flex: 1
+    },
+    defaultColorTheme: {
+        backgroundColor: 'blue',
+        color: 'white'
     }
 });

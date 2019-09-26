@@ -8,6 +8,7 @@ import TexParser from 'mathjax-full/js/input/tex/TexParser';
 import { mathjax } from 'mathjax-full/js/mathjax';
 import { SVG } from 'mathjax-full/js/output/svg';
 import { MathToSVGConfig, mathToSVGDefaultConfig } from './Config';
+import * as matrixUtil from 'transformation-matrix/src/index';
 
 function parseSize(size: string | number, config: Partial<MathToSVGConfig> = {}) {
     if (typeof size === 'number') return size;
@@ -87,12 +88,60 @@ export class MathjaxAdaptor {
         /*
         return _.map(this.splitMath(math), this.toSVG.bind(this)) as string[];
         */
+        const useCollection = this.elementsByTag(this.convert(math), 'use'));
+        console.log(_.map(useCollection, (n)=>this.accTransformations(n)))
+       // console.log(this.elementsByTag(this.adaptor.firstChild(this.convert(math)), 'use'))
+        const nodeList = accumulateTransformations(this.adaptor.clone(this.adaptor.firstChild(this.convert(math))), this.adaptor);
         
-        const nodeList = breakIntoSeperateTrees(this.adaptor.clone(this.adaptor.firstChild(this.convert(math))));
-        console.log(nodeList)
         return _.map(nodeList, node => MathjaxAdaptor.parseSVG(this.adaptor.outerHTML(node)));
         
     }
+
+    elementsByTag(node: LiteElement, name: string) {
+        let stack = [] as LiteNode[];
+        let tags = [] as LiteElement[];
+        let n: LiteNode = node;
+        while (n) {
+            if (n.kind !== '#text' && n.kind !== '#comment') {
+                n = n as LiteElement;
+                console.log(n.kind, _.isEqual(n.kind, name))
+                if (_.isEqual(n.kind, name)) {
+                    tags.push(n)
+                }
+                if (n.children.length) {
+                    stack = n.children.concat(stack);
+                }
+            }
+            n = stack.shift();
+        }
+        return tags;
+    }
+
+    transformationToMatrix(node: LiteElement) {
+        const transformAttr = _.get(node.attributes, 'transform', null);
+        if (!transformAttr) return;
+
+        const mat = matrixUtil.compose(matrixUtil.fromTransformAttribute(transformAttr));
+
+        switch (mat.type) {
+            case 'matrix':
+                return mat;
+            case 'translate':
+                return matrixUtil.compose(matrixUtil.translate(mat.tx, mat.ty || 0));
+        }
+        return transformAttr && matrixUtil.fromTransformAttribute(transformAttr);
+    }
+
+    accTransformations(node: LiteElement) {
+        let n = node;
+        const matrices = [];
+        while (n.parent) {
+            matrices.push(this.transformationToMatrix(n));
+            n = n.parent;
+        }
+        return matrixUtil.toSVG(matrixUtil.compose(_.compact(matrices)));
+    }
+
 
     /**
      * doesn't seem to increase performance dramatically, maybe even the opposite
@@ -103,7 +152,7 @@ export class MathjaxAdaptor {
         if (_.size(mathArray) > 0) {
             setTimeout(() => {
                 _.map(mathArray, (math) => this.toSVG(math));
-                if (__DEV__) console.log('Mathjax preload completed');
+                if (__DEV__) console.log('react-native-math-view: Mathjax preload completed');
             }, 0);
         }
     }
@@ -113,6 +162,54 @@ export const FactoryMemoize = _.memoize((stringifiedOptions: string) => new Math
 
 export default function (config?: Partial<MathToSVGConfig>) {
     return FactoryMemoize(JSON.stringify(_.defaultsDeep(config || {}, mathToSVGDefaultConfig)));
+}
+
+export function accumulateTransformations(node: LiteElement, adaptor: LiteAdaptor) {
+    let pathToDefs: Array<number | string> = [0];
+    const response: any[] = [];
+    //console.log( node.attributes)
+    
+
+    recurseThroughTree(node, (childNode, path) => {
+        if (childNode.kind === 'defs') pathToDefs = path;
+        else if (_.startsWith(_.join(path), _.join(pathToDefs))) return;
+
+        if (childNode.kind === 'use') {
+
+            const treeNodeList = _.map(_.without(path, 'children'), (key, index, collection) => {
+                const p = _.slice(collection, 0, index + 1);
+                return _.get(node, _.flatten(_.map(p, seg => (['children', seg]))));
+            });
+
+            const transformations = _.compact(_.map(treeNodeList, (node) => {
+                const transformAttr = _.get(node.attributes, 'transform', null);
+                if (!transformAttr) return;
+
+                const mat = matrixUtil.compose(matrixUtil.fromTransformAttribute(transformAttr));
+
+                switch (mat.type) {
+                    case 'matrix':
+                        return mat;
+                    case 'translate':
+                        return matrixUtil.compose(matrixUtil.translate(mat.tx, mat.ty || 0));
+                }
+                return transformAttr && matrixUtil.fromTransformAttribute(transformAttr);
+            }));
+
+            //console.log(treeNodeList[0].attributes, matrixUtil.toSVG(matrixUtil.compose(transformations)))
+
+            adaptor.setAttribute(treeNodeList[0], 'transform', matrixUtil.toSVG(matrixUtil.compose(transformations)))
+           // console.log(_.keys(adaptor))
+
+            const tree = _.reduceRight(_.initial(treeNodeList), (prev, curr, index, list) => {
+                return _.assign({}, curr, { children: [prev] });
+            }, _.last(treeNodeList));
+
+            response.push(_.set(_.assign({}, node), 'children', [_.get(node, `children.0`), tree]));
+        }
+    });
+
+    return response as LiteElement;
 }
 
 /**

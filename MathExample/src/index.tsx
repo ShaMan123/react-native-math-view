@@ -1,102 +1,26 @@
 
 import * as _ from 'lodash';
-import React, { useCallback, useMemo, useState } from 'react';
-import { Button, Switch, Text, View, StyleSheet } from 'react-native';
-import MathView, { MathProvider } from 'react-native-math-view';
-import Svg, { SvgXml, SvgFromXml, Use, G } from 'react-native-svg';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
+import { Button, StyleSheet, Switch, Text, View } from 'react-native';
+import { MathjaxFactory } from 'react-native-math-view';
+import { FactoryMemoize } from 'react-native-math-view/dist/MathjaxFactory';
 import AppContext from './Context';
 import DifferentLayouts from './DifferentLayouts';
 import FlexWrapMathSectionList from './FlexWrapMathSectionList';
 import { useInc, useWidth } from './Hooks';
-import MathStrings from './math';
+import MathStrings, { getRecursiveFrac, getTaylor } from './math';
+import MathItem from './MathItem';
 import MathSectionList from './MathSectionList';
 import Standalone from './Standalone';
 import styles from './styles';
 
-import { parse } from 'svg-parser';
-import hastToString from 'hast-util-to-string';
-import hastToJSX from '@mapbox/hast-util-to-jsx';
-import hastToHTML from 'hast-util-to-html';
-import MathItem from './MathItem';
 
 const numStates = 4;
 
 const interval = 3000;
 
 const allMath = _.flatten(_.values(MathStrings));
-
-const parsedSVG = parse(MathProvider.mathToSVG(allMath[0]));
-const svg = parsedSVG.children[0];
-const defs = _.filter(svg.children, (c) => c.tagName === 'defs')[0];
-const doc = _.reject(svg.children, (c) => c.tagName === 'defs');
-
-function getDef(id: string, defArr: any[] = defs) {
-    if (!id) return;
-    const use = _.find(defs.children, (def) => _.isEqual(_.get(def,'properties.id', null), id.substr(1)));
-    return use;
-}
-
-let mip: { el: any, path: string }[] = [];
-
-function iterateOverChildren(el: { children: any[] }, path?: string|undefined) {
-    return _.map(el.children, (child, index) => {
-        if (child.tagName === 'defs') return child;
-
-        path = `${path === undefined ? '' : `${path}.`}children.${index}`;
-        const xlinkHref = _.get(child.properties, `xlink:href`, null);
-        if (xlinkHref) {
-            const el = _.cloneDeep(child);
-            _.set(el, 'children', [getDef(xlinkHref)])
-            _.set(el, 'properties', _.omit(child.properties, 'xlink:href'));
-            mip.push({ el: child, path })
-            return el;
-        }
-        else {
-            iterateOverChildren(child, path);
-            return child;
-        }
-    })
-}
-
-//console.log(_.keys(svg));
-
-//_.map(doc, iterateOverChildren)
-iterateOverChildren(svg)
-const flatTree = _.map(mip, ({ el, path }) => {
-    const tree = _.cloneDeep(svg);
-    const defs = _.filter(svg.children, (c) => c.tagName === 'defs');
-    //_.set(tree, 'children', defs);
-    const p = _.tail(_.split(path, '.'));
-    _.reduce(p, (prev, curr, index) => {
-        const path = `${prev}.${curr}`;
-        if (curr === 'children') {
-            //_.set(tree, path, [])
-        }
-        else {
-            //_.set(tree, prev, []);
-            //const dest = index === 0 ? `${prev}.${defs.length}` : `${prev}.0`;
-            //_.set(tree, `${prev}.0`, _.get(svg, path));
-        }
-        return path;
-    }, path[0])
-    
-    //_.set(tree, 'children', []);
-    /*
-    let p = _.split(path, '.');
-    let branch = [el];
-    console.log(p)
-    const tree = _.cloneDeep(svg);
-    while (_.size(p) > 1) {
-        p = _.dropRight(p);
-        _.set(_.get(tree, p),
-        _.set(tree, p, [el]);
-    }
-    */
-    console.log(_.reject(tree.children, (c) => c.tagName === 'defs'));
-    return hastToHTML(tree);
-})
-
-//console.log(_.map(doc,iterateOverChildren));
+const test = allMath[0];//'\\cos\\left(x\\right)';
 
 function getTitle(index: number) {
     switch (index) {
@@ -110,7 +34,10 @@ function getTitle(index: number) {
 }
 
 export default function App() {
-    const [page, setPage] = useState(4);
+    useEffect(() => {
+        MathjaxFactory().preload(_.slice(allMath, 0, 5));
+    }, [])
+    const [page, setPage] = useState(-1);
 
     const [switchValue, setSwitchValue] = useState(false);
 
@@ -127,13 +54,26 @@ export default function App() {
         switch (page) {
             case -1:
                 return (
+                    <View style={styles.default}>
                     <View style={{ flex: 1, justifyContent: 'space-evenly' }}>
                         <PageSelector index={0} />
                         <PageSelector index={1} />
                         <PageSelector index={2} />
                         <PageSelector index={3} />
                         <PageSelector index={4} />
-                    </View>
+                        </View>
+                        <View style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <Button
+                                onPress={() => FactoryMemoize.cache.clear()}
+                                title='clear cache'
+                                color='blue'
+                            />
+                            <Button
+                                onPress={() => MathjaxFactory().preload(_.slice(allMath, 0, 10))}
+                                title='preload'
+                            />
+                        </View>
+                        </View>
                 );
             case 0: return <Standalone />
             case 1: return <MathSectionList />;
@@ -142,22 +82,59 @@ export default function App() {
             case 4:
                 return (
                     <View style={{ alignItems: 'flex-end', direction: 'ltr' }}>
-                        <MathItem math={allMath[0]} />
-                        <View style={[StyleSheet.absoluteFill, { alignItems: 'flex-end', flexDirection: 'row-reverse', margin: 5 }]}>
-                            {_.map(flatTree, (svg, index) => {
-                                console.log('fm',index, svg)
-                                return <MathItem key={`MEditable${index}`} math='abc' svg={svg} containerStyle={[styles.flexContainer, { margin: 0 }]} onPress={e => console.log(index)} />
-                            })}
-                        </View>
+                        <MathItem math={test} />
+
+                        {_.map(MathjaxFactory().toSVGArray(test), (svg, index) => {
+                            return (
+                                <View key={`MEditable${index}`} style={[StyleSheet.absoluteFill, { alignItems: 'flex-end', flexDirection: 'row-reverse', margin: 5 }]}>
+                                    <MathItem
+
+                                        //math='abc' 
+                                        math={svg}
+                                        containerStyle={[styles.flexContainer, { margin: 5 }]}
+                                        onPress={e => console.log(index)}
+                                    />
+                                </View>
+                            )
+                        })}
+
                     </View>
                 );
+                /*
                 return (
+                    <View style={{ alignItems: 'flex-end', direction: 'ltr' }}>
+                        <MathItem math={test} />
+                        
+                        {_.map(MathProvider.mathToSVG(test), (svg, index) => {
+                                return (
+                                    <View key={`MEditable${index}`} style={[StyleSheet.absoluteFill, { alignItems: 'flex-end', flexDirection: 'row-reverse', margin: 5 }]}>
+                                        <MathItem
+                                        
+                                            //math='abc' 
+                                            math={MathProvider.mathToSVG(test)}
+                                        containerStyle={[styles.flexContainer, { margin: 5 }]}
+                                        onPress={e => console.log(index)}
+                                        />
+                                    </View>
+                                    )
+                            })}
+                        
+                    </View>
+                );
+
+return (
                     <View style={{alignItems: 'flex-end', direction:'ltr'}}>
-                        <MathItem math={'\\cos\\left(x\\right)'} />
+                        <MathItem math={test} />
                         <View style={[StyleSheet.absoluteFill, { alignItems: 'flex-end', flexDirection:'row-reverse' ,margin:5}]}>
                             <MathItem math={'\\cos'} containerStyle={[styles.flexContainer, { margin: 0 }]} onPress={e=>console.log('cos')} />
                             <MathItem math={'\\left(x\\right)'} containerStyle={[styles.flexContainer, { margin: 0 }]} />
                             </View>
+                        </View>
+                    );
+                */
+                return (
+                    <View style={{alignItems: 'flex-end', direction:'ltr'}}>
+                        <MathItem math={test} />
                         </View>
                     );
             default: null

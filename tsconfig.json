@@ -17,7 +17,7 @@
     ],
     "types": [ "mathjax-full/js/adaptors/liteAdaptor.d.ts" ],
     "paths": {
-      "*": [ "*/index.android.ts", "*/index.ios.ts", "*.android.ts", "*.ios.ts", "/node_modules/*", "/node_modules/*/index.d.ts", "/node_modules/@types/*" ],
+      "*": [ "*/index.android.ts", "*/index.ios.ts", "*.android.ts", "*.ios.ts", "/node_modules/*", "/node_modules/*/index.d.ts", "/node_modules/*/*.d.ts", "/node_modules/@types/*" ],
       "transformation-matrix": [ "node_modules/transformation-matrix/transformation-matrix.d.ts" ],
       "mathjax-full": [ "node_modules/mathjax-full/js/mathjax.d.ts" ],
       "mathjax-full/*": [ "node_modules/mathjax-full/*" ]

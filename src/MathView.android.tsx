@@ -31,7 +31,41 @@ export interface MathViewProps extends ViewProps {
     config?: MathToSVGConfig
 }
 
+export interface MathViewBaseProps extends MathViewProps {
+    svg: string
+}
+
+/** call MathjaxFactory to create and cache an instance of @class {MathjaxAccessor} for future use */
 const mathjaxGlobal = MathjaxFactory();
+
+/**
+ * *****    CAUTION: use at own risk    ****
+ * use only for custom use cases
+ * A pass props rendering function
+ * MUST pass a valid `svg` prop
+ * 
+ * @param props
+ * @param ref
+ */
+function MathBaseView(props: MathViewBaseProps, ref: any) {
+    //  Layout Task Manager
+    //  -----------------------------------------------------------------------------------------------------------------------------------------------
+    //  used to remount RNMathView in order to recompute layout properly 
+    //  occurs after props.math changes svg
+    const key = useMemo(() => _.uniqueId('MathView'), [props.svg]);
+
+    return (
+        <RNMathView
+            {...props}
+            style={[styles.container, props.resizeMode === 'contain' && styles.contain, props.style]}
+            ref={ref}
+            hardwareAccelerated
+            key={key}
+        />
+    );
+}
+
+const ControlledMathView = forwardRef(MathBaseView);
 
 /**
  * uses async rendering for better performance in combination with memoization
@@ -61,20 +95,11 @@ function MathView(props: MathViewProps, ref: any) {
     //  uncomment this line and comment async rendering section to test sync rendering
     //const svg = useMemo(() => mathjax.toSVG(props.math), [props.math, mathjax]);
 
-    //  Layout Task Manager
-    //  -----------------------------------------------------------------------------------------------------------------------------------------------
-    //  used to remount RNMathView in order to recompute layout properly 
-    //  occurs after props.math changes svg
-    const key = useMemo(() => _.uniqueId('MathView'), [svg]);
-    
     return (
-        <RNMathView
+        <ControlledMathView
             {...props}
             svg={svg}
-            style={[styles.container, props.resizeMode === 'contain' && styles.contain, props.style]}
             ref={ref}
-            hardwareAccelerated
-            key={key}
         />
     );
 }
@@ -89,9 +114,14 @@ const styles = StyleSheet.create({
         maxWidth: '100%',
         maxHeight: '100%'
     }
-})
+});
 
 const MathViewWrapper = forwardRef(MathView);
+
+ControlledMathView.defaultProps = MathBaseView.defaultProps = {
+    resizeMode: 'contain',
+    config: {}
+} as Partial<MathViewBaseProps>;
 
 MathViewWrapper.defaultProps = MathView.defaultProps = {
     resizeMode: 'contain',
@@ -99,8 +129,11 @@ MathViewWrapper.defaultProps = MathView.defaultProps = {
 } as Partial<MathViewProps>;
 
 //@ts-ignore
-MathViewWrapper.Constants = Constants;
+MathViewWrapper.Constants = ControlledMathView.Constants = Constants;
 //@ts-ignore
-MathViewWrapper.getPreserveAspectRatio = (alignment: string, scale: string) => `${alignment} ${scale}`;
+MathViewWrapper.getPreserveAspectRatio = ControlledMathView.getPreserveAspectRatio = (alignment: string, scale: string) => `${alignment} ${scale}`;
 
-export default MathViewWrapper;
+export {
+    MathViewWrapper as default,
+    ControlledMathView
+}

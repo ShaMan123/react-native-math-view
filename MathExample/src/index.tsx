@@ -4,6 +4,7 @@ import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { Button, StyleSheet, Switch, Text, View } from 'react-native';
 import { MathjaxFactory } from 'react-native-math-view';
 import { FactoryMemoize } from 'react-native-math-view/dist/MathjaxFactory';
+import { ControlledMathView } from 'react-native-math-view/dist/MathView.android';
 import AppContext from './Context';
 import DifferentLayouts from './DifferentLayouts';
 import FlexWrapMathSectionList from './FlexWrapMathSectionList';
@@ -80,17 +81,45 @@ export default function App() {
             case 2: return <FlexWrapMathSectionList />;
             case 3: return <DifferentLayouts />;
             case 4:
+
+                return (
+                    <View style={{ alignItems: 'flex-end', direction: 'ltr' }}>
+                        <MathItem math={test} />
+                        
+                        {_.map(MathjaxFactory().toSVGArray(test), (svg, index) => {
+
+                            return (
+                                <View
+                                    key={`MEditable${index}`}
+                                    style={[StyleSheet.absoluteFill, { alignItems: 'flex-end', flexDirection: 'row-reverse', margin: 5 }]}
+                                >
+                                    <ControlledMathView
+                                        
+                                        //math='abc' 
+                                        //math={math}
+                                        svg={svg}
+                                        containerStyle={[styles.flexContainer, { margin: 0 }]}
+                                        style={{color:`rgb(${Math.pow(index,2)%255}, 255,0)`}}
+                                        onPress={e => console.log(index)}
+                                    />
+                                </View>
+                                )
+                            })}
+                      
+                    </View>
+                );
+
                 return (
                     <View style={{ alignItems: 'flex-end', direction: 'ltr' }}>
                         <MathItem math={test} />
 
-                        {_.map(MathjaxFactory().toSVGArray(test), (svg, index) => {
+                        {_.map(_.reject(MathjaxFactory().splitMath(test), math=>math.match(/((\\left)|(\\right))/)), (math, index) => {
                             return (
                                 <View key={`MEditable${index}`} style={[StyleSheet.absoluteFill, { alignItems: 'flex-end', flexDirection: 'row-reverse', margin: 5 }]}>
                                     <MathItem
 
                                         //math='abc' 
-                                        math={svg}
+                                        math={math}
                                         containerStyle={[styles.flexContainer, { margin: 5 }]}
                                         onPress={e => console.log(index)}
                                     />
@@ -101,26 +130,6 @@ export default function App() {
                     </View>
                 );
                 /*
-                return (
-                    <View style={{ alignItems: 'flex-end', direction: 'ltr' }}>
-                        <MathItem math={test} />
-                        
-                        {_.map(MathProvider.mathToSVG(test), (svg, index) => {
-                                return (
-                                    <View key={`MEditable${index}`} style={[StyleSheet.absoluteFill, { alignItems: 'flex-end', flexDirection: 'row-reverse', margin: 5 }]}>
-                                        <MathItem
-                                        
-                                            //math='abc' 
-                                            math={MathProvider.mathToSVG(test)}
-                                        containerStyle={[styles.flexContainer, { margin: 5 }]}
-                                        onPress={e => console.log(index)}
-                                        />
-                                    </View>
-                                    )
-                            })}
-                        
-                    </View>
-                );
 
 return (
                     <View style={{alignItems: 'flex-end', direction:'ltr'}}>

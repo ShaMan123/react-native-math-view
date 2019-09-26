@@ -84,9 +84,12 @@ export class MathjaxAdaptor {
     })
 
     toSVGArray(math: string) {
-        //return _.map(this.splitMath(math), this.toSVG.bind(this)) as string[];
-
+        /*
+        return _.map(this.splitMath(math), this.toSVG.bind(this)) as string[];
+        */
+        
         const nodeList = breakIntoSeperateTrees(this.adaptor.clone(this.adaptor.firstChild(this.convert(math))));
+        console.log(nodeList)
         return _.map(nodeList, node => MathjaxAdaptor.parseSVG(this.adaptor.outerHTML(node)));
         
     }

@@ -4,7 +4,7 @@
   "description": "Math view for react-native",
   "main": "dist",
   "esnext": "src",
-  "types": "react-native-math-view.d.ts",
+  "types": "dist/src/index.android.d.ts",
   "nativePackage": true,
   "scripts": {
     "release": "node ./scripts/publish",

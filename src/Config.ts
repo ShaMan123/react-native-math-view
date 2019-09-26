@@ -37,8 +37,9 @@ export interface MathToSVGConfig {
     /**
      * output the required CSS rather than the SVG itself
      * default: false 
+     * won't be used in react-native context
      * */
-    css: boolean,
+    //css: boolean,
 
     /**
      * whether to use a local font cache or not
@@ -53,6 +54,6 @@ export const mathToSVGDefaultConfig = {
     ex: 8,
     width: 80 * 16,
     packages: AllPackages,
-    css: false,
+    //css: false,
     fontCache: true
 } as MathToSVGConfig;

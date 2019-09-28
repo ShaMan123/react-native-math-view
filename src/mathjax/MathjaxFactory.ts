@@ -18,6 +18,7 @@ import { MathItem } from 'mathjax-full/js/core/MathItem';
 import { HTMLMathItem } from 'mathjax-full/js/handlers/html/HTMLMathItem';
 import { speechAction } from './SpeechAction';
 import { BBox } from 'mathjax-full/ts/core/MathItem';
+import * as TreeWalker from './TreeWalker';
 //import { MmlFactory } from 'mathjax-full/js/core/MmlTree/MmlFactory';
 /*
 declare const global: any;
@@ -42,7 +43,9 @@ export interface MathFragmentResponse {
         localCahceId: string,
         input: string,
         variant: string,
-        charCode: string
+        charCode16: string,
+        charCode: number,
+        char: string,
     },
     viewBox: LayoutRectangle,
     index: number
@@ -160,22 +163,26 @@ export class MathjaxAdaptor {
         return _.map(this.splitMath(math), this.toSVG.bind(this)) as string[];
         */
         const svgNode = this.adaptor.firstChild(this.convert(math)) as LiteElement;
+        const startMatrix = this.transformationToMatrix(svgNode);
 
         const viewBox = _.map(_.split(svgNode.attributes['viewBox'], ' '), parseFloat);
-        
-        const useCollection = this.elementsByTag(svgNode, 'use');
+        const [vbX, vbY, vbWidth, vbHeight] = viewBox;
+
+        const useCollection = _.compact(TreeWalker.walkDown(svgNode, (n, level) => n.children.length === 0 && n));
 
         const transforms = _.map(useCollection, (node) => this.accTransformations(node));
 
         const viewBoxes = _.map(transforms, (mat, index, collection) => {
             const box = _.clone(viewBox);
-            const x = mat.e - collection[0].e;
-            const y = mat.f - collection[0].f;
-            const width = _.get(collection, `${index + 1}.e`, viewBox[2]) - mat.e;
+            const x = mat.e - startMatrix.e;
+            const y = mat.f - startMatrix.f;
+            //const sx = Math.abs(mat.a * startMatrix.a);
+            //const sy = Math.abs(mat.d * startMatrix.d);
+            const width = _.get(collection, `${index + 1}.e`, vbWidth) - mat.e;
             const height = box[3];
-            
-            const h = _.mapValues({ x, width }, (value, key) => value / viewBox[2]);
-            const v = _.mapValues({ y, height }, (value, key) => value / viewBox[3]);
+
+            const h = _.mapValues({ x, width }, (value, key) => value / vbWidth);
+            const v = _.mapValues({ y, height }, (value, key) => value / vbHeight);
 
             return _.assign({}, h, v);
         });
@@ -209,32 +216,13 @@ export class MathjaxAdaptor {
         return _.zipWith(responseArr, viewBoxes, (res, viewBox) => _.assign(res, ({ viewBox }))) as MathFragmentResponse[];
         
     }
-    
-    elementsByTag(node: LiteElement, name: string) {
-        let stack = [] as LiteNode[];
-        let tags = [] as LiteElement[];
-        let n: LiteNode = node;
-        while (n) {
-            if (n.kind !== '#text' && n.kind !== '#comment') {
-                n = n as LiteElement;
-                if (_.isEqual(n.kind, name)) {
-                    tags.push(n)
-                }
-                if (n.children.length) {
-                    stack = n.children.concat(stack);
-                }
-            }
-            n = stack.shift();
-        }
-        return tags;
-    }
 
     transformationToMatrix(node: LiteElement) {
         const transformAttr = _.get(node.attributes, 'transform', null);
         const xAttr = _.get(node.attributes, 'x', 0);
         const yAttr = _.get(node.attributes, 'y', 0);
 
-        if (!transformAttr) return;
+        if (!transformAttr) return compose(matrixUtil.translate(0));
 
         const matrices = _.map(matrixUtil.fromTransformAttribute(transformAttr) as matrixUtil.MatrixDescriptor[], (mat) => {
             switch (mat.type) {
@@ -248,32 +236,17 @@ export class MathjaxAdaptor {
                     throw new Error(`Mathjax transformation accumulator unhandled command ${mat.type}`);
             }
         });
-
-        transformAttr.match('scale') && console.log(matrices, compose(matrixUtil.translate(xAttr, yAttr), ...matrices))
-
+        
         return compose(matrixUtil.translate(xAttr, yAttr), ...matrices);
     }
 
     accTransformations(node: LiteElement) {
-        const matrices = this.climbTree<matrixUtil.Matrix>(node, (n, level, acc) => {
+        const matrices = TreeWalker.walkUp<matrixUtil.Matrix>(node, (n, level, acc) => {
             return this.transformationToMatrix(n);
         });
 
-        return compose(..._.reverse(_.compact(matrices)));
+        return compose(..._.reverse(matrices));
     }   
-
-    climbTree<T>(node: LiteElement, callback: (node: LiteElement, ancestorLevel: number, accum: T[]) => T) {
-        let n = node;
-        let i = 0;
-        const accum: T[] = [];
-        while (n.parent) {
-            accum.push(callback(n, i, accum));
-            i++;
-            n = n.parent;
-        }
-        return accum;
-    }
-
 
     /**
      * doesn't seem to increase performance dramatically, maybe even the opposite

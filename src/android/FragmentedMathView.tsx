@@ -5,6 +5,7 @@ import { LayoutRectangle, StyleSheet, View, LayoutChangeEvent, Insets, Touchable
 import MathjaxFactory, { MathFragmentResponse } from '../mathjax/MathjaxFactory';
 import MathView, { ControlledMathView, MathViewProps } from './MathView';
 import HitRectUtil, { defaultHitSlop, MathFragmentRect } from './HitRectUtil';
+import * as TreeWalker from '../mathjax/TreeWalker';
 
 
 function useLayout(initial = { x: 0, y: 0, width: 0, height: 0 }) {
@@ -57,10 +58,20 @@ function FragmentedMathView(props: FragmentedMathViewProps, ref: any) {
         test: (x: number, y: number) => hitRectUtil.test(x, y),
         __test: (x: number, y: number) => {
            // console.log(test.current(x, y))
-
-            _.map(hitRectUtil.test(x, y), ({ node, namespace, index, hitResult }) => {
+            const hitResult = hitRectUtil.test(x, y);
+            /*
+            const augment = _.map(hitResult, (arg) => {
+                return arg.namespace.char.match(/[a-zA-Z]/) ? _.filter(data, ({ node: n }) => _.isEqual(arg.node.parent, n.parent)) : [arg.node];
+            });
+            */
+            _.map(hitResult, ({ node, namespace, index, hitResult }) => {
                 anima[index].setValue(2);
                 Animated.spring(anima[index], { toValue: 1, useNativeDriver: true, delay: 100 }).start();
+
+                TreeWalker.walkUp(node, (n, l) => {
+                    namespace.char.match(/[a-zA-Z]/)
+                })
+                
                 console.log(namespace.char)
             });
         },
@@ -110,9 +121,8 @@ function FragmentedMathView(props: FragmentedMathViewProps, ref: any) {
                     </Animated.View>
                 );
             })}
-            {__DEV__ /*&& props.dev*/ && layout && _.map(data, ({ svg, viewBox, namespace: { char } }, index) => {
-                const rect = _.pick(new MathFragmentRect().setRect(layout, viewBox), 'left', 'top', 'right', 'bottom', 'width', 'height')
-                console.log(layout, rect)
+            {__DEV__ && props.dev && layout && _.map(data, ({ svg, viewBox, namespace: { char } }, index) => {
+                const rect = _.pick(new MathFragmentRect().setRect(layout, viewBox), 'left', 'top', 'right', 'bottom', 'width', 'height');
                 return (
                     <View
                         key={`MathFragmentBorder${index}`}

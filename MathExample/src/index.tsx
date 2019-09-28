@@ -13,7 +13,7 @@ import MathItem from './MathItem';
 import MathSectionList from './MathSectionList';
 import Standalone from './Standalone';
 import styles from './styles';
-import { TapGestureHandler, RectButton } from 'react-native-gesture-handler';
+import { TapGestureHandler, RectButton, State } from 'react-native-gesture-handler';
 
 const numStates = 4;
 
@@ -33,13 +33,14 @@ function getTitle(index: number) {
     }
 }
 
-function MEEM() {
+function TouchableMathView() {
     const ref = useRef();
     return (
         <TapGestureHandler
             onHandlerStateChange={e => {
-                console.log('go go go', e.nativeEvent)
-                ref.current.__test(e.nativeEvent.x, e.nativeEvent.y)
+                //console.log('go go go', e.nativeEvent)
+                e.nativeEvent.state === State.ACTIVE && ref.current.__test(e.nativeEvent.x, e.nativeEvent.y)
+                //console.log(JSON.stringify(test))
             }}
             enabled
         >
@@ -100,7 +101,7 @@ export default function App() {
             case 1: return <MathSectionList />;
             case 2: return <FlexWrapMathSectionList />;
             case 3: return <DifferentLayouts />;
-            case 4: return <MEEM />
+            case 4: return <TouchableMathView />
                 
             default: null
         }

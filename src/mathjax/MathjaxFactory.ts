@@ -168,7 +168,7 @@ export class MathjaxAdaptor {
         const viewBox = _.map(_.split(svgNode.attributes['viewBox'], ' '), parseFloat);
         const [vbX, vbY, vbWidth, vbHeight] = viewBox;
 
-        const useCollection = _.compact(TreeWalker.walkDown(svgNode, (n, level) => n.children.length === 0 && n));
+        const useCollection = _.compact(TreeWalker.walkDown(svgNode, (n, level) => !TreeWalker.reject(n) && n.kind === 'use' && n /*n.children.length === 0 && n*/));
 
         const transforms = _.map(useCollection, (node) => this.accTransformations(node));
 
@@ -210,8 +210,6 @@ export class MathjaxAdaptor {
                 index
             };
         });
-
-       this.splitMath(math)
 
         return _.zipWith(responseArr, viewBoxes, (res, viewBox) => _.assign(res, ({ viewBox }))) as MathFragmentResponse[];
         

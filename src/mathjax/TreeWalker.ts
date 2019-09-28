@@ -50,5 +50,5 @@ export function walkDown<T>(node: LiteElement, callback: TreeWalkerCallback<T>) 
 }
 
 export function reject(node: LiteNode) {
-    return node.kind !== '#text' && node.kind !== '#comment';
+    return node.kind === '#text' || node.kind === '#comment';
 }

@@ -32,7 +32,7 @@ export default class Rect implements LayoutRectangle, Insets {
         return this.y + this.height * 0.5;
     }
 
-    set(left: number, top: number, right: number, bottom: number) {
+    protected set(left: number, top: number, right: number, bottom: number) {
         if (_.some([left, right, top, bottom], _.isNil)) throw new Error('react-native-math-view: invalid Rect dimension');
         this.left = left;
         this.top = top;
@@ -41,19 +41,19 @@ export default class Rect implements LayoutRectangle, Insets {
         return this;
     }
 
-    fromInsetsRect(rect: Insets) {
+    protected fromInsetsRect(rect: Insets) {
         return this.set(rect.left, rect.top, rect.right, rect.bottom);
     }
 
-    fromLayout(x: number, y: number, width: number, height: number) {
+    protected fromLayout(x: number, y: number, width: number, height: number) {
         return this.set(x, y, x + width, y + height);
     }
 
-    fromLayoutRect(rect: LayoutRectangle) {
+    protected fromLayoutRect(rect: LayoutRectangle) {
         return this.fromLayout(rect.x, rect.y, rect.width, rect.height);
     }
 
-    fromRect(rect: LayoutRectangle | Insets) {
+    protected fromRect(rect: LayoutRectangle | Insets) {
         return _.has(rect, 'width') && _.has(rect, 'height') ? this.fromLayoutRect(rect as LayoutRectangle) : this.fromInsetsRect(rect as Insets);
     }
 

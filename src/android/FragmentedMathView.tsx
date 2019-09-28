@@ -4,13 +4,8 @@ import React, { useState, useCallback, useRef, useMemo, MutableRefObject, useEff
 import { LayoutRectangle, StyleSheet, View, LayoutChangeEvent, Insets, TouchableOpacity, TouchableOpacityProps, GestureResponderEvent, I18nManager, Animated, Text } from 'react-native';
 import MathjaxFactory, { MathFragmentResponse } from '../mathjax/MathjaxFactory';
 import MathView, { ControlledMathView, MathViewProps } from './MathView';
+import HitRectUtil, { defaultHitSlop, MathFragmentRect } from './HitRectUtil';
 
-const defaultHitSlop = {
-    left: 0,
-    top: -20,
-    right: 0,
-    bottom: 20
-};
 
 function useLayout(initial = { x: 0, y: 0, width: 0, height: 0 }) {
     const [layout, setLayout] = useState<LayoutRectangle>(initial);
@@ -23,111 +18,49 @@ function useLayout(initial = { x: 0, y: 0, width: 0, height: 0 }) {
     */
 }
 
-/**
- * returns a rect relative to the view
- * @param layout
- * @param viewBox
- * @param hitSlop
- */
-function getFragmentRect(layout: LayoutRectangle, viewBox: LayoutRectangle, hitSlop: number | Insets = 0) {
-    const left = viewBox.x * layout.width;
-    const top = viewBox.y * layout.height;
-    const width = viewBox.width * layout.width;
-    const height = viewBox.height * layout.height;
-    const right = left + width;
-    const bottom = top + height;
-
-    const hitSlopRect = _.isNumber(hitSlop) ? _.mapValues(defaultHitSlop, (value, key) => hitSlop) : hitSlop as Insets;
-
-    const rect = {
-        left,
-        top,
-        right,
-        bottom
-    }
-
-    const hitRect = _.mapValues(rect, (value, key: keyof Insets) => value + _.get(hitSlopRect, key, 0));
-    
-    return {
-        ...rect,
-        width,
-        height,
-        test(x: number, y: number) {
-            const h = (x >= hitRect.left) && (x <= hitRect.right);
-            const v = y >= hitRect.top && y <= hitRect.bottom;
-            return h && v;
-        }
-    }
-}
-
-function HitTestFactory(layout: () => LayoutRectangle, data: MathFragmentResponse[], hitSlop: number | Insets) {
-    const rectMem = {
-        _layout: {} as LayoutRectangle,
-        data,
-        hitSlop,
-        __rects:[] as ReturnType<typeof getFragmentRect>,
-        __getRects() {
-            this.layout = layout();
-            this.data = data;
-            this.hitSlop = hitSlop;
-            this.__rects = _.map(data, ({ viewBox, namespace }, index) => getFragmentRect(layout(), viewBox, hitSlop));
-            return this.__rects;
-        },
-        
-        rects() {
-            const useMem = _.isEqual(this.layout, layout()) && _.isEqual(this.data, data) && _.isEqual(this.hitSlop, hitSlop);
-            return useMem ? this.__rects : this.__getRects();
-        }
-    }
-
-    return function test(x: number, y: number) {
-        const response = _.invokeMap(rectMem.rects(), 'test', x, y);
-        return _.filter(data, (v, i) => response[i]);
-    }
-    
-}
-
-
 interface FragmentedMathViewProps extends MathViewProps {
-    hitSlop: number | Insets
+    hitSlop: number | Insets,
+    dev: boolean
 }
 
-const AnimatedControlledMathView = Animated.createAnimatedComponent(ControlledMathView);
-
-function FragmentedMathView(props: MathViewProps, ref: any) {
+function FragmentedMathView(props: FragmentedMathViewProps, ref: any) {
     const [layout, onLayout] = useLayout(null);
-   
-    const test = useRef<ReturnType<typeof HitTestFactory>>(() => { });
-    /*
-     *  const [data, setData] = useState([]);
-    useEffect(() => {
-        setData(MathjaxFactory().toSVGArray(props.math));
-    }, []);
-    */
-    const data = useMemo(() => layout && MathjaxFactory().toSVGArray(props.math), [layout]);
+    //const data = useMemo(() => layout && MathjaxFactory().toSVGArray(props.math), [layout, props.math]);
+    const [data, setData] = useState<MathFragmentResponse[]>();
+    const hitRectUtil = useMemo(() => new HitRectUtil(), []);
 
     useEffect(() => {
-        _.set(test, 'current', HitTestFactory(() => layout, data, props.hitSlop))
-    }, [layout, data, props.hitSlop]);
+        if (!layout) return;
+        setData(MathjaxFactory().toSVGArray(props.math));
+    }, [props.math, layout]);
+
+    useEffect(() => {
+        if (layout && data) hitRectUtil.set(layout, data);
+    }, [layout, data, hitRectUtil]);
+
+    useEffect(() => {
+        hitRectUtil.setHitSlop(props.hitSlop);
+    }, [props.hitSlop, hitRectUtil]);
+
     
     const __ref = useRef();
     const anima = useMemo(() => _.map(new Array(_.size(data)), () => new Animated.Value(1)), [data]);
     const animaF = useMemo(() => _.map(data, ({ viewBox }, i) => {
-        const rect = getFragmentRect(layout, viewBox, 0);
+        if (!layout || !data) return;
+        const rect = new MathFragmentRect().setRect(layout, viewBox);
         return Animated.multiply(layout.width * 0.5 - rect.left, Animated.subtract(anima[i], 1));
-    }), [layout, anima]);
+    }), [layout, data, anima]);
 
     //console.warn('FragmentedMathView bug intializng ref, unmount and remount and see if you manage to cet the ref')
 
     useImperativeHandle(ref, () => _.assign({}, __ref.current, {
-        test,
+        test: (x: number, y: number) => hitRectUtil.test(x, y),
         __test: (x: number, y: number) => {
            // console.log(test.current(x, y))
 
-            _.map(test.current(x, y), ({ node, namespace, index }) => {
-                //console.log(index)
+            _.map(hitRectUtil.test(x, y), ({ node, namespace, index, hitResult }) => {
                 anima[index].setValue(2);
-                Animated.spring(anima[index], { toValue: 1, /*useNativeDriver: true,*/ delay: 100 }).start();
+                Animated.spring(anima[index], { toValue: 1, useNativeDriver: true, delay: 100 }).start();
                 console.log(namespace.char)
             });
         },
@@ -150,6 +83,7 @@ function FragmentedMathView(props: MathViewProps, ref: any) {
         <Animated.View
             collapsable={false}
             style={styles.flexContainer}
+            renderToHardwareTextureAndroid
         >
             <MathView
                 {...props}
@@ -157,9 +91,10 @@ function FragmentedMathView(props: MathViewProps, ref: any) {
                 onLayout={onLayout}
                 //style={{ color: 'green', backgroundColor: 'red', opacity: 0.3 }}
                 ref={__ref}
+                
             />
 
-            {_.map(data, ({ svg, viewBox, namespace: { char } }, index) => {
+            {layout && data && _.map(data, ({ svg, viewBox, namespace: { char } }, index) => {
                 return (
                     <Animated.View
                         pointerEvents='none'
@@ -167,32 +102,29 @@ function FragmentedMathView(props: MathViewProps, ref: any) {
                         style={[StyleSheet.absoluteFill, styles.flexContainer, { transform: [{ translateX: animaF[index] },{ scale: anima[index] }]}]}
                     >
                         <ControlledMathView
-
-                            //math='abc' 
-                            //math={math}
                             {...props}
                             svg={svg}
-                            //containerStyle={[styles.flexContainer, { margin: 0 }]}
-                            style={[{ color: 'blue' }]}
-                        //onLayout={e=>console.log(e.nativeEvent)}
+                            style={{ color: 'blue' }}
                         />
 
                     </Animated.View>
                 );
             })}
-            {__DEV__ && layout && _.map(data, ({ svg, viewBox, namespace: { char } }, index) => {
+            {__DEV__ /*&& props.dev*/ && layout && _.map(data, ({ svg, viewBox, namespace: { char } }, index) => {
+                const rect = _.pick(new MathFragmentRect().setRect(layout, viewBox), 'left', 'top', 'right', 'bottom', 'width', 'height')
+                console.log(layout, rect)
                 return (
-                    <Text
+                    <View
                         key={`MathFragmentBorder${index}`}
                         style={[StyleSheet.absoluteFill, {
                             borderColor: 'blue',
                             borderWidth: 2,
-                            ..._.omit(getFragmentRect(layout, viewBox, 0), 'test'),
+                            ...rect,
                             opacity: 0.5
                         }]}
                     >
-                        {char}
-                    </Text>
+                        <Text>{char}</Text>
+                    </View>
                 );
                 })}
         </Animated.View>
@@ -237,7 +169,8 @@ const FragmentedMathViewWrapper = React.forwardRef(FragmentedMathView);
 
 FragmentedMathViewWrapper.defaultProps = FragmentedMathView.defaultProps = {
     resizeMode: 'contain',
-    hitSlop: defaultHitSlop
+    hitSlop: defaultHitSlop,
+    dev: false
 } as Partial<FragmentedMathViewProps>;
 
 export default FragmentedMathViewWrapper;

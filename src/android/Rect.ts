@@ -31,33 +31,30 @@ export default class Rect implements LayoutRectangle, Insets {
     get centerY() {
         return this.y + this.height * 0.5;
     }
-    
-    protected constructor(left: number, top: number, right: number, bottom: number) {
+
+    set(left: number, top: number, right: number, bottom: number) {
         if (_.some([left, right, top, bottom], _.isNil)) throw new Error('react-native-math-view: invalid Rect dimension');
         this.left = left;
         this.top = top;
         this.right = right;
         this.bottom = bottom;
+        return this;
     }
 
-    static fromInsets(left: number, top: number, right: number, bottom: number) {
-        return new Rect(left, right, top, bottom);
+    fromInsetsRect(rect: Insets) {
+        return this.set(rect.left, rect.top, rect.right, rect.bottom);
     }
 
-    static fromInsetsRect(rect: Insets) {
-        return Rect.fromInsets(rect.left, rect.top, rect.right, rect.bottom);
+    fromLayout(x: number, y: number, width: number, height: number) {
+        return this.set(x, y, x + width, y + height);
     }
 
-    static fromLayout(x: number, y: number, width: number, height: number) {
-        return new Rect(x, y, x + width, y + height);
+    fromLayoutRect(rect: LayoutRectangle) {
+        return this.fromLayout(rect.x, rect.y, rect.width, rect.height);
     }
 
-    static fromLayoutRect(rect: LayoutRectangle) {
-        return Rect.fromLayout(rect.x, rect.y, rect.width, rect.height);
-    }
-
-    static fromRect(rect: LayoutRectangle | Insets) {
-        return _.has(rect, 'width') && _.has(rect, 'height') ? Rect.fromLayoutRect(rect as LayoutRectangle) : Rect.fromInsetsRect(rect as Insets);
+    fromRect(rect: LayoutRectangle | Insets) {
+        return _.has(rect, 'width') && _.has(rect, 'height') ? this.fromLayoutRect(rect as LayoutRectangle) : this.fromInsetsRect(rect as Insets);
     }
 
     inset(left: number, top: number, right: number, bottom: number) {
@@ -73,7 +70,7 @@ export default class Rect implements LayoutRectangle, Insets {
     }
 
     clone() {
-        return Rect.fromInsetsRect(this);
+        return new Rect().fromInsetsRect(this);
     }
 
     test(x: number, y: number) {

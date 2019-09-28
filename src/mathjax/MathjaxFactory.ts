@@ -16,6 +16,8 @@ import { MathML } from 'mathjax-full/js/input/mathml';
 import { MathList } from 'mathjax-full/js/core/MathList';
 import { MathItem } from 'mathjax-full/js/core/MathItem';
 import { HTMLMathItem } from 'mathjax-full/js/handlers/html/HTMLMathItem';
+import { speechAction } from './SpeechAction';
+import { BBox } from 'mathjax-full/ts/core/MathItem';
 //import { MmlFactory } from 'mathjax-full/js/core/MmlTree/MmlFactory';
 /*
 declare const global: any;
@@ -84,9 +86,7 @@ export class MathjaxAdaptor {
             //enrichSpeech: options.enrichSpeech
         });
 
-        //this.svg.factory.wrap(math.root).getBBox();
-        
-        ///this.html.addRenderAction('test_action',[(...args) => {console.log(...args)}])
+        //this.html.addRenderAction('mip', ...speechAction.simplfy);
     }
 
     protected get adaptor() {
@@ -130,7 +130,23 @@ export class MathjaxAdaptor {
         while (parser.i < parser.string.length) {
             response.push(parser.GetArgument(math, true))
         }
+        /*
+         * try to compose bbox
+        const mathItems = _.map(response, (frag, index, collection) => {
+            const bip = new HTMLMathItem(frag, this.tex, true);
+            bip.compile(this.html.document)
+            bip.bbox = this.svg.getBBox(bip, this.html);
+            return bip;
+        });
 
+        _.reduce(mathItems, (acc, val) => {
+            const { w, h, d } = val.bbox;
+            _.set(val.bbox, 'x', acc);
+            return acc + w;
+        }, 0);
+
+        console.log(_.map(mathItems, (m)=>[m.bbox, m.math]))
+       */
         return response as string[];
     })
 
@@ -179,50 +195,21 @@ export class MathjaxAdaptor {
 
             const clone = this.adaptor.clone(svgNode);
             clone.children = [clone.children[0], n];
-            /*
-            const bip = new HTMLMathItem('\\alpha', this.tex, true);
-            bip.compile(this.html.document);            
-            */
-            //this.adaptor.setAttribute(clone, 'viewBox', viewBoxes[index]);
-            //console.log(clone.attributes['viewBox'], viewBoxes[index])
+            
             return {
                 node: clone,
                 svg: MathjaxAdaptor.parseSVG(this.adaptor.outerHTML(clone)),
                 namespace,
-                index,
-                //bbox: this.svg.getBBox(bip, this.html)
+                index
             };
         });
-        
-       
-        /*
-        console.log(_.map(this.svg.fontCache.getCache(), (node) => {
-            let stack = [] as LiteNode[];
-            let tags = [] as LiteElement[];
-            let n: LiteNode = node;
-            while (n) {
-                if (n.kind !== '#text' && n.kind !== '#comment') {
-                    n = n as LiteElement;
-                    if (_.size(n.children) === 0) {
-                        tags.push(_.get(n,'attributes.id'));
-                    }
-                    if (_.size(n.children)>0) {
-                        stack = n.children.concat(stack);
-                    }
-                }
-                n = stack.shift();
-            }
-            return _.map(_.compact(tags), (id) => String.fromCharCode(_.last(_.split(id, '-'))));
-        }));
-        */
+
+       this.splitMath(math)
+
         return _.zipWith(responseArr, viewBoxes, (res, viewBox) => _.assign(res, ({ viewBox }))) as MathFragmentResponse[];
         
     }
-
-    getBBox() {
-
-    }
-
+    
     elementsByTag(node: LiteElement, name: string) {
         let stack = [] as LiteNode[];
         let tags = [] as LiteElement[];
@@ -248,6 +235,7 @@ export class MathjaxAdaptor {
         const yAttr = _.get(node.attributes, 'y', 0);
 
         if (!transformAttr) return;
+
         const matrices = _.map(matrixUtil.fromTransformAttribute(transformAttr) as matrixUtil.MatrixDescriptor[], (mat) => {
             switch (mat.type) {
                 case 'matrix':
@@ -261,18 +249,28 @@ export class MathjaxAdaptor {
                     break;
             }
         });
+
         return compose(matrixUtil.translate(xAttr, yAttr), ...matrices);
     }
 
     accTransformations(node: LiteElement) {
+        const matrices = this.climbTree<matrixUtil.Matrix>(node, (n, level, acc) => {
+            return this.transformationToMatrix(n);
+        });
+
+        return compose(..._.compact(matrices));
+    }   
+
+    climbTree<T>(node: LiteElement, callback: (node: LiteElement, ancestorLevel: number, accum: T[]) => T) {
         let n = node;
-        const matrices = [];
+        let i = 0;
+        const accum: T[] = [];
         while (n.parent) {
-            matrices.push(this.transformationToMatrix(n));
+            accum.push(callback(n, i, accum));
+            i++;
             n = n.parent;
         }
-        
-        return compose(..._.compact(matrices));
+        return accum;
     }
 
 

@@ -1,8 +1,8 @@
 
 import * as _ from 'lodash';
 import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
-import { Button, LayoutRectangle, StyleSheet, Switch, Text, View } from 'react-native';
-import MathView, { ControlledMathView } from 'react-native-math-view/src';
+import { Button, LayoutRectangle, StyleSheet, Switch, Text, View, SectionList, Animated } from 'react-native';
+import MathView, { ControlledMathView, MathViewProps } from 'react-native-math-view/src';
 import MathjaxFactory, { FactoryMemoize } from 'react-native-math-view/src/mathjax';
 import AppContext from './Context';
 import DifferentLayouts from './DifferentLayouts';
@@ -13,7 +13,7 @@ import MathItem from './MathItem';
 import MathSectionList from './MathSectionList';
 import Standalone from './Standalone';
 import styles from './styles';
-import { TapGestureHandler, RectButton, State } from 'react-native-gesture-handler';
+import { TapGestureHandler, RectButton, State, FlatList, TapGestureHandlerStateChangeEvent } from 'react-native-gesture-handler';
 
 const numStates = 4;
 
@@ -33,24 +33,34 @@ function getTitle(index: number) {
     }
 }
 
-function TouchableMathView() {
+function TouchableMathView({ math }: MathViewProps) {
+    const [editable, setEditable] = useState(false);
     const ref = useRef();
+    const reactToTouch = useCallback((x: number, y: number) => ref.current && ref.current.__test(x, y), [ref]);
+    /*
+    useEffect(() => {
+        console.log()
+    })
+    */
     return (
         <TapGestureHandler
             onHandlerStateChange={e => {
+                if (!editable) setEditable(true);
                 //console.log('go go go', e.nativeEvent)
-                e.nativeEvent.state === State.ACTIVE && ref.current.__test(e.nativeEvent.x, e.nativeEvent.y)
-                //console.log(JSON.stringify(test))
+                e.nativeEvent.state === State.ACTIVE && reactToTouch(e.nativeEvent.x, e.nativeEvent.y)
             }}
             enabled
         >
-            <MathView
-                math={test}
-                action='edit'
-                ref={ref}
-            />
+            <Animated.View collapsable={false}>
+                <MathItem
+                    math={math}
+                    action={editable ? 'edit' : 'none'}
+                    ref={ref}
+                    containerStyle={[styles.flexContainer, { justifyContent: 'flex-end'}]}
+                />
+            </Animated.View>
         </TapGestureHandler>
-    )
+    );
 }
 
 export default function App() {
@@ -101,7 +111,12 @@ export default function App() {
             case 1: return <MathSectionList />;
             case 2: return <FlexWrapMathSectionList />;
             case 3: return <DifferentLayouts />;
-            case 4: return <TouchableMathView />
+            case 4: return <FlatList
+                style={styles.default}
+                data={allMath}
+                renderItem={({ item: math }) => <TouchableMathView math={math} />}
+                keyExtractor={(m, i) => `TouchableMathView${i}`}
+            />
                 
             default: null
         }

@@ -5,7 +5,6 @@ import { LayoutRectangle, StyleSheet, View, LayoutChangeEvent, Insets, Touchable
 import MathjaxFactory, { MathFragmentResponse } from '../mathjax/MathjaxFactory';
 import MathView, { ControlledMathView, MathViewProps } from './MathView';
 
-
 const defaultHitSlop = {
     left: 0,
     top: -20,
@@ -101,17 +100,17 @@ function FragmentedMathView(props: MathViewProps, ref: any) {
     const __ref = useRef();
     const anima = useMemo(() => _.map(new Array(_.size(data)), () => new Animated.Value(1)), []);
 
-    console.warn('FragmentedMathView bug intializng ref, unmount and remount and see if you manage to cet the ref')
+    //console.warn('FragmentedMathView bug intializng ref, unmount and remount and see if you manage to cet the ref')
 
     useImperativeHandle(ref, () => _.assign({}, __ref.current, {
         test,
         __test: (x: number, y: number) => {
-            console.log(test.current(x, y))
-            _.map(test.current(x, y), ({ namespace, index }) => {
+           // console.log(test.current(x, y))
+            _.map(test.current(x, y), ({ node, namespace, index }) => {
                 //console.log(index)
                 anima[index].setValue(2);
                 Animated.spring(anima[index], { toValue: 1, useNativeDriver: true, delay: 100 }).start();
-                //String.fromCharCode(namespace.charCode)
+                console.log(namespace.char)
             });
         },
         __pip() {
@@ -138,7 +137,7 @@ function FragmentedMathView(props: MathViewProps, ref: any) {
                 {...props}
                 //containerStyle={{ backgroundColor: 'red', opacity: 0 }}
                 onLayout={onLayout}
-                style={{ color: 'green', backgroundColor: 'red', opacity: 0.3 }}
+                //style={{ color: 'green', backgroundColor: 'red', opacity: 0.3 }}
                 ref={__ref}
             />
 
@@ -195,8 +194,8 @@ function FragmentedMathView(props: MathViewProps, ref: any) {
 const styles = StyleSheet.create({
     flexContainer: {
         display: 'flex',
-        flexDirection: 'row'
-
+        flexDirection: 'row',
+        justifyContent: 'flex-end'
     },
 });
 

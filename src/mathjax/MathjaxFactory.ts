@@ -243,12 +243,13 @@ export class MathjaxAdaptor {
                 case 'translate':
                     return compose(matrixUtil.translate(mat.tx, mat.ty || 0));
                 case 'scale':
-                    return compose(matrixUtil.scale(mat.sx || 1, mat.sy || 1));
+                    return compose(matrixUtil.scale(mat.sx || 1, mat.sy || mat.sx || 1));
                 default:
-                    if (_.isString(mat.type)) throw new Error(`Mathjax transformation accumulator unhandled command ${mat.type}`);
-                    break;
+                    throw new Error(`Mathjax transformation accumulator unhandled command ${mat.type}`);
             }
         });
+
+        transformAttr.match('scale') && console.log(matrices, compose(matrixUtil.translate(xAttr, yAttr), ...matrices))
 
         return compose(matrixUtil.translate(xAttr, yAttr), ...matrices);
     }
@@ -258,7 +259,7 @@ export class MathjaxAdaptor {
             return this.transformationToMatrix(n);
         });
 
-        return compose(..._.compact(matrices));
+        return compose(..._.reverse(_.compact(matrices)));
     }   
 
     climbTree<T>(node: LiteElement, callback: (node: LiteElement, ancestorLevel: number, accum: T[]) => T) {

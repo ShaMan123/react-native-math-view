@@ -1,16 +1,35 @@
 import * as _ from 'lodash';
+import { EnrichHandler } from 'mathjax-full/js/a11y/semantic-enrich';
 import { LiteElement, LiteNode } from 'mathjax-full/js/adaptors/lite/Element';
-import { liteAdaptor, LiteAdaptor } from 'mathjax-full/js/adaptors/liteAdaptor';
+import { liteAdaptor } from 'mathjax-full/js/adaptors/liteAdaptor';
 import { MathDocument } from 'mathjax-full/js/core/MathDocument';
 import { RegisterHTMLHandler } from 'mathjax-full/js/handlers/html';
 import { TeX } from 'mathjax-full/js/input/tex';
 import TexParser from 'mathjax-full/js/input/tex/TexParser';
 import { mathjax } from 'mathjax-full/js/mathjax';
 import { SVG } from 'mathjax-full/js/output/svg';
-import { MathToSVGConfig, mathToSVGDefaultConfig } from './Config';
-import * as matrixUtil from 'transformation-matrix';
 import { LayoutRectangle } from 'react-native';
+import * as matrixUtil from 'transformation-matrix';
+import { MathToSVGConfig, mathToSVGDefaultConfig } from './Config';
 
+import { MathML } from 'mathjax-full/js/input/mathml';
+import { MathList } from 'mathjax-full/js/core/MathList';
+import { MathItem } from 'mathjax-full/js/core/MathItem';
+import { HTMLMathItem } from 'mathjax-full/js/handlers/html/HTMLMathItem';
+//import { MmlFactory } from 'mathjax-full/js/core/MmlTree/MmlFactory';
+/*
+declare const global: any;
+global.SRE_JSON_PATH = '../../node_modules/speech-rule-engine/lib/mathmaps';
+import SRE from 'speech-rule-engine/lib/sre';
+global.SRE = SRE;
+global.sre = Object.create(SRE);
+global.sre.Engine = { isReady() { return SRE.engineReady() } };
+//import 'mathjax-full/js/a11y/sre-node';
+
+mathjax.asyncLoad = (name: string) => console.log('asunload', name);
+
+console.log(sre)
+*/
 const compose = matrixUtil.transform;
 
 export interface MathFragmentResponse {
@@ -42,22 +61,40 @@ export class MathjaxAdaptor {
 
     constructor(options: MathToSVGConfig) {
         this.options = options;
+
         //
         //  Create DOM adaptor and register it for HTML documents
         //
         const adaptor = liteAdaptor();
-        RegisterHTMLHandler(adaptor);
+        const htmlHander = RegisterHTMLHandler(adaptor);
+        //EnrichHandler(htmlHander, new MathML());
 
         //
         //  Create input and output jax and a document using them on the content from the HTML file
         //
         this.tex = new TeX({ packages: options.packages });
-        this.svg = new SVG({ fontCache: (options.fontCache ? 'local' : 'none') });
-        this.html = mathjax.document('', { InputJax: this.tex, OutputJax: this.svg });
+        this.svg = new SVG({
+            fontCache: (options.fontCache ? 'local' : 'none'),
+            internalSpeechTitles: true
+        });
+        
+        this.html = mathjax.document('', {
+            InputJax: this.tex,
+            OutputJax: this.svg
+            //enrichSpeech: options.enrichSpeech
+        });
+
+        //this.svg.factory.wrap(math.root).getBBox();
+        
+        ///this.html.addRenderAction('test_action',[(...args) => {console.log(...args)}])
     }
 
     protected get adaptor() {
         return this.html.adaptor as ReturnType<typeof liteAdaptor>;
+    }
+
+    protected get mmlFactory() {
+        return this.html.mmlFactory;
     }
 
     protected get convertOptions() {
@@ -65,7 +102,7 @@ export class MathjaxAdaptor {
             display: !this.options.inline,
             em: this.options.em,
             ex: this.options.ex,
-            containerWidth: this.options.width
+            containerWidth: this.options.width,
         }
     }
 
@@ -133,24 +170,31 @@ export class MathjaxAdaptor {
             const transform = this.accTransformations(node);
 
             const xlinkHref = _.get(node.attributes, 'xlink:xlink:href', _.get(node.attributes, 'xlink:href'));
-            const idHints = _.split(xlinkHref, '-');
+            const splitId = _.split(xlinkHref, '-');
+            const charCode = parseInt(_.last(splitId), 16);
+            const char = String.fromCharCode(charCode);
+            const namespace = _.zipObject(['ns', 'localCahceId', 'input', 'variant', 'charCode16', 'charCode', 'char'], _.concat(splitId, charCode, char));
 
             this.adaptor.setAttribute(n, 'transform', matrixUtil.toSVG(transform));
 
             const clone = this.adaptor.clone(svgNode);
             clone.children = [clone.children[0], n];
-
+            /*
+            const bip = new HTMLMathItem('\\alpha', this.tex, true);
+            bip.compile(this.html.document);            
+            */
             //this.adaptor.setAttribute(clone, 'viewBox', viewBoxes[index]);
             //console.log(clone.attributes['viewBox'], viewBoxes[index])
             return {
                 node: clone,
                 svg: MathjaxAdaptor.parseSVG(this.adaptor.outerHTML(clone)),
-                namespace: _.zipObject(['ns', 'localCahceId', 'input', 'variant', 'charCode'], idHints),
-                index
+                namespace,
+                index,
+                //bbox: this.svg.getBBox(bip, this.html)
             };
         });
-
         
+       
         /*
         console.log(_.map(this.svg.fontCache.getCache(), (node) => {
             let stack = [] as LiteNode[];
@@ -172,17 +216,11 @@ export class MathjaxAdaptor {
         }));
         */
         return _.zipWith(responseArr, viewBoxes, (res, viewBox) => _.assign(res, ({ viewBox }))) as MathFragmentResponse[];
-        /*
-        return _.map(nodeList, node => MathjaxAdaptor.parseSVG(this.adaptor.outerHTML(node)));
-        return []
-        console.log(_.map(nodeList, node => MathjaxAdaptor.parseSVG(this.adaptor.outerHTML(node))))
-        //console.log(this.adaptor.firstChild(this.convert(math)).attributes, this.convert(math).styles)
-       // console.log(this.elementsByTag(this.adaptor.firstChild(this.convert(math)), 'use'))
-       // const nodeList = breakIntoSeperateTrees(this.adaptor.clone(this.adaptor.firstChild(this.convert(math))));
         
-        return _.map(nodeList, node => MathjaxAdaptor.parseSVG(this.adaptor.outerHTML(node)));
-        */
-        
+    }
+
+    getBBox() {
+
     }
 
     elementsByTag(node: LiteElement, name: string) {
@@ -206,8 +244,11 @@ export class MathjaxAdaptor {
 
     transformationToMatrix(node: LiteElement) {
         const transformAttr = _.get(node.attributes, 'transform', null);
+        const xAttr = _.get(node.attributes, 'x', 0);
+        const yAttr = _.get(node.attributes, 'y', 0);
+
         if (!transformAttr) return;
-        const matrices = _.map(matrixUtil.fromTransformAttribute(transformAttr), (mat) => {
+        const matrices = _.map(matrixUtil.fromTransformAttribute(transformAttr) as matrixUtil.MatrixDescriptor[], (mat) => {
             switch (mat.type) {
                 case 'matrix':
                     return mat;
@@ -219,8 +260,8 @@ export class MathjaxAdaptor {
                     if (_.isString(mat.type)) throw new Error(`Mathjax transformation accumulator unhandled command ${mat.type}`);
                     break;
             }
-        })
-        return compose(matrices);
+        });
+        return compose(matrixUtil.translate(xAttr, yAttr), ...matrices);
     }
 
     accTransformations(node: LiteElement) {
@@ -231,7 +272,7 @@ export class MathjaxAdaptor {
             n = n.parent;
         }
         
-        return compose(_.compact(matrices));
+        return compose(..._.compact(matrices));
     }
 
 
@@ -255,93 +296,3 @@ export const FactoryMemoize = _.memoize((stringifiedOptions: string) => new Math
 export default function (config?: Partial<MathToSVGConfig>) {
     return FactoryMemoize(JSON.stringify(_.defaultsDeep(config || {}, mathToSVGDefaultConfig)));
 }
-
-export function accumulateTransformations(node: LiteElement, adaptor: LiteAdaptor) {
-    let pathToDefs: Array<number | string> = [0];
-    const response: any[] = [];
-    //console.log( node.attributes)
-    
-
-    recurseThroughTree(node, (childNode, path) => {
-        if (childNode.kind === 'defs') pathToDefs = path;
-        else if (_.startsWith(_.join(path), _.join(pathToDefs))) return;
-
-        if (childNode.kind === 'use') {
-
-            const treeNodeList = _.map(_.without(path, 'children'), (key, index, collection) => {
-                const p = _.slice(collection, 0, index + 1);
-                return _.get(node, _.flatten(_.map(p, seg => (['children', seg]))));
-            });
-
-            const transformations = _.compact(_.map(treeNodeList, (node) => {
-                const transformAttr = _.get(node.attributes, 'transform', null);
-                if (!transformAttr) return;
-
-                const mat = compose(matrixUtil.fromTransformAttribute(transformAttr));
-
-                switch (mat.type) {
-                    case 'matrix':
-                        return mat;
-                    case 'translate':
-                        return compose(matrixUtil.translate(mat.tx, mat.ty || 0));
-                }
-                return transformAttr && matrixUtil.fromTransformAttribute(transformAttr);
-            }));
-
-            //console.log(treeNodeList[0].attributes, matrixUtil.toSVG(compose(transformations)))
-
-            adaptor.setAttribute(treeNodeList[0], 'transform', matrixUtil.toSVG(compose(transformations)))
-           // console.log(_.keys(adaptor))
-
-            const tree = _.reduceRight(_.initial(treeNodeList), (prev, curr, index, list) => {
-                return _.assign({}, curr, { children: [prev] });
-            }, _.last(treeNodeList));
-
-            response.push(_.set(_.assign({}, node), 'children', [_.get(node, `children.0`), tree]));
-        }
-    });
-
-    return response as LiteElement;
-}
-
-/**
- * This method iterates through the entire node and breaks it up into seperate SVG node,
- * each containing a single leaf and it's entire tree
- * This was developed in order to manage seperate symbols in a math string
- * @param node adaptor.firstChild(node)
- */
-export function breakIntoSeperateTrees(node: any) {
-    let pathToDefs: Array<number | string> = [0];
-    const response: any[] = [];
-    //console.log( node.attributes)
-    recurseThroughTree(node, (childNode, path) => {
-        if (childNode.kind === 'defs') pathToDefs = path;
-        else if (_.startsWith(_.join(path), _.join(pathToDefs))) return;
-
-        if (childNode.kind === 'use') {
-
-            const treeNodeList = _.map(_.without(path, 'children'), (key, index, collection) => {
-                const p = _.slice(collection, 0, index + 1);
-                return _.get(node, _.flatten(_.map(p, seg => (['children', seg]))));
-            });
-
-            const tree = _.reduceRight(_.initial(treeNodeList), (prev, curr, index, list) => {
-                return _.assign({}, curr, { children: [prev] });
-            }, _.last(treeNodeList));
-
-            response.push(_.set(_.assign({}, node), 'children', [_.get(node, `children.0`), tree]));
-        }
-    });
-
-    return response as LiteElement;
-}
-
-function recurseThroughTree(node: any, callback: (node: any, path: string[]) => any, path: string[] = []) {
-    path.push('children');
-    _.map(node.children, (child, key) => {
-        const p = _.concat(path, key);
-        callback(child, p)
-        recurseThroughTree(child, callback, p)
-    });
-}
-

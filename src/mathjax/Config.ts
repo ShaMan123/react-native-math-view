@@ -44,6 +44,11 @@ export interface MathToSVGConfig {
      * default: true 
      * */
     fontCache: boolean,
+
+    /**
+     * https://docs.mathjax.org/en/latest/options/accessibility.html#semantic-enrich-options
+     * */
+    enrichSpeech: 'none' | 'shallow' | 'deep'
 }
 
 export const mathToSVGDefaultConfig = {
@@ -54,4 +59,5 @@ export const mathToSVGDefaultConfig = {
     packages: AllPackages,
     //css: false,
     fontCache: true,
+    enrichSpeech: 'deep'
 } as MathToSVGConfig;

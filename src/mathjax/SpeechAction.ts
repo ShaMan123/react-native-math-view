@@ -1,7 +1,9 @@
-require('mathjax-full/js/util/asyncLoad/node.js');
-require('mathjax-full/js/a11y/semantic-enrich.js');
-const STATE = require('mathjax-full/js/core/MathItem.js').STATE;
+import { MathItem } from "mathjax-full/js/core/MathItem";
+import { RenderMath } from "mathjax-full/js/core/MathDocument";
 
+//require('mathjax-full/js/util/asyncLoad/node.js');
+//require('mathjax-full/js/a11y/semantic-enrich.js');
+import { STATE } from 'mathjax-full/js/core/MathItem';
 //
 //  Remove the data-semantic-* attributes other than data-semantic-speech
 //
@@ -17,6 +19,11 @@ function removeSemanticData(math) {
     });
 }
 
+const renderMath: RenderMath<any, any, any> = (math, doc) => {
+    const { start, end, bbox, math: latex } = math;
+    return
+}
+
 //
 //  The renderActions needed to remove the data-semantic-attributes.
 //    STATE.ENRICHED is the priority of the enrichment, so this will rung just after enrichment.
@@ -25,14 +32,14 @@ function removeSemanticData(math) {
 //
 export const speechAction = {
     simplfy: [
-        STATE.ENRICHED + 1,
+        STATE.TYPESET + 1,
         (doc) => {
+            console.log('m1')
+
             for (const math of doc.math) {
-                removeSemanticData(math);
+                //removeSemanticData(math);
             }
         },
-        (math, doc) => {
-            removeSemanticData(math);
-        }
+        renderMath
     ]
 };

@@ -25,7 +25,7 @@ public class AccessibleObject {
         }
 
         FieldAccessor(String fieldName) throws NoSuchFieldException {
-            mField = o.getClass().getDeclaredField(getName());
+            mField = o.getClass().getDeclaredField(fieldName);
             mField.setAccessible(true);
         }
 

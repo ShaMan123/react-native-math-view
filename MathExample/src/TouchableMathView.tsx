@@ -16,9 +16,8 @@ export function TouchableMathView({ math }: MathViewProps) {
             setEditable(true);
             return;
         }
-        console.log(e.nativeEvent)
         ref.current && ref.current.__test(e.nativeEvent.x, e.nativeEvent.y);
-    }, [ref]);
+    }, [ref, editing]);
     
     const tap = useRef();
     const pan = useRef();

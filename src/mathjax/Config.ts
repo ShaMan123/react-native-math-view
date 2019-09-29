@@ -48,7 +48,7 @@ export interface MathToSVGConfig {
     /**
      * https://docs.mathjax.org/en/latest/options/accessibility.html#semantic-enrich-options
      * */
-    enrichSpeech: 'none' | 'shallow' | 'deep'
+    enrichSpeech: 'none' | 'shallow' | 'deep',
 }
 
 export const mathToSVGDefaultConfig = {

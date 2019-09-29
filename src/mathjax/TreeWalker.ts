@@ -40,7 +40,7 @@ export function walkDown<T>(node: LiteElement, callback: TreeWalkerCallback<T>) 
         children = _.get(n, 'children', []) as LiteElement[];
 
         if (_.size(children) > 0) {
-            _.forEach(children, child => _.set(child, 'pLevel', i + 1));
+            children = _.map(children, child => _.set(child, 'attributes.pLevel', i + 1));
             stack = _.concat(children, stack);
         }
 

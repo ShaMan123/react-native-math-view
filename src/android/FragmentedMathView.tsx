@@ -67,11 +67,11 @@ function FragmentedMathView(props: FragmentedMathViewProps, ref: any) {
             _.map(hitResult, ({ node, namespace, index, hitResult }) => {
                 anima[index].setValue(2);
                 Animated.spring(anima[index], { toValue: 1, useNativeDriver: true, delay: 100 }).start();
-
+                /*
                 TreeWalker.walkUp(node, (n, l) => {
                     namespace.char.match(/[a-zA-Z]/)
                 })
-                
+                */
                 console.log(namespace.char)
             });
         },

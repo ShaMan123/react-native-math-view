@@ -194,7 +194,7 @@ export class MathjaxAdaptor {
 
             const xlinkHref = _.get(node.attributes, 'xlink:xlink:href', _.get(node.attributes, 'xlink:href'));
             const splitId = _.split(xlinkHref, '-');
-            const charCode = parseInt(_.last(splitId), 16);
+            const charCode = parseInt(_.last(splitId) as string, 16);
             const char = String.fromCharCode(charCode);
             const namespace = _.zipObject(['ns', 'localCahceId', 'input', 'variant', 'charCode16', 'charCode', 'char'], _.concat(splitId, charCode, char));
 

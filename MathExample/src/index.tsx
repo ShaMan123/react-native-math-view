@@ -38,8 +38,10 @@ export default function App() {
     const PageSelector = useCallback(({ index }: { index: number }) => {
         return (
             <RectButton
-                onPress={() => setPage(index)}
-                
+                onPress={() => {
+                    setPage(index);
+                    console.log('selected page', index)
+                }}
             >
                 <Text style={[styles.defaultColorTheme, { padding: 10, margin: 20, textAlign: 'center' }]}>{getTitle(index)}</Text>
             </RectButton>

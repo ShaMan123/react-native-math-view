@@ -16,6 +16,7 @@ export function TouchableMathView({ math }: MathViewProps) {
             setEditable(true);
             return;
         }
+        
         ref.current && ref.current.__test(e.nativeEvent.x, e.nativeEvent.y);
     }, [ref, editing]);
     
@@ -31,6 +32,7 @@ export function TouchableMathView({ math }: MathViewProps) {
                 <PanGestureHandler
                     onGestureEvent={reactToTouch}
                     ref={pan}
+                    maxDeltaX={20}
                     //waitFor={[tap]}
                 >
                     <Animated.View collapsable={false}>

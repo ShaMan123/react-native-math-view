@@ -22,6 +22,7 @@ A react native view used to easily display and handle math.
 
 ```js
 import MathView from 'react-native-math-view';
+//  import MathView from 'react-native-math-view/src';  // <- use this to import directly from typescript source files
 
 render() {
   return (

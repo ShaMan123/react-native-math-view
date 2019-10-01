@@ -2,9 +2,9 @@
   "name": "react-native-math-view",
   "version": "3.3.1",
   "description": "Math view for react-native",
-  "main": "dist",
+  "main": "dist/src",
   "esnext": "src",
-  "types": "dist/src/index.android.d.ts",
+  "types": "react-native-math-view.d.ts",
   "nativePackage": true,
   "scripts": {
     "release": "node ./scripts/publish",

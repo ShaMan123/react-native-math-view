@@ -3,9 +3,12 @@ const path = require('path');
 const chalk = require('chalk');
 const fs = require('fs');
 
+const dir = path.resolve(__dirname, '..');
+const cwd = dir.substring(0, dir.indexOf('node_modules'));  // dir.includes('node_modules') ? path.resolve(dir, '..', '..') : dir
+
 const processConfig = {
     stdio: 'inherit',
-    cwd: process.cwd() //path.resolve(__dirname, '..')
+    cwd
 };
 
 const innerPathToFile = 'input/tex/mhchem/mhchem_parser.js';

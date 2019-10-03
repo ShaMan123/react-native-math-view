@@ -7,7 +7,7 @@ const _ = require('lodash');
 const argv = require('yargs').argv;
 
 const processConfig = {
-    cwd: process.cwd() //path.resolve(__dirname, '..')
+    cwd: path.resolve(__dirname, '..')
 };
 
 function runCommand(command, procConfig = processConfig) {

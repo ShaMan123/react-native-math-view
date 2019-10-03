@@ -5,7 +5,7 @@ const fs = require('fs');
 
 const processConfig = {
     stdio: 'inherit',
-    cwd: path.resolve(__dirname, '..')
+    cwd: process.cwd() //path.resolve(__dirname, '..')
 };
 
 const innerPathToFile = 'input/tex/mhchem/mhchem_parser.js';

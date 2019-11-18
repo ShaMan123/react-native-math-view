@@ -36,5 +36,9 @@ export default StyleSheet.create({
     defaultColorTheme: {
         backgroundColor: 'blue',
         color: 'white'
+    },
+    centerContent: {
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 });

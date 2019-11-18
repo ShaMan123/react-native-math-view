@@ -2,9 +2,9 @@
 import * as _ from 'lodash';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Switch, Text, View } from 'react-native';
-import { RectButton } from 'react-native-gesture-handler';
+import { RectButton, FlatList } from 'react-native-gesture-handler';
 import MathjaxFactory, { FactoryMemoize } from 'react-native-math-view/src/mathjax';
-import AppContext from './Context';
+import AppContext, { useAppContext } from './Context';
 import DifferentLayouts from './DifferentLayouts';
 import FlexWrapMathSectionList from './FlexWrapMathSectionList';
 import { useInc, useWidth } from './Hooks';
@@ -13,18 +13,56 @@ import MathSectionList from './MathSectionList';
 import Standalone from './Standalone';
 import styles from './styles';
 import TouchableMathList from './TouchableMathView';
+import SvgXml from './SvgXml';
 
 const allMath = _.flatten(_.values(MathStrings));
 
-function getTitle(index: number) {
-    switch (index) {
-        case -1: return 'Back To Menu';
-        case 0: return 'Stanalone View';
-        case 1: return 'Flex SectionList';
-        case 2: return 'FlexWrap SectionList';
-        case 3: return 'Rendering on the Fly';
-        default: return '';
-    }
+const SCREENS = [
+    { title: 'Stanalone View', component: Standalone },
+    { title: 'Flex SectionList', component: MathSectionList },
+    { title: 'FlexWrap SectionList', component: FlexWrapMathSectionList },
+    { title: 'Rendering on the Fly', component: DifferentLayouts },
+    { title: 'Touch to Edit SectionList', component: TouchableMathList },
+    { title: 'Fallback (SvgXml)', component: SvgXml },
+];
+
+
+function PageSelector({ index, title }: { index: number, title: string }) {
+    const { setPage } = useAppContext();
+    return (
+        <RectButton
+            onPress={() => setPage(index)}
+        >
+            <Text
+                style={[styles.defaultColorTheme, { padding: 10, margin: 20, textAlign: 'center' }]}
+            >
+                {title}
+            </Text>
+        </RectButton>
+    );
+}
+
+function MainScreen() {
+    return (
+        <View style={styles.default}>
+            <FlatList
+                data={SCREENS}
+                renderItem={({ item, index }) => <PageSelector index={index} title={item.title} />}
+                keyExtractor={(item, index) => `PageSelector${index}`}
+            />
+            <View style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Button
+                    onPress={() => FactoryMemoize.cache.clear()}
+                    title='clear cache'
+                    color='blue'
+                />
+                <Button
+                    onPress={() => MathjaxFactory().preload(_.slice(allMath, 0, 10))}
+                    title='preload'
+                />
+            </View>
+        </View>
+    )
 }
 
 export default function App() {
@@ -35,81 +73,41 @@ export default function App() {
 
     const [switchValue, setSwitchValue] = useState(false);
 
-    const PageSelector = useCallback(({ index }: { index: number }) => {
-        return (
-            <RectButton
-                onPress={() => {
-                    setPage(index);
-                    console.log('selected page', index)
-                }}
-            >
-                <Text style={[styles.defaultColorTheme, { padding: 10, margin: 20, textAlign: 'center' }]}>{getTitle(index)}</Text>
-            </RectButton>
-        );
-    }, []);
-
     const el = useMemo(() => {
         switch (page) {
             case -1:
                 return (
-                    <View style={styles.default}>
-                    <View style={{ flex: 1, justifyContent: 'space-evenly' }}>
-                        <PageSelector index={0} />
-                        <PageSelector index={1} />
-                        <PageSelector index={2} />
-                        <PageSelector index={3} />
-                        <PageSelector index={4} />
-                        </View>
-                        <View style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <Button
-                                onPress={() => FactoryMemoize.cache.clear()}
-                                title='clear cache'
-                                color='blue'
-                            />
-                            <Button
-                                onPress={() => MathjaxFactory().preload(_.slice(allMath, 0, 10))}
-                                title='preload'
-                            />
-                        </View>
-                        </View>
+                    <MainScreen />
                 );
-            case 0: return <Standalone />
-            case 1: return <MathSectionList />;
-            case 2: return <FlexWrapMathSectionList />;
-            case 3: return <DifferentLayouts />;
-            case 4: return <TouchableMathList />
-                
-            default: null
+            default:
+                const El = SCREENS[page].component;
+                return <>
+                    <El />
+                    <View style={{ borderColor: 'darkblue', borderWidth: 2 }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+                            <Switch
+                                onValueChange={setSwitchValue}
+                                value={switchValue}
+                            />
+                            <Text style={{ fontWeight: switchValue ? 'bold' : 'normal' }}>{switchValue ? 'HYPER mode' : 'static mode'}</Text>
+                        </View>
+                        <PageSelector index={-1} title="Back" />
+                    </View>
+                </>
         }
-    }, [page]);
+    }, [page, switchValue]);
 
     return (
-        <>
-            <View style={styles.default}>
-                <AppContext.Provider
-                    value={{
-                        switch: switchValue,
-                        width: useWidth(switchValue),
-                        inc: useInc(switchValue)
-                    }}
-                >
-                    {el}
-                </AppContext.Provider>
-            </View>
-            {
-                page !== -1 &&
-                <View style={{ borderColor: 'darkblue', borderWidth: 2 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-                        <Switch
-                            onValueChange={setSwitchValue}
-                            value={switchValue}
-                        />
-                        <Text style={{ fontWeight: switchValue ? 'bold' : 'normal' }}>{switchValue ? 'HYPER mode' : 'static mode'}</Text>
-                    </View>
-                    <PageSelector index={-1} />
-                </View>
-            }
-
-        </>
+        <AppContext.Provider
+            value={{
+                switch: switchValue,
+                width: useWidth(switchValue),
+                inc: useInc(switchValue),
+                page,
+                setPage
+            }}
+        >
+            {el}
+        </AppContext.Provider>
     );
 }

@@ -20,9 +20,8 @@ A react native view used to easily display and handle math.
 
 ## Getting Started
 
-```js
+```ts
 import MathView from 'react-native-math-view';
-//  import MathView from 'react-native-math-view/src';  // <- use this to import directly from typescript source files
 
 render() {
   return (
@@ -44,6 +43,7 @@ render() {
 ## Running example app
 From the project's directory run:
 ```
+yarn --production=false
 cd MathExample
 yarn --production=false
 npx react-native run-android
@@ -58,7 +58,7 @@ This will watch `ts` files and start bundler.
 
 
 ## Implementation:
-  - [ ] [iOS native MathView](https://github.com/kostub/iosMath) - linked native! Need to create RN component
+  - [ ] [iOS native MathView](https://github.com/kostub/iosMath) - linked native! Need to create RN component. For now fallbacking to `react-native-svg`
 
   - [x] Android MathView - **native since V2**, based on [Android SVGImageView](https://bigbadaboom.github.io/androidsvg). Need to implement `editable` state.
 

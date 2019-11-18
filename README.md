@@ -39,7 +39,9 @@ import MathView from 'react-native-math-view';
 
 1. Make sure to properly escape all `LaTeX` strings (Syntax sensitive):
 
-This occurs because when passing `math={value}` `value` gets evaluated as opposed to `math='LaTeX'`
+This occurs because when passing `math={value}`, `value` gets evaluated as opposed to `math='LaTeX'`. 
+<br />It is cosidered best practice to avoid using `math='LaTeX'`.
+
 ```diff
         <MathView
 -	   math='x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}'

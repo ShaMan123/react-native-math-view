@@ -65,7 +65,7 @@ From the project's directory run:
 yarn --production=false
 cd MathExample
 yarn --production=false
-npx react-native run-android
+npm run android
 ```
 
 #### Developing:

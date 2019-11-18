@@ -1,8 +1,7 @@
-import { MathToSVGConfig } from './src/mathjax/index';
 import MathViewAndroid, { MathViewProps as MathViewPropsAndroid } from './src/index.android';
 import MathViewIOS, { MathViewProps as MathViewPropsIOS } from './src/index.ios';
+import { MathToSVGConfig } from './src/mathjax';
 import MathjaxAdaptor from './src/mathjax/MathjaxAdaptor';
-import IMathjaxFactory from './src/mathjax/index';
 
 declare module 'react-native-math-view' {
     /**unified android & iOS props */

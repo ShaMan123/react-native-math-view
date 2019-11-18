@@ -11,7 +11,7 @@
     "start": "cd MathExample && npm start",
     "dev": "node ./scripts/dev",
     "tsc": "node ./scripts/dev --tsc",
-    "postinstall": "node ./scripts/compileMathjax && tsc"
+    "postinstall": "node ./scripts/compileMathjax"
   },
   "keywords": [
     "react-native",

@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { EnrichHandler } from 'mathjax-full/js/a11y/semantic-enrich';
 import { LiteElement, LiteNode } from 'mathjax-full/js/adaptors/lite/Element';
 import { liteAdaptor } from 'mathjax-full/js/adaptors/liteAdaptor';
@@ -117,7 +117,7 @@ export default class MathjaxAdaptor {
             fontCache: (options.fontCache ? 'local' : 'none'),
             internalSpeechTitles: true
         });
-        
+
         this.html = mathjax.document('', {
             InputJax: this.tex,
             OutputJax: this.svg
@@ -134,7 +134,7 @@ export default class MathjaxAdaptor {
     protected get mmlFactory() {
         return this.html.mmlFactory;
     }
-    
+
     protected get parseOptions() {
         return this.tex.parseOptions;
     }
@@ -182,6 +182,20 @@ export default class MathjaxAdaptor {
     toSVG = _.memoize((math: string) => {
         const node = this.convert(math);
         return parseSVG(this.adaptor.innerHTML(node)) as string; //   css option won't be used in react-native context    //   opts.css ? adaptor.textContent(svg.styleSheet(html)) : adaptor.innerHTML(node);
+    })
+
+    toSVGXMLProps = _.memoize((math: string) => {
+        const node = this.convert(math);
+        const svgNode = this.adaptor.firstChild(node) as LiteElement;
+        const svg = parseSVG(this.adaptor.innerHTML(node)) as string;
+        const width = parseSize(this.adaptor.getAttribute(svgNode, 'width'), this.options);
+        const height = parseSize(this.adaptor.getAttribute(svgNode, 'height'), this.options);
+
+        return {
+            xml: svg,
+            width,
+            height
+        }
     })
 
     toSVGArray(math: string) {
@@ -251,7 +265,7 @@ export default class MathjaxAdaptor {
                 index
             };
         });
-        
+
         const viewBoxes = _.map(transforms, (mat, index, collection) => {
             const box = _.clone(viewBox);
             const x = mat.e - startMatrix.e;
@@ -266,12 +280,12 @@ export default class MathjaxAdaptor {
 
             return _.assign({}, h, v);
         });
-        
+
         return _.zipWith(responseArr, viewBoxes, (res, viewBox) => _.assign(res, ({ viewBox }))) as MathFragmentResponse[];
-        
+
     }
 
-    
+
 
     /**
      * doesn't seem to increase performance dramatically, maybe even the opposite

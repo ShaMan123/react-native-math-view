@@ -1,14 +1,16 @@
 'use strict';
 
 import * as _ from 'lodash';
-import React, { forwardRef, useMemo, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { Animated, NativeModules, requireNativeComponent, StyleSheet, UIManager, ViewProps, ViewStyle } from 'react-native';
-import MathjaxFactory, { MathjaxAdaptor, MathToSVGConfig, mathToSVGDefaultConfig } from '../mathjax';
+import React, { forwardRef, useEffect, useMemo, useState, Ref } from 'react';
+import { NativeModules, requireNativeComponent, UIManager, ViewProps } from 'react-native';
+import { styles } from '../common';
+import MathjaxFactory, { MathToSVGConfig } from '../mathjax/index';
 
 const nativeViewName = 'RNMathView';
 const RNMathView = requireNativeComponent(nativeViewName);
 const MathViewManager = NativeModules.RNMathViewManager || {};
-export const { Constants } = UIManager.getViewManagerConfig ? UIManager.getViewManagerConfig(nativeViewName) : UIManager[nativeViewName];
+//console.log(UIManager.getViewManagerConfig('getConstants')().RNMathView)
+export const { Constants } = UIManager.getViewManagerConfig(nativeViewName);
 
 export type ResizeMode = 'cover' | 'contain';
 
@@ -46,7 +48,7 @@ const mathjaxGlobal = MathjaxFactory();
  * @param props
  * @param ref
  */
-function MathBaseView(props: MathViewBaseProps, ref: any) {
+function MathBaseView(props: MathViewBaseProps, ref: Ref<any>) {
     //  Layout Task Manager
     //  -----------------------------------------------------------------------------------------------------------------------------------------------
     //  used to remount RNMathView in order to recompute layout properly 
@@ -81,7 +83,7 @@ function MathView(props: MathViewProps, ref: any) {
     //  better performance
     //  uses memoize to improve first draw:
     //  if `math` prop didn't mount yet (no memoized value) revert to async rendering, otherwise use memoized value (prevents an unnecessary render and wait)
-    const [svg, setSVG] = useState(mathjax.toSVG.cache.has(props.math) ? mathjax.toSVG.cache.get(props.math): undefined);
+    const [svg, setSVG] = useState(mathjax.toSVG.cache.has(props.math) ? mathjax.toSVG.cache.get(props.math) : undefined);
     useEffect(() => {
         setSVG(mathjax.toSVG(props.math));
     }, [props.math, mathjax]);
@@ -103,18 +105,6 @@ function MathView(props: MathViewProps, ref: any) {
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        //flexDirection: 'row',
-        display: 'flex',
-        minHeight: 35
-    },
-    contain: {
-        maxWidth: '100%',
-        maxHeight: '100%'
-    }
-});
-
 const MathViewWrapper = forwardRef(MathView);
 
 ControlledMathView.defaultProps = MathBaseView.defaultProps = {
@@ -132,7 +122,4 @@ MathViewWrapper.Constants = ControlledMathView.Constants = Constants;
 //@ts-ignore
 MathViewWrapper.getPreserveAspectRatio = ControlledMathView.getPreserveAspectRatio = (alignment: string, scale: string) => `${alignment} ${scale}`;
 
-export {
-    MathViewWrapper as default,
-    ControlledMathView
-}
+export { MathViewWrapper as default, ControlledMathView };

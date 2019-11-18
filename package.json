@@ -2,7 +2,7 @@
   "name": "react-native-math-view",
   "version": "3.3.4",
   "description": "Math view for react-native",
-  "main": "dist/src",
+  "main": "src",
   "esnext": "src",
   "types": "react-native-math-view.d.ts",
   "nativePackage": true,
@@ -25,10 +25,6 @@
   ],
   "author": "ShaMan123 (https://github.com/ShaMan123)",
   "license": "",
-  "peerDependencies": {
-    "react": "*",
-    "react-native": "*"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/ShaMan123/react-native-math-view.git"
@@ -40,6 +36,11 @@
     "lodash": "^4.17.15",
     "mathjax-full": "^3.0.0",
     "transformation-matrix": "^2.1.0"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*",
+    "react-native-svg": "^9.13.3"
   },
   "devDependencies": {
     "@types/events": "^3.0.0",

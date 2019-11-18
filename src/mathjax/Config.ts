@@ -26,10 +26,10 @@ export interface MathToSVGConfig {
      * */
     width: number,
 
-   /**
-     * the packages to use, e.g. "base, ams"
-     * default: AllPackages
-     * */
+    /**
+      * the packages to use, e.g. "base, ams"
+      * default: AllPackages
+      * */
     packages: string[],
 
     /**

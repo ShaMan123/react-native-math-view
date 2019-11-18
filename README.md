@@ -27,16 +27,35 @@ render() {
   return (
     ...
     	<MathView
-	   math='x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}'
+	   math={'x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}'}
 	/> 
 	<MathView
-	   math='\\cos\\left(x\\right)=\\frac{b}{c}'
+	   math='\cos\left(x\right)=\frac{b}{c}'
 	/> 
     ...
   );
 }
 
 
+```
+
+## TroubleShooting
+
+1. Make sure to properly escape all `LaTeX` strings (Syntax sensitive):
+
+This occurs because when passing `math={value}` `value` gets evaluated as opposed to `math='LaTeX'`
+```diff
+        <MathView
+-	   math='x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}'
++	   math='x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}'
+	/> 
+	
+	//	OR
+	
+        <MathView
+-	   math={'x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}'}
++	   math={'x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}'}
+	/> 
 ```
 
 

@@ -1,13 +1,13 @@
 # react-native-math-view
 
+## WIP V3
+
+A react native view used to easily display and handle math.
+
 | Launch Test | Example App |
 | --- | --- |
 | ![Launch](./docs/launchAndroid.gif) | ![Example App](./docs/exampleAndroid.gif) |
 
-
-## WIP V3
-
-A react native view used to easily display and handle math.
 
 ## Installation
 

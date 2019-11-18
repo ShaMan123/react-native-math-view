@@ -1,7 +1,6 @@
 'use strict';
 
-import React, { forwardRef, useImperativeHandle } from 'react';
-import { StyleSheet } from 'react-native';
+import React, { forwardRef } from 'react';
 import FragmentedMathView from './FragmentedMathView';
 import MathView, { ControlledMathView, MathViewProps } from './MathView';
 

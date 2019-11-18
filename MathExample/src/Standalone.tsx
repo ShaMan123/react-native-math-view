@@ -13,7 +13,7 @@ export default function Standalone() {
     const tag = useMemo(() => allMath[curr % allMath.length], [curr]);
 
     return (
-        <View style={{ flex: 1, justifyContent: 'center' }}>
+        <View style={[styles.default, styles.centerContent]}>
             <MathItem
                 math={tag}
                 style={styles.defaultColorTheme}

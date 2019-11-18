@@ -1,7 +1,7 @@
 
 import React, { useEffect, useMemo, forwardRef } from 'react';
 import { Animated, TouchableOpacityProps, ViewProps } from 'react-native';
-import MathView, { MathViewProps } from 'react-native-math-view/src';
+import MathView, { MathViewProps } from 'react-native-math-view';
 import { useColor } from './Hooks';
 import styles from './styles';
 import { TouchableHighlight, TouchableOpacity } from 'react-native-gesture-handler';
@@ -18,12 +18,12 @@ function MathItem(props: MathViewProps & TouchableOpacityProps & { containerStyl
             })
             .start();
     }, []);
-    
+
     return (
         <TouchableOpacity
             {...props}
             style={[props.containerStyle, /*{ opacity }*/]}
-            //activeOpacity={0.2}
+        //activeOpacity={0.2}
         >
             <MathView
                 //color={parsedColor()} // can set color in style or directly

@@ -14,10 +14,12 @@ export default function SvgXml() {
 
     return (
         <View style={[styles.default, styles.centerContent]}>
-            <MathViewFallback
-                math={tag}
-                style={[styles.defaultColorTheme, styles.default, { maxWidth: '100%' }]}
-            />
+            <View style={[styles.centerContent, styles.defaultColorTheme]}>
+                <MathViewFallback
+                    math={tag}
+                    style={[styles.defaultColorTheme, { marginVertical: 10 }]}
+                />
+            </View>
         </View>
     );
 }

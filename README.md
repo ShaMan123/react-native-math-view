@@ -15,6 +15,8 @@ A react native view used to easily display and handle math.
 
 **iOS**: Install `react-native-svg`
 
+**Errors during installation:** If you're getting an error regarging `tsc` you can disregard it as long as `compiled mathjax successfully` was printed to the console
+
 
 ## Getting Started
 

@@ -13,10 +13,17 @@ A react native view used to easily display and handle math.
 
 `npm install --save react-native-math-view` **OR** `yarn add react-native-math-view --production=false`
 
-**iOS**: Install `react-native-svg`
+#### iOS: 
+Install `react-native-svg`
 
-**Errors during installation:** If you're getting an error regarging `tsc` you can disregard it as long as `compiled mathjax successfully` was printed to the console
-
+#### Errors during installation:
+If you're getting an error regarging `compileMathjax` you can disregard it as long as `compiled mathjax successfully` was printed to the console.
+To be sure everything is compiled properly run the following command from the `mathjax-full` `node_module` directory of your project:
+```bash
+npm run compile
+```
+`typescript` errors can be safely disregareded.
+<br />see also [#16](/../../issues/16)
 
 ## Getting Started
 

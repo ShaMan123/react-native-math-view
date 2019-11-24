@@ -17,7 +17,7 @@ A react native view used to easily display and handle math.
 Install `react-native-svg`
 
 #### Errors during installation:
-If you're getting an error regarging `compileMathjax` you can disregard it as long as `compiled mathjax successfully` was printed to the console.
+If you're getting an error regarging `compileMathjax` you can disregard it as long as `compiled mathjax successfully` was printed to the console. If you're using `yarn` it's probable no logging will show.
 To be sure everything is compiled properly run the following command from the `mathjax-full` `node_module` directory of your project:
 ```bash
 npm run compile

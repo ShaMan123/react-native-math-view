@@ -16,7 +16,7 @@ const processConfig = {
     //detached: true
 };
 
-const innerPathToFile = 'input/tex/mhchem/mhchem_parser.js';
+
 
 try {
     //  compiles ts files
@@ -24,7 +24,11 @@ try {
     child_process.execSync('npm run compile', processConfig);
 }
 catch (e) { };
-//child_process.execSync('cd node_modules/mathjax-full && npm run postcompile', processConfig);
-fs.copyFileSync(path.resolve(processConfig.cwd, 'ts', innerPathToFile), path.resolve(processConfig.cwd, 'js', innerPathToFile));
 
+child_process.execSync('npm run postcompile', processConfig);
+/*
+const innerPathToFile = 'input/tex/mhchem/mhchem_parser.js';
+fs.copyFileSync(path.resolve(processConfig.cwd, 'ts', innerPathToFile), path.resolve(processConfig.cwd, 'js', innerPathToFile));
+*/
 console.log(chalk.bold('\n\n\ncompiled mathjax successfully'));
+console.log(chalk.bold('\ntypescript compiling errors can be safely disregarded'));

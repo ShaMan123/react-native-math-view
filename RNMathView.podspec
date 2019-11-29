@@ -20,6 +20,6 @@ s.source_files = "ios/**/*.{h,m}"
 s.requires_arc = true
 
 s.dependency "React"
-# s.dependency "iosMath"
+s.dependency "iosMath"
 end
 

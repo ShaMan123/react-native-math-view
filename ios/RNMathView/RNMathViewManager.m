@@ -5,83 +5,43 @@
 #import <React/RCTView.h>
 #import <React/UIView+React.h>
 #import <React/RCTUIManager.h>
-#import <IosMath/IosMath.h>
 #import "MTMathUILabel.h"
 
 @implementation RNMathViewManager
+
+RCT_EXPORT_MODULE(RNMathView)
+
+- (UIView *)view
+{
+    MTMathUILabel* label = [[MTMathUILabel alloc] init];
+    label.latex = @"x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}";
+    //label.frame = CGRectMake(0, 0, 500, 500);
+    return label;
+}
+
+#pragma mark - Props
+RCT_CUSTOM_VIEW_PROPERTY(math, NSString, MTMathUILabel)
+{
+    MTMathUILabel *currentView = !view ? defaultView : view;
+    currentView.latex = json;
+}
+
+
 
 - (dispatch_queue_t)methodQueue
 {
     return dispatch_get_main_queue();
 }
-RCT_EXPORT_MODULE()
 
 + (BOOL)requiresMainQueueSetup
 {
     return YES;
 }
 
+/*
 -(NSDictionary *)constantsToExport {
-    return @{
-             @"MainBundlePath": [[NSBundle mainBundle] bundlePath],
-             @"NSDocumentDirectory": [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject],
-             @"NSLibraryDirectory": [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) firstObject],
-             @"NSCachesDirectory": [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject],
-             };
+    //return @{};
 }
-
-
-#pragma mark - Events
-
-RCT_EXPORT_VIEW_PROPERTY(onChange, RCTBubblingEventBlock);
-/*
- #pragma mark - Props
- RCT_CUSTOM_VIEW_PROPERTY(localSourceImage, NSDictionary, MTMathUILabel)
- {
- MTMathUILabel *currentView = !view ? defaultView : view;
- NSDictionary *dict = [RCTConvert NSDictionary:json];
- dispatch_async(dispatch_get_main_queue(), ^{
- [currentView openSketchFile:dict[@"filename"]
- directory:[dict[@"directory"] isEqual: [NSNull null]] ? @"" : dict[@"directory"]
- contentMode:[dict[@"mode"] isEqual: [NSNull null]] ? @"" : dict[@"mode"]];
- });
- }
- 
- RCT_CUSTOM_VIEW_PROPERTY(text, NSArray, MTMathUILabel)
- {
- MTMathUILabel *currentView = !view ? defaultView : view;
- NSArray *arr = [RCTConvert NSArray:json];
- dispatch_async(dispatch_get_main_queue(), ^{
- [currentView setCanvasText:arr];
- });
- }
  */
-#pragma mark - Lifecycle
 
-- (UIView *)view
-{
-    MTMathUILabel* label = [[MTMathUILabel alloc] init];
-    label.latex = @"x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}";
-    return label;
-    //return [[MTMathUILabel alloc] initWithEventDispatcher: self.bridge.eventDispatcher];
-}
-
-/*
-#pragma mark - Utils
-
-- (void)runTask:(nonnull NSNumber *)reactTag block:(void (^)(MTMathUILabel *canvas))block {
-    [self.bridge.uiManager addUIBlock:
-     ^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, MTMathUILabel *> *viewRegistry){
-
-         MTMathUILabel *view = viewRegistry[reactTag];
-         if (!view || ![view isKindOfClass:[MTMathUILabel class]]) {
-             RCTLogError(@"Cannot find MTMathUILabel with tag #%@", reactTag);
-             return;
-         }
-
-         block(view);
-     }];
-}
-*/
 @end
-

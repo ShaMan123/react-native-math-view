@@ -6,5 +6,5 @@ target 'RNMathView' do
   # use_frameworks!
 
   # Pods for RNMathView
- pod 'iosMath'
+ 
 end

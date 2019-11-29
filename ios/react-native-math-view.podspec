@@ -38,7 +38,7 @@ Pod::Spec.new do |s|
   #
 
 # s.license      = "MIT (example)"
-   s.license      = { :type => "MIT", :file => "FILE_LICENSE" }
+   s.license      = { :type => "MIT" }
 
 
   # ――― Author Metadata  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -130,7 +130,7 @@ Pod::Spec.new do |s|
 
   s.requires_arc = true
 
-  s.xcconfig = { "HEADER_SEARCH_PATHS" => "$(inherit)" }
+# s.xcconfig = { "HEADER_SEARCH_PATHS" => "$(inherit)" }
    s.dependency "iosMath"
 
 end

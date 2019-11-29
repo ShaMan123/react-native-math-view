@@ -7,17 +7,12 @@ import { styles } from '../common';
 import MathjaxFactory from '../mathjax/index';
 
 function SvgXml(props: MathViewProps, ref: Ref<any>) {
-    const xmlProps = useMemo(() =>
-        MathjaxFactory().toSVGXMLProps(props.math),
-        [props.math]
-    );
-
     return (
         <SvgFromXml
             {...props}
             style={[props.resizeMode === 'contain' && styles.contain, props.style]}
             ref={ref}
-            {...xmlProps}
+            {...MathjaxFactory().toSVGXMLProps(props.math)}
         />
     );
 }

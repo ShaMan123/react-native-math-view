@@ -5,7 +5,7 @@ import { NativeModules, requireNativeComponent, UIManager, ViewProps } from 'rea
 const nativeViewName = 'RNMathView';
 const RNMathView = requireNativeComponent(nativeViewName);
 const MathViewManager = NativeModules.RNMathViewManager || {};
-export const { Constants } = UIManager.getViewManagerConfig ? UIManager.getViewManagerConfig(nativeViewName) : UIManager[nativeViewName];
+//export const { Constants } = UIManager.getViewManagerConfig ? UIManager.getViewManagerConfig(nativeViewName) : UIManager[nativeViewName];
 
 export interface MathViewProps extends ViewProps {
     math: string,

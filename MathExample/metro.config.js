@@ -14,7 +14,7 @@ module.exports = {
       path.resolve(__dirname, '../node_modules/react'),
       path.resolve(__dirname, '../node_modules/react-native'),
       path.resolve(__dirname, '../node_modules/react-native-svg'),
-      path.resolve(__dirname, '../MathExampl1e'),
+      path.resolve(__dirname, '../MathExample1'),
     ]),
     extraNodeModules: {
       '@babel/runtime': path.resolve(__dirname, 'node_modules/@babel/runtime'),

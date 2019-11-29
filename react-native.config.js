@@ -4,13 +4,12 @@
 //const root = __dirname;
 
 module.exports = {
-    dependency: {
+    project: {
         platforms: {
             android: {
                 packageImportPath: "import io.autodidact.rnmathview.RNMathViewPackage;",
                 packageInstance: "new RNMathViewPackage()"
             },
-            ios: {}
         },
         assets: [
             //"MathJaxProvider/index.html"

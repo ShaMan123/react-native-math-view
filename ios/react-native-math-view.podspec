@@ -17,15 +17,14 @@ Pod::Spec.new do |s|
 
   s.name         = "react-native-math-view"
   s.version      = "1.0.0"
-  s.summary      = "mathView for react native!"
+  s.summary      = "MathView for react native!"
 
   # This description is used to generate tags and improve search results.
   #   * Think: What does it do? Why did you write it? What is the focus?
   #   * Try to keep it short, snappy and to the point.
   #   * Write the description between the DESC delimiters below.
   #   * Finally, don't worry about the indent, CocoaPods strips it!
-  s.description  = <<-DESC
-                   DESC
+  s.description  = "iosMath bindings for react-native"
 
   s.homepage     = "https://github.com/ShaMan123/react-native-math-view"
   # s.screenshots  = "www.example.com/screenshots_1.gif", "www.example.com/screenshots_2.gif"
@@ -38,8 +37,8 @@ Pod::Spec.new do |s|
   #  Popular ones are 'MIT', 'BSD' and 'Apache License, Version 2.0'.
   #
 
-  s.license      = "MIT (example)"
-  # s.license      = { :type => "MIT", :file => "FILE_LICENSE" }
+# s.license      = "MIT (example)"
+   s.license      = { :type => "MIT", :file => "FILE_LICENSE" }
 
 
   # ――― Author Metadata  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -52,7 +51,7 @@ Pod::Spec.new do |s|
   #  profile URL.
   #
 
-  s.author             = { "ShaMan123" => "email@address.com" }
+  s.author             = "ShaMan123"
   # Or just: s.author    = "ShaMan123"
   # s.authors            = { "ShaMan123" => "email@address.com" }
   # s.social_media_url   = "http://twitter.com/ShaMan123"
@@ -63,7 +62,7 @@ Pod::Spec.new do |s|
   #  the deployment target. You can optionally include the target after the platform.
   #
 
-  # s.platform     = :ios
+   s.platform     = :ios
   # s.platform     = :ios, "5.0"
 
   #  When using multiple platforms
@@ -119,7 +118,7 @@ Pod::Spec.new do |s|
   # s.framework  = "SomeFramework"
   # s.frameworks = "SomeFramework", "AnotherFramework"
 
-  # s.library   = "iconv"
+# s.library   = "iosMath"
   # s.libraries = "iconv", "xml2"
 
 
@@ -129,9 +128,9 @@ Pod::Spec.new do |s|
   #  where they will only apply to your library. If you depend on other Podspecs
   #  you can include multiple dependencies to ensure it works.
 
-  # s.requires_arc = true
+  s.requires_arc = true
 
-  # s.xcconfig = { "HEADER_SEARCH_PATHS" => "$(SDKROOT)/usr/include/libxml2" }
-  # s.dependency "JSONKit", "~> 1.4"
+  s.xcconfig = { "HEADER_SEARCH_PATHS" => "$(inherit)" }
+   s.dependency "iosMath"
 
 end

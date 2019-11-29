@@ -28,6 +28,7 @@ function MathItem(props: MathViewProps & TouchableOpacityProps & { containerStyl
             <MathView
                 //color={parsedColor()} // can set color in style or directly
                 resizeMode='contain'
+                color={color}
                 style={{ color }} // can use color prop instead
                 {...props}
                 ref={ref}

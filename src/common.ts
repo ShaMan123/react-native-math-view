@@ -9,5 +9,8 @@ export const styles = StyleSheet.create({
     contain: {
         maxWidth: '100%',
         maxHeight: '100%'
+    },
+    default: {
+      flex: 1
     }
 });

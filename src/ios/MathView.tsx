@@ -1,11 +1,12 @@
 'use strict';
 import * as React from 'react';
-import { NativeModules, requireNativeComponent, UIManager, ViewProps } from 'react-native';
+import { NativeModules, requireNativeComponent, UIManager, ViewProps, View } from 'react-native';
+import { styles } from '../common'
 
 const nativeViewName = 'RNMathView';
 const RNMathView = requireNativeComponent(nativeViewName);
 const MathViewManager = NativeModules.RNMathViewManager || {};
-//export const { Constants } = UIManager.getViewManagerConfig ? UIManager.getViewManagerConfig(nativeViewName) : UIManager[nativeViewName];
+export const { Constants } = UIManager.getViewManagerConfig ? UIManager.getViewManagerConfig(nativeViewName) : UIManager[nativeViewName];
 
 export interface MathViewProps extends ViewProps {
     math: string,
@@ -20,10 +21,11 @@ export interface MathViewProps extends ViewProps {
 
 function MathView(props: MathViewProps, ref: any) {
     return (
-        <RNMathView
-            {...props}
-            ref={ref}
-        />
+      <RNMathView
+          {...props}
+          style={[styles.default, props.style, {minHeight:50, minWidth:300}]}
+          ref={ref}
+      />
     );
 }
 

@@ -7,6 +7,7 @@
 #import <React/RCTUIManager.h>
 #import "MTMathUILabel.h"
 #import "RCTConvert+MTMathUILabel.h"
+#import "RNMathView.h"
 
 @implementation RNMathViewManager
 
@@ -24,18 +25,29 @@ RCT_EXPORT_MODULE(RNMathView)
 
 - (UIView *)view
 {
+    
     MTMathUILabel* label = [[MTMathUILabel alloc] init];
     label.textAlignment = kMTTextAlignmentCenter;
     return label;
+     
+    //RNMathView *view = [[RNMathView alloc] init];
+    //return view;
 }
 
 #pragma mark - Props
+
 RCT_CUSTOM_VIEW_PROPERTY(math, NSString, MTMathUILabel)
 {
     MTMathUILabel *currentView = !view ? defaultView : view;
     currentView.latex = json;
 }
-
+/*
+RCT_CUSTOM_VIEW_PROPERTY(math, NSString, RNMathView)
+{
+    RNMathView *currentView = !view ? defaultView : view;
+    currentView.view.latex = json;
+}
+*/
 RCT_CUSTOM_VIEW_PROPERTY(color, UIColor, MTMathUILabel)
 {
     MTMathUILabel *currentView = !view ? defaultView : view;

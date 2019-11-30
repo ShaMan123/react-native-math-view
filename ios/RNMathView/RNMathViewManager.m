@@ -34,8 +34,6 @@ RCT_CUSTOM_VIEW_PROPERTY(math, NSString, MTMathUILabel)
 {
     MTMathUILabel *currentView = !view ? defaultView : view;
     currentView.latex = json;
-    [currentView setNeedsLayout];
-    [currentView setNeedsDisplay];
 }
 
 RCT_CUSTOM_VIEW_PROPERTY(color, UIColor, MTMathUILabel)

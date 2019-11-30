@@ -1,6 +1,6 @@
 'use strict';
 import * as React from 'react';
-import { NativeModules, requireNativeComponent, UIManager, ViewProps, View } from 'react-native';
+import { NativeModules, requireNativeComponent, UIManager, ViewProps, View, StyleSheet } from 'react-native';
 import { styles } from '../common'
 
 const nativeViewName = 'RNMathView';
@@ -23,7 +23,7 @@ function MathView(props: MathViewProps, ref: any) {
     return (
       <RNMathView
           {...props}
-          style={[styles.default, props.style, {minHeight:50, minWidth:300}]}
+          style={[styles.default, props.style]}
           ref={ref}
       />
     );

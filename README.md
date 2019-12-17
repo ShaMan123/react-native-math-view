@@ -92,6 +92,8 @@ This will watch `ts` files and start bundler.
 
 ### FollowUp
 
+[iOS editable math view](https://github.com/kostub/MathEditor)
+
 [KaTeX](https://github.com/Khan/KaTeX) - Math keypad that works with `<WebView>`. See [this](https://github.com/ShaMan123/math-input)
 
 [React with LaTeX](https://github.com/Pomax/BezierInfo-2) - using server side rendering to speed things up.

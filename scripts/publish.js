@@ -11,7 +11,7 @@ const argv = yargs.argv;
 const isRelease = true;
 
 const ONLY_ON_BRANCH = 'origin/master';
-const VERSION_TAG = isRelease ? 'latest' : 'snapshot';
+const VERSION_TAG = argv.tag || (isRelease ? 'latest' : 'snapshot');
 const VERSION_INC = _.defaultTo(argv._.shift(), 'patch');
 
 function run() {
@@ -19,11 +19,9 @@ function run() {
     if (!validateEnv()) {
         return;
     }
-    */
-    //setupGit();
-    //
-
-    //createNpmRc();
+*/
+    setupGit();
+    createNpmRc();
     versionTagAndPublish();
 }
 
@@ -56,7 +54,7 @@ function setupGit() {
 
 function createNpmRc() {
     fs.existsSync(`package-lock.json`) && fs.unlinkSync(`package-lock.json`);
-    
+
     const content = `
 email=\${NPM_EMAIL}
 //registry.npmjs.org/:_authToken=\${NPM_TOKEN}

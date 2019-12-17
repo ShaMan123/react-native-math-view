@@ -26,9 +26,10 @@ try {
 catch (e) { };
 
 child_process.execSync('npm run postcompile', processConfig);
-/*
+
 const innerPathToFile = 'input/tex/mhchem/mhchem_parser.js';
 fs.copyFileSync(path.resolve(processConfig.cwd, 'ts', innerPathToFile), path.resolve(processConfig.cwd, 'js', innerPathToFile));
-*/
-console.log(chalk.bold('\n\n\ncompiled mathjax successfully'));
-console.log(chalk.bold('\ntypescript compiling errors can be safely disregarded'));
+
+console.log(chalk.bold('\n\n\nreact-native-math-view:'));
+console.log(chalk.bold('compiled mathjax successfully'));
+console.log(chalk.bold('typescript compiling errors can be safely disregarded'));

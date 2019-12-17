@@ -86,7 +86,7 @@ This will watch `ts` files and start bundler.
 
 
 ## Implementation:
-  - [ ] [iOS native MathView](https://github.com/kostub/iosMath) - linked native! Need to create RN component. For now fallbacking to `react-native-svg`
+  - [ ] [iOS native MathView](https://github.com/kostub/iosMath) - POC successful, need to implement native measuring. For now fallbacking to `react-native-svg`
 
   - [x] Android MathView - **native since V2**, based on [Android SVGImageView](https://bigbadaboom.github.io/androidsvg). Need to implement `editable` state.
 

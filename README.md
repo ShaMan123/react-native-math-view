@@ -15,6 +15,7 @@ A react native view used to easily display and handle math.
 
 #### iOS: 
 Install `react-native-svg`
+
 `$ cd ios && pod install`
 
 #### Errors during installation:

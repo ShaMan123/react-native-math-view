@@ -15,6 +15,7 @@ A react native view used to easily display and handle math.
 
 #### iOS: 
 Install `react-native-svg`
+`$ cd ios && pod install`
 
 #### Errors during installation:
 If you're getting an error regarging `compileMathjax` you can disregard it as long as `compiled mathjax successfully` was printed to the console. If you're using `yarn` it's probable no logging will show.<br />

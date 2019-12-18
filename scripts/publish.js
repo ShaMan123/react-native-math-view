@@ -19,9 +19,10 @@ function run() {
     if (!validateEnv()) {
         return;
     }
-*/
+
     setupGit();
     createNpmRc();
+    */
     versionTagAndPublish();
 }
 

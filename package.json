@@ -1,6 +1,6 @@
 {
   "name": "react-native-math-view",
-  "version": "3.4.3",
+  "version": "3.4.4",
   "description": "Math view for react-native",
   "main": "src",
   "esnext": "src",

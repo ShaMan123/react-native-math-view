@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { Ref, useMemo } from 'react';
+import React, { Ref } from 'react';
 import { SvgFromXml } from 'react-native-svg';
 import { MathViewProps } from '../android/index';
 import { styles } from '../common';
@@ -12,7 +12,7 @@ function SvgXml(props: MathViewProps, ref: Ref<any>) {
             {...props}
             style={[props.resizeMode === 'contain' && styles.contain, props.style]}
             ref={ref}
-            {...MathjaxFactory().toSVGXMLProps(props.math)}
+            {...MathjaxFactory(props.config).toSVGXMLProps(props.math)}
         />
     );
 }
@@ -21,7 +21,7 @@ const FallbackMathView = React.forwardRef(SvgXml);
 
 FallbackMathView.defaultProps = {
     color: 'black',
-    resizeMode: 'contain'
+    resizeMode: 'cover'
 } as MathViewProps;
 
 FallbackMathView.displayName = 'FallbackMathView'

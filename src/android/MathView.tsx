@@ -29,7 +29,7 @@ export interface MathViewProps extends ViewProps {
      * */
     resizeMode?: ResizeMode,
 
-    config?: MathToSVGConfig
+    config?: Partial<MathToSVGConfig>
 }
 
 export interface MathViewBaseProps extends MathViewProps {

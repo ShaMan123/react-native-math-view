@@ -31,6 +31,7 @@ function MathItem(props: MathViewProps & TouchableOpacityProps & { containerStyl
                 style={{ color }} // can use color prop instead
                 {...props}
                 ref={ref}
+            //config={{ ex: 50 }}
             />
         </TouchableOpacity>
     );

@@ -10,7 +10,7 @@ const nativeViewName = 'RNMathView';
 const RNMathView = requireNativeComponent(nativeViewName);
 const MathViewManager = NativeModules.RNMathViewManager || {};
 //console.log(UIManager.getViewManagerConfig('getConstants')().RNMathView)
-export const { Constants } = UIManager.getViewManagerConfig ? UIManager.getViewManagerConfig(nativeViewName) : UIManager[nativeViewName];
+export const { Constants } = UIManager.getViewManagerConfig ? UIManager.getViewManagerConfig(nativeViewName) : UIManager[nativeViewName] || {};
 
 export type ResizeMode = 'cover' | 'contain';
 

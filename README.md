@@ -13,6 +13,8 @@ A react native view used to easily display and handle math.
 
 `npm install --save react-native-math-view` **OR** `yarn add react-native-math-view`
 
+`react-native` > 0.59
+
 #### iOS: 
 Install `react-native-svg`
 

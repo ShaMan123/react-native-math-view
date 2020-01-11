@@ -69,6 +69,8 @@ This occurs because when passing `math={value}`, `value` gets evaluated as oppos
 	/> 
 ```
 
+2. Try you LaTeX in the `MathJax` [sandbox](https://www.mathjax.org/#demo).
+<br />You can run `setMode('SVG')` from dev console in order to render svg.
 
 ## Running example app
 From the project's directory run:

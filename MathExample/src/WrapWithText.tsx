@@ -8,8 +8,7 @@ import MathItem from './MathItem';
 import styles from './styles';
 import { TouchableOpacity, FlatList, ScrollView } from 'react-native-gesture-handler';
 
-const processString = _.replace(`When $a \\ne 0$, there are two solutions 
-to \\(ax^2 + bx + c = 0\\) and they are $$x_{1,2} = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$`, /\\(\(|\))/g, '$');
+const processString = _.replace(`When $a \\ne 0$, there are two solutions \nto \\(ax^2 + bx + c = 0\\) and they are $$x_{1,2} = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$`, /\\(\(|\))/g, '$');
 const processString1 = `hello world! I'm trying to understand why $ $flex wrap styling messes up text vertical alignment`;
 
 const allMath = _.flatten(_.values(MathStrings));
@@ -55,11 +54,13 @@ function MathParagraph({ math, renderRow }: { math: string, renderRow: (value: s
 
 
 export default function Composition() {
+    const { switch: mode, inc } = useContext(AppContext);
+    const value = inc % 2 === 0 ? _.replace(processString, /\n/g, '') : processString;
     return (
         <ScrollView style={[styles.default, { backgroundColor: 'pink' }]}>
             <Text>Compose with Text & MathView</Text>
             <MathParagraph
-                math={processString}
+                math={value}
                 renderRow={(value, isMath) => {
                     return (
                         <View
@@ -87,7 +88,7 @@ export default function Composition() {
             </View>
             <Text>Split input, wrap text with op \\text{}</Text>
             <MathParagraph
-                math={processString}
+                math={value}
                 renderRow={(value, isMath) => {
                     return (
                         <MathItem

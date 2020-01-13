@@ -1,5 +1,5 @@
 
-import { StyleSheet } from 'react-native';
+import { StyleSheet, I18nManager } from 'react-native';
 
 export default StyleSheet.create({
     flexContainer: {
@@ -40,5 +40,20 @@ export default StyleSheet.create({
     centerContent: {
         justifyContent: 'center',
         alignItems: 'center'
+    },
+    flexLeft: {
+        flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row'
+    },
+    diverseContainer: {
+        flexWrap: 'wrap',
+        display: 'flex',
+        flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row',
+        marginVertical: 10
+    },
+    inlineContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        //alignItems: 'center'
+        //alignItems: 'flex-start'
     }
 });

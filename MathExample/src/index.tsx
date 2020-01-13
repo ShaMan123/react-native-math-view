@@ -14,6 +14,7 @@ import Standalone from './Standalone';
 import styles from './styles';
 import TouchableMathList from './TouchableMathView';
 import SvgXml from './SvgXml';
+import WrapWithText from './WrapWithText';
 
 const allMath = _.flatten(_.values(MathStrings));
 
@@ -23,6 +24,7 @@ const SCREENS = [
     { title: 'FlexWrap SectionList', component: FlexWrapMathSectionList },
     { title: 'Rendering on the Fly', component: DifferentLayouts },
     { title: 'Touch to Edit SectionList', component: TouchableMathList },
+    { title: 'Inline Text', component: WrapWithText },
     { title: 'Fallback (SvgXml)', component: SvgXml },
 ];
 

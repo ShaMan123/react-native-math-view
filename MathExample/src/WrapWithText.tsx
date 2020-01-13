@@ -101,7 +101,7 @@ export default function Composition() {
             />
             <Text>Inline</Text>
             <MathItem
-                math={`\\text{${_.replace(processString, /\$\$/g, '$')}}`}
+                math={`\\text{${_.replace(_.replace(processString, /\n+/g, '$$ $$'), /\$\$/g, '$')}}`}
                 style={styles.defaultColorTheme}
             />
             <Text>Raw</Text>

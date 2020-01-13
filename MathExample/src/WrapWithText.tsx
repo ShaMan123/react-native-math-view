@@ -8,8 +8,9 @@ import MathItem from './MathItem';
 import styles from './styles';
 import { TouchableOpacity, FlatList, ScrollView } from 'react-native-gesture-handler';
 
-const processString = _.replace(`When $a \\ne 0$, there are two solutions to \\(ax^2 + bx + c = 0\\) and they are $$x_{1,2} = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$`, /\\(\(|\))/g, '$');
-const processString1 = `hello world! I'm trying to understand why $ $flex wrap styling messes up text vertical alignment`
+const processString = _.replace(`When $a \\ne 0$, there are two solutions 
+to \\(ax^2 + bx + c = 0\\) and they are $$x_{1,2} = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$`, /\\(\(|\))/g, '$');
+const processString1 = `hello world! I'm trying to understand why $ $flex wrap styling messes up text vertical alignment`;
 
 const allMath = _.flatten(_.values(MathStrings));
 
@@ -34,16 +35,18 @@ function InlineItem({ value, isMath }: { value: string, isMath: boolean }) {
 
 }
 
-function MathParagraph({ math, renderRow }: { math: string, renderRow: (value: string, index: number, isMath: boolean) => JSX.Element }) {
+function MathParagraph({ math, renderRow }: { math: string, renderRow: (value: string, isMath: boolean) => JSX.Element }) {
+    const statements = _.split(math, /\$\$/g);
+    const bits = _.split(math, /\n|{\$\$}/g);
     return (
         <View
-            style={[styles.centerContent, styles.defaultColorTheme]}
+            style={[styles.defaultColorTheme, { alignItems: 'flex-end' }]}
         >
             {
-                _.map(_.split(math, /\$\$/g), (value, i) => {
+                _.map(statements, (value, i) => {
                     if (value === '') return null;
                     const isMath = i % 2 === 1;
-                    return React.cloneElement(renderRow(value, i, isMath), { key: value + i });
+                    return _.map(_.split(value, /\n/g), (val, index) => React.cloneElement(renderRow(val, isMath), { key: value + i + index }))
                 })
             }
         </View>
@@ -53,11 +56,11 @@ function MathParagraph({ math, renderRow }: { math: string, renderRow: (value: s
 
 export default function Composition() {
     return (
-        <View style={[styles.default, { backgroundColor: 'pink' }]}>
+        <ScrollView style={[styles.default, { backgroundColor: 'pink' }]}>
             <Text>Compose with Text & MathView</Text>
             <MathParagraph
                 math={processString}
-                renderRow={(value, i, isMath) => {
+                renderRow={(value, isMath) => {
                     return (
                         <View
                             style={[styles.diverseContainer]}
@@ -75,7 +78,7 @@ export default function Composition() {
             <Text>Compose with FlatList</Text>
             <View>
                 <FlatList
-                    data={_.split(processString, /\$+/g)}
+                    data={_.split(_.replace(processString, /\n+/g, '$$ $$'), /\$+/g)}
                     renderItem={({ index, item }) => <InlineItem value={item} isMath={index % 2 === 1} />}
                     keyExtractor={(item, index) => `${item}${index}`}
                     contentContainerStyle={[{ flexWrap: 'wrap', display: 'flex', alignItems: 'center' }, styles.flexLeft]}
@@ -85,7 +88,7 @@ export default function Composition() {
             <Text>Split input, wrap text with op \\text{}</Text>
             <MathParagraph
                 math={processString}
-                renderRow={(value, i, isMath) => {
+                renderRow={(value, isMath) => {
                     return (
                         <MathItem
                             key={value}
@@ -106,6 +109,6 @@ export default function Composition() {
                 math={processString}
                 style={styles.defaultColorTheme}
             />
-        </View>
+        </ScrollView>
     );
 }

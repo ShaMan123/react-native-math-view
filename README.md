@@ -18,11 +18,19 @@ A react native view used to easily display and handle math.
 #### iOS: 
 Install `react-native-svg`
 
-`$ cd ios && pod install`
+```bash
+$ cd ios && pod install
+```
+
+#### Expo
+Expo doesn't support native modules. 
+You can use this library with `react-native-svg` (performance suffers a bit), see [#19](/../../issues/19).
+
 
 #### Errors during installation:
-If you're getting an error regarging `compileMathjax` you can disregard it as long as `compiled mathjax successfully` was printed to the console. If you're using `yarn` it's probable no logging will show.<br />
-To be sure everything is compiled properly run the following command from the `mathjax-full` `node_module` directory of your project:
+1. Upgrade `typescript`
+1. If you're getting an error regarging `compileMathjax` you can disregard it as long as `compiled mathjax successfully` was printed to the console. If you're using `yarn` it's probable no logging will show.<br />
+1. To be sure everything is compiled properly run the following command from the `mathjax-full` `node_module` directory of your project:
 ```bash
 npm run compile
 ```

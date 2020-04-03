@@ -21,7 +21,7 @@ const FallbackMathView = React.forwardRef(SvgXml);
 
 FallbackMathView.defaultProps = {
     color: 'black',
-    resizeMode: 'cover'
+    resizeMode: 'contain'
 } as MathViewProps;
 
 FallbackMathView.displayName = 'FallbackMathView'

@@ -124,7 +124,7 @@ export default class MathjaxAdaptor {
 
         this.html = mathjax.document('', {
             InputJax: this.tex,
-            OutputJax: this.svg
+            OutputJax: this.svg,
             //enrichSpeech: options.enrichSpeech
         });
 
@@ -192,13 +192,23 @@ export default class MathjaxAdaptor {
         const node = this.convert(math);
         const svgNode = this.adaptor.firstChild(node) as LiteElement;
         const svg = parseSVG(this.adaptor.innerHTML(node)) as string;
+        //const exFactor = this.options.ex / mathToSVGDefaultConfig.ex;
+        //const emFactor = this.options.em / mathToSVGDefaultConfig.em;
+
         const width = parseSize(this.adaptor.getAttribute(svgNode, 'width'), this.options);
         const height = parseSize(this.adaptor.getAttribute(svgNode, 'height'), this.options);
+        const viewBox = this.adaptor.getAttribute(svgNode, 'viewBox').split(' ');
+        const vbw = parseFloat(viewBox[2]);
+        const vbh = parseFloat(viewBox[3]);
+        const vby = parseFloat(viewBox[1]);
+        const availableSVGHeight = vbh + vby;
+        const outHeight = width * availableSVGHeight / vbw;
 
         return {
             xml: svg,
             width,
-            height
+            height: outHeight,
+            //viewBox: viewBox.join(' ')
         }
     })
 

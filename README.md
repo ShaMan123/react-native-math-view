@@ -89,6 +89,8 @@ yarn --production=false
 npm run android
 ```
 
+### [MathJax Supported LaTeX Commands](https://docs.mathjax.org/en/v1.0/tex.html#supported-latex-commands)
+
 
 ## Implementation:
   - [ ] [iOS native MathView](https://github.com/kostub/iosMath) - POC successful, need to implement native measuring. For now fallbacking to `react-native-svg`

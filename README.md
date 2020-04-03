@@ -89,13 +89,6 @@ yarn --production=false
 npm run android
 ```
 
-#### Developing:
-From root run:
-```
-npm run dev
-```
-This will watch `ts` files and start bundler.
-
 
 ## Implementation:
   - [ ] [iOS native MathView](https://github.com/kostub/iosMath) - POC successful, need to implement native measuring. For now fallbacking to `react-native-svg`
@@ -105,6 +98,8 @@ This will watch `ts` files and start bundler.
 ### FollowUp
 
 [iOS editable math view](https://github.com/kostub/MathEditor)
+
+[Native android math view](https://github.com/himamis/ReTeX)
 
 [KaTeX](https://github.com/Khan/KaTeX) - Math keypad that works with `<WebView>`. See [this](https://github.com/ShaMan123/math-input)
 

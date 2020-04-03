@@ -112,7 +112,11 @@ export default class MathjaxAdaptor {
         //
         //  Create input and output jax and a document using them on the content from the HTML file
         //
-        this.tex = new TeX({ packages: options.packages });
+        this.tex = new TeX({
+            packages: options.packages,
+            inlineMath: options.inlineMath,
+            displayMath: options.displayMath,
+        });
         this.svg = new SVG({
             fontCache: (options.fontCache ? 'local' : 'none'),
             internalSpeechTitles: true

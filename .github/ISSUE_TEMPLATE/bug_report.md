@@ -21,6 +21,9 @@ assignees: ''
 A clear and concise description of what the bug is.
 If you're problem is related to `MathJax` internals try to provide more information, links, etc.
 
+**LaTeX**
+If your bug occurs when using a specific math expression add it here.
+
 **To Reproduce**
 Steps to reproduce the behavior.
 

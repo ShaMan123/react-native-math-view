@@ -109,6 +109,7 @@ export default function Composition() {
             <MathItem
                 math={processString}
                 style={styles.defaultColorTheme}
+                config={{ inline: false }}
             />
         </ScrollView>
     );

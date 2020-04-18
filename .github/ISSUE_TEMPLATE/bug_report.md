@@ -12,7 +12,7 @@ assignees: ''
 1. Read through **pinned**, open and closed issues.
 1. Read through [Trouble Shooting](../#troubleshooting).
 1. Make sure you're using the latest version.
-1. Check out the [Example](../tree/master/MathExample) app for code snippets that might provide an answer to your problem.
+1. Check out the [Example](../tree/master/MathExample) app for code snippets that might provide an answer to your problem as well as [MathJax Demos](https://github.com/mathjax/MathJax-demos-node).
 
 
 ---

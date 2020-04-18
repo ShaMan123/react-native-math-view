@@ -7,11 +7,13 @@ assignees: ''
 
 ---
 
-### Before you file a report
+---
+### Before You File a BUG Report
 1. Read through **pinned**, open and closed issues.
-1. Read through [Trouble Shooting](./README.md#troubleshooting).
+1. Read through [Trouble Shooting](../#troubleshooting).
 1. Make sure you're using the latest version.
-1. Check out the [Example](./MathExample) app for code snippets that might provide an answer to your problem.
+1. Check out the [Example](../tree/master/MathExample) app for code snippets that might provide an answer to your problem.
+---
 
 **Describe the bug**
 A clear and concise description of what the bug is.

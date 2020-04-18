@@ -60,7 +60,6 @@ function MathBaseView(props: MathViewBaseProps, ref: Ref<any>) {
             {...props}
             style={[styles.container, props.resizeMode === 'contain' && styles.contain, props.style]}
             ref={ref}
-            hardwareAccelerated
             key={key}
         />
     );

@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Create a bug report
 title: ''
 labels: ''
 assignees: ''
@@ -9,6 +9,7 @@ assignees: ''
 
 ---
 ### Before You File a BUG Report
+
 1. Read through **pinned**, open and closed issues.
 1. Read through [Trouble Shooting](../#troubleshooting).
 1. Make sure you're using the latest version.
@@ -17,6 +18,7 @@ assignees: ''
 
 **Describe the bug**
 A clear and concise description of what the bug is.
+If you're problem is related to `MathJax` internals try to provide more information, links, etc.
 
 **To Reproduce**
 Steps to reproduce the behavior.

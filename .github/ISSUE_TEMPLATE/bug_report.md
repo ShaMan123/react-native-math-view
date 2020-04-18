@@ -33,3 +33,8 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 In addition to screenshots of your app add a screenshot from the [MathJax sandbox](https://www.mathjax.org/#demo) for comparison.
+
+
+<details><summary>Stack Trace</summary>
+paste the stack trace here
+</details>

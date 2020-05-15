@@ -24,7 +24,7 @@ $ cd ios && pod install
 
 #### Expo
 Expo doesn't support native modules. 
-You can use this library with `react-native-svg` (performance suffers a bit), see [#19](/../../issues/19).
+You can use this library with `react-native-svg` (performance suffers a bit), see [#19](/../../issues/19#issuecomment-567918194).
 
 
 #### Errors during installation:

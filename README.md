@@ -2,7 +2,8 @@
 
 ## WIP V3
 
-A react native view used to easily display and handle math.
+A react native view used to easily display and handle math. 
+The library doesn't use `WebView`.
 
 | Launch Test | Example App |
 | --- | --- |

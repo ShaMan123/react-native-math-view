@@ -106,7 +106,7 @@ export default class MathjaxAdaptor {
         //  Create DOM adaptor and register it for HTML documents
         //
         const adaptor = liteAdaptor();
-        const htmlHander = RegisterHTMLHandler(adaptor);
+        const htmlHandler = RegisterHTMLHandler(adaptor);
         //EnrichHandler(htmlHander, new MathML());
 
         //

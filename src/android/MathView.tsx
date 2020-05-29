@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import React, { forwardRef, useEffect, useMemo, useState, Ref } from 'react';
 import { NativeModules, requireNativeComponent, UIManager, ViewProps } from 'react-native';
 import { styles } from '../common';
-import MathjaxFactory, { MathToSVGConfig } from '../mathjax/index';
+import MathjaxFactory, { MathToSVGConfig } from '../mathjax';
 
 const nativeViewName = 'RNMathView';
 const RNMathView = requireNativeComponent(nativeViewName);

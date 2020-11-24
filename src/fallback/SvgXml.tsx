@@ -24,6 +24,6 @@ FallbackMathView.defaultProps = {
     resizeMode: 'cover'
 } as MathViewProps;
 
-FallbackMathView.displayName = 'FallbackMathView'
+FallbackMathView.displayName = 'FallbackMathView';
 
 export default FallbackMathView;

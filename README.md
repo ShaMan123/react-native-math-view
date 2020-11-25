@@ -51,6 +51,10 @@ import MathView from 'react-native-math-view';
 	<MathView
 	   math='\cos\left(x\right)=\frac{b}{c}'
 	/> 
+	<MathView
+	   math='\cos\left(x=\frac{b}{c}'
+	   renderError={({ error }) => <Text style={[{ fontWeight: 'bold' }]}>{error}</Text>}
+	/> 
     ...
   );
 

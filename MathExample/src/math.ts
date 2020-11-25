@@ -4,61 +4,61 @@ export const trig = [
     {
         "string": "\\sin\\left(2\\alpha\\right)=2\\sin\\left(\\alpha\\right)\\cos\\left(\\alpha\\right)",
         "math": true,
-        "alt": "сйрес жеейъ лфемд",
+        "alt": "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ",
         "parents": { "-LAsMZHiyhcq8DvIgI2U": 0 }
     },
     {
         "string": "\\cos \\left(2\\alpha \\right)=\\cos ^2\\left(\\alpha \\right)-\\sin ^2\\left(\\alpha \\right)",
         "math": true,
-        "alt": "чесйрес жеейъ лфемд",
+        "alt": "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ",
         "parents": { "-LAsMZHiyhcq8DvIgI2U": 0 }
     },
     {
         "string": "\\sin \\left(\\alpha \\pm \\beta \\right)=\\sin \\left(\\alpha \\right)\\cos \\left(\\beta \\right)\\pm \\cos \\left(\\alpha \\right)\\sin \\left(\\beta \\right)",
         "math": true,
-        "alt": "сйрес зйбеш жеейеъ",
+        "alt": "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ",
         "parents": { "-LAsMZHiyhcq8DvIgI2U": 0 }
     },
     {
         "string": "\\cos \\left(\\alpha \\pm \\beta \\right)=\\cos \\left(\\alpha \\right)\\cos \\left(\\beta \\right)\\mp \\sin \\left(\\alpha \\right)\\sin \\left(\\beta \\right)",
         "math": true,
-        "alt": "чесйрес зйбеш жеейъ",
+        "alt": "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ",
         "parents": { "-LAsMZHiyhcq8DvIgI2U": 0 }
     },
     {
         "string": "\\sin \\left(\\alpha \\right)\\pm \\sin \\left(\\beta \\right)=2\\sin \\left(\\frac{\\alpha \\pm \\beta }{2}\\right)2\\cos \\left(\\frac{\\alpha \\mp \\beta }{2}\\right)",
         "math": true,
-        "alt": "сйрес зйбеш вгмйн",
+        "alt": "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ",
         "parents": { "-LAsMZHiyhcq8DvIgI2U": 0 }
     },
     {
         "string": "\\cos \\left(\\alpha \\right)+\\cos \\left(\\beta \\right)=2\\cos \\left(\\frac{\\alpha +\\beta }{2}\\right)2\\cos \\left(\\frac{\\alpha -\\beta }{2}\\right)",
         "math": true,
-        "alt": "чесйрес зйбеш вгмйн",
+        "alt": "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ",
         "parents": { "-LAsMZHiyhcq8DvIgI2U": 0 }
     },
     {
         "string": "\\cos \\left(\\alpha \\right)-\\cos \\left(\\beta \\right)=-2\\sin \\left(\\frac{\\alpha +\\beta }{2}\\right)2\\sin \\left(\\frac{\\alpha -\\beta }{2}\\right)",
         "math": true,
-        "alt": "чесйрес зйсеш вгмйн",
+        "alt": "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ",
         "parents": { "-LAsMZHiyhcq8DvIgI2U": 0 }
     },
     {
         "string": "\\frac{a}{\\sin \\left(\\alpha \\right)}=\\frac{b}{\\sin \\left(\\beta \\right)}=\\frac{c}{\\sin \\left(\\gamma \\right)}=2R",
         "math": true,
-        "alt": "ощфи сйрес",
+        "alt": "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ",
         "parents": { "-LAsMZHhdvp3WJiFBp4r": 0 }
     },
     {
         "string": "c^2=a^2+b^2-2ab\\cos \\left(\\gamma \\right)",
         "math": true,
-        "alt": "ощфи чесйрес",
+        "alt": "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ",
         "parents": { "-LAsMZHhdvp3WJiFBp4r": 0 }
     },
     {
         "string": "S_{\\triangle }=\\frac{ab\\sin \\left(\\gamma \\right)}{2}",
         "math": true,
-        "alt": "щиз ощемщ",
+        "alt": "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ",
         "parents": { "-LAsMZHhdvp3WJiFBp4r": 0 }
     }
 ];
@@ -67,41 +67,41 @@ export const calculus = [
     {
         "string": "f'\\left(x\\right)=0",
         "math": true,
-        "alt": "чйцеп",
+        "alt": "пїЅпїЅпїЅпїЅпїЅ",
         "parents": { "-LAsMZHgej2TmHNkvpqC": 0 }
     },
     {
         "string": "f''\\left(x\\right)=0",
         "math": true,
-        "alt": "фйъем",
+        "alt": "пїЅпїЅпїЅпїЅпїЅ",
         "parents": { "-LAsMZHgej2TmHNkvpqC": 0 }
     },
     {
         "string": "\\left(\\frac{f\\left(x\\right)}{g\\left(x\\right)}\\right)'=\\frac{f'\\left(x\\right)g\\left(x\\right)-g'\\left(x\\right)f\\left(x\\right)}{g^2\\left(x\\right)}",
         "math": true,
-        "alt": "рвжшъ щм ферчцййъ орд",
+        "alt": "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ",
         "parents": { "-LAsMZHgej2TmHNkvpqC": 0 }
     },
     {
         "string": "\\left(f\\left(x\\right)g\\left(x\\right)\\right)'=f'\\left(x\\right)g\\left(x\\right)+g'\\left(x\\right)f\\left(x\\right)",
         "math": true,
-        "alt": "рвжшъ щм ферчцййъ лфм",
+        "alt": "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ",
         "parents": { "-LAsMZHgej2TmHNkvpqC": 0 }
     },
     {
         "string": "\\left(f\\left(g\\left(x\\right)\\right)\\right)'=f'\\left(g\\left(x\\right)\\right)\\cdot g'\\left(x\\right)",
         "math": true,
-        "alt": "рвжшъ щм ферчцйд оешлбъ",
+        "alt": "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ",
         "parents": { "-LAsMZHgej2TmHNkvpqC": 0 }
     },
     {
         "string": "\\left(x^n\\right)'=n\\cdot x^{n-1}",
         "math": true,
-        "alt": "рвжшъ щм ферчцййъ фемйрен",
+        "alt": "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ",
         "parents": { "-LAsMZHgej2TmHNkvpqC": 0 }
     },
     {
-        "string": "асйофиеиеъ",
+        "string": "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ",
         "math": false,
         "parents": { "-LAsMZHfNgCQuq6Kasmv": 0 }
     }
@@ -124,7 +124,8 @@ export const chemistry = [
 ];
 
 export const math = [
-    'x_{1,2}=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}'
+    'x_{1,2}=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}',
+    `f'\\left(x\\`
 ];
 
 export function getTaylor(n: number) {

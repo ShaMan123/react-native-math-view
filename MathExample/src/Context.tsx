@@ -7,7 +7,9 @@ export interface IAppContext {
     width: number | string | Animated.Value | Animated.AnimatedInterpolation,
     inc: number,
     page: number,
-    setPage: (index: number) => void
+    setPage: (index: number) => void,
+    switchValue: boolean,
+    setSwitchValue: (index: boolean) => void
 }
 
 const AppContext = createContext<IAppContext>({
@@ -15,7 +17,9 @@ const AppContext = createContext<IAppContext>({
     width: '100%',
     inc: 0,
     page: -1,
-    setPage: () => { throw new Error('AppContext not initialized') }
+    setPage: () => { throw new Error('AppContext not initialized') },
+    switchValue: false,
+    setSwitchValue: () => { throw new Error('AppContext not initialized') },
 });
 
 export function useAppContext() {

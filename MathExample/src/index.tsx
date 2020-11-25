@@ -1,5 +1,5 @@
 
-import * as _ from 'lodash';
+import _ from 'lodash';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Switch, Text, View } from 'react-native';
 import { RectButton, FlatList } from 'react-native-gesture-handler';
@@ -67,37 +67,37 @@ function MainScreen() {
     )
 }
 
+const Page = () => {
+    const { inc, page, setPage, switchValue, setSwitchValue } = useAppContext();
+    switch (page) {
+        case -1:
+            return (
+                <MainScreen />
+            );
+        default:
+            const El = SCREENS[page].component;
+            return <>
+                <El />
+                <View style={{ borderColor: 'darkblue', borderWidth: 2 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+                        <Switch
+                            onValueChange={setSwitchValue}
+                            value={switchValue}
+                        />
+                        <Text style={{ fontWeight: switchValue ? 'bold' : 'normal' }}>{switchValue ? 'HYPER mode' : 'static mode'}</Text>
+                    </View>
+                    <PageSelector index={-1} title="Back" />
+                </View>
+            </>
+    }
+}
+
 export default function App() {
     useEffect(() => {
         MathjaxFactory().preload(_.slice(allMath, 0, 5));
     }, [])
     const [page, setPage] = useState(-1);
-
     const [switchValue, setSwitchValue] = useState(false);
-
-    const el = useMemo(() => {
-        switch (page) {
-            case -1:
-                return (
-                    <MainScreen />
-                );
-            default:
-                const El = SCREENS[page].component;
-                return <>
-                    <El />
-                    <View style={{ borderColor: 'darkblue', borderWidth: 2 }}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-                            <Switch
-                                onValueChange={setSwitchValue}
-                                value={switchValue}
-                            />
-                            <Text style={{ fontWeight: switchValue ? 'bold' : 'normal' }}>{switchValue ? 'HYPER mode' : 'static mode'}</Text>
-                        </View>
-                        <PageSelector index={-1} title="Back" />
-                    </View>
-                </>
-        }
-    }, [page, switchValue]);
 
     return (
         <AppContext.Provider
@@ -106,10 +106,12 @@ export default function App() {
                 width: useWidth(switchValue),
                 inc: useInc(switchValue),
                 page,
-                setPage
+                setPage,
+                switchValue,
+                setSwitchValue
             }}
         >
-            {el}
+            <Page />
         </AppContext.Provider>
     );
 }

@@ -3,9 +3,10 @@ import * as _ from 'lodash';
 import React, { useState, useCallback, useRef, useMemo, MutableRefObject, useEffect, useImperativeHandle } from 'react';
 import { LayoutRectangle, StyleSheet, View, LayoutChangeEvent, Insets, TouchableOpacity, TouchableOpacityProps, GestureResponderEvent, I18nManager, Animated, Text } from 'react-native';
 import MathjaxFactory, { MathFragmentResponse } from '../mathjax/MathjaxFactory';
-import MathView, { ControlledMathView, MathViewProps } from './MathView';
+import MathView, { ControlledMathView } from './MathView';
 import HitRectUtil, { defaultHitSlop, MathFragmentRect } from './HitRectUtil';
 import * as TreeWalker from '../mathjax/TreeWalker';
+import { MathViewProps } from 'src/common';
 
 
 function useLayout(initial = { x: 0, y: 0, width: 0, height: 0 }) {
@@ -43,7 +44,7 @@ function FragmentedMathView(props: FragmentedMathViewProps, ref: any) {
         hitRectUtil.setHitSlop(props.hitSlop);
     }, [props.hitSlop, hitRectUtil]);
 
-    
+
     const __ref = useRef();
     const anima = useMemo(() => _.map(new Array(_.size(data)), () => new Animated.Value(1)), [data]);
     const animaF = useMemo(() => _.map(data, ({ viewBox }, i) => {
@@ -57,7 +58,7 @@ function FragmentedMathView(props: FragmentedMathViewProps, ref: any) {
     useImperativeHandle(ref, () => _.assign({}, __ref.current, {
         test: (x: number, y: number) => hitRectUtil.test(x, y),
         __test: (x: number, y: number) => {
-           // console.log(test.current(x, y))
+            // console.log(test.current(x, y))
             const hitResult = hitRectUtil.test(x, y);
             /*
             const augment = _.map(hitResult, (arg) => {
@@ -78,18 +79,18 @@ function FragmentedMathView(props: FragmentedMathViewProps, ref: any) {
         __pip() {
             _.map(new Array(data.length), (a, i) => anima[i].setValue(2))
             setTimeout(() => {
-                
+
             }, 200)
             Animated.stagger(
                 50,
                 _.concat(
                     // _.map(new Array(data.length), (a, i) => Animated.spring(anima[i], { toValue: 2, useNativeDriver: true })),
-                    _.map(new Array(data.length), (a, i) => Animated.spring(anima[i], { toValue: 1, useNativeDriver: true, delay:500 })),
+                    _.map(new Array(data.length), (a, i) => Animated.spring(anima[i], { toValue: 1, useNativeDriver: true, delay: 500 })),
                 )
             ).start();
         }
     }));
-    
+
     return (
         <Animated.View
             collapsable={false}
@@ -102,7 +103,7 @@ function FragmentedMathView(props: FragmentedMathViewProps, ref: any) {
                 onLayout={onLayout}
                 //style={{ color: 'green', backgroundColor: 'red', opacity: 0.3 }}
                 ref={__ref}
-                
+
             />
 
             {layout && data && _.map(data, ({ svg, viewBox, namespace: { char } }, index) => {
@@ -110,7 +111,7 @@ function FragmentedMathView(props: FragmentedMathViewProps, ref: any) {
                     <Animated.View
                         pointerEvents='none'
                         key={`MathFragment${index}`}
-                        style={[StyleSheet.absoluteFill, styles.flexContainer, { transform: [{ translateX: animaF[index] },{ scale: anima[index] }]}]}
+                        style={[StyleSheet.absoluteFill, styles.flexContainer, { transform: [{ translateX: animaF[index] }, { scale: anima[index] }] }]}
                     >
                         <ControlledMathView
                             {...props}
@@ -136,7 +137,7 @@ function FragmentedMathView(props: FragmentedMathViewProps, ref: any) {
                         <Text>{char}</Text>
                     </View>
                 );
-                })}
+            })}
         </Animated.View>
     );
     /*

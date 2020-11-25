@@ -2,27 +2,40 @@
 
 import React, { Ref } from 'react';
 import { SvgFromXml } from 'react-native-svg';
-import { MathViewProps } from '../android/index';
-import { styles } from '../common';
+import { ErrorComponent, MathViewProps, styles } from '../common';
 import MathjaxFactory from '../mathjax/index';
 
 function SvgXml(props: MathViewProps, ref: Ref<any>) {
-    return (
-        <SvgFromXml
-            {...props}
-            style={[props.resizeMode === 'contain' && styles.contain, props.style]}
-            ref={ref}
-            {...MathjaxFactory(props.config).toSVGXMLProps(props.math)}
-        />
-    );
+    try {
+        const svgXmlProps = MathjaxFactory(props.config).toSVGXMLProps(props.math)
+        return (
+            <SvgFromXml
+                {...props}
+                style={[props.resizeMode === 'contain' && styles.contain, props.style]}
+                ref={ref}
+                {...svgXmlProps}
+            />
+        );
+    } catch (error) {
+        const { renderError: Fallback } = props;
+        return typeof Fallback === 'function' ?
+            <Fallback
+                error={`${error}`}    //escape \
+                {...props}
+            /> :
+            React.isValidElement(Fallback) ?
+                Fallback :
+                null;
+    }
 }
 
 const FallbackMathView = React.forwardRef(SvgXml);
 
 FallbackMathView.defaultProps = {
     color: 'black',
-    resizeMode: 'cover'
-} as MathViewProps;
+    resizeMode: 'cover',
+    renderError: ErrorComponent
+} as Partial<MathViewProps>;
 
 FallbackMathView.displayName = 'FallbackMathView';
 

@@ -1,8 +1,9 @@
 'use strict';
 
 import React, { forwardRef } from 'react';
+import { MathViewProps } from 'src/common';
 import FragmentedMathView from './FragmentedMathView';
-import MathView, { ControlledMathView, MathViewProps } from './MathView';
+import MathView, { ControlledMathView } from './MathView';
 
 
 export interface MathViewControllerProps extends MathViewProps {

@@ -1,7 +1,7 @@
 
 import * as _ from 'lodash';
 import React, { useContext, useMemo } from 'react';
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
 import AppContext from './Context';
 import MathStrings from './math';
 import MathViewFallback from 'react-native-math-view/src/fallback';
@@ -20,6 +20,7 @@ export default function SvgXml() {
                     math={tag}
                     style={[styles.defaultColorTheme, { marginVertical: 10 }]}
                     resizeMode="cover"
+                    renderError={({ error }) => <Text style={[styles.defaultColorTheme, { marginVertical: 10 }, { fontWeight: 'bold' }]}>{error}</Text>}
                 />
             </View>
         </View>

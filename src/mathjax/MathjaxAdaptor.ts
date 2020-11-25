@@ -8,6 +8,7 @@ import { TeX } from 'mathjax-full/js/input/tex';
 import TexParser from 'mathjax-full/js/input/tex/TexParser';
 import { mathjax } from 'mathjax-full/js/mathjax';
 import { SVG } from 'mathjax-full/js/output/svg';
+import { STATE } from 'mathjax-full/js/core/MathItem';
 import { LayoutRectangle } from 'react-native';
 import * as matrixUtil from 'transformation-matrix';
 import { MathToSVGConfig, mathToSVGDefaultConfig } from './Config';
@@ -20,6 +21,7 @@ import { HTMLMathItem } from 'mathjax-full/js/handlers/html/HTMLMathItem';
 import { speechAction } from './SpeechAction';
 import { BBox } from 'mathjax-full/ts/core/MathItem';
 import * as TreeWalker from './TreeWalker';
+import TexError from 'mathjax-full/js/input/tex/TexError';
 //import { MmlFactory } from 'mathjax-full/js/core/MmlTree/MmlFactory';
 /*
 declare const global: any;
@@ -35,6 +37,7 @@ mathjax.asyncLoad = (name: string) => console.log('asunload', name);
 console.log(sre)
 */
 
+const ERROR_MAP = new Map<string, { id: string, message: string }>();
 
 export interface MathFragmentResponse {
     node: LiteElement,
@@ -62,9 +65,12 @@ class ConvertMemoize extends Memoize {
     cache: Array<{ math: string, options: MathToSVGConfig, mathElement: LiteElement }> = [];
     covert(math: string, options: MathToSVGConfig, doc: MathDocument<any, any, any>) {
         const cached = this.get(math, options);
-
         if (_.isNil(cached)) {
             const mathElement = doc.convert(math, ConvertMemoize.getConvertOptions(options)) as LiteElement;
+            const isError = doc.inputJax[0].parseOptions.error;
+            if (isError) {
+                throw new Error(ERROR_MAP.get(math)?.message || '');
+            }
             this.cache.push({ math, options, mathElement });
             return mathElement;
         }
@@ -116,7 +122,14 @@ export default class MathjaxAdaptor {
             packages: options.packages,
             inlineMath: options.inlineMath,
             displayMath: options.displayMath,
+            formatError: (jax: TeX<any, any, any>, err: TexError) => {
+                const math = jax.latex;
+                __DEV__ && console.warn('MathView: LaTex parsing Error', { ...err, math });
+                ERROR_MAP.set(math, err);
+                return jax.formatError(err);
+            },
         });
+
         this.svg = new SVG({
             fontCache: (options.fontCache ? 'local' : 'none'),
             internalSpeechTitles: true
@@ -124,11 +137,20 @@ export default class MathjaxAdaptor {
 
         this.html = mathjax.document('', {
             InputJax: this.tex,
-            OutputJax: this.svg
+            OutputJax: this.svg,
+            //compileError: () => console.error('ds'),
+            //typesetError: () => console.error('ds'),
+
             //enrichSpeech: options.enrichSpeech
         });
-
-        //this.html.addRenderAction('mip', ...speechAction.simplfy);
+        /*
+                this.html.addRenderAction(
+                    'mip',
+                    STATE.COMPILE + 1,
+                    (doc) => { },
+                    (math, doc) => console.log(this.tex.parseOptions.error, doc.inputJax[0].latex)
+                );
+        */
     }
 
     protected get adaptor() {
@@ -299,7 +321,11 @@ export default class MathjaxAdaptor {
     preload(mathArray: string[]) {
         if (_.size(mathArray) > 0) {
             setTimeout(() => {
-                _.map(mathArray, (math) => this.toSVG(math));
+                _.forEach(mathArray, (math) => {
+                    try {
+                        return this.toSVG(math)
+                    } catch (error) { }
+                });
                 if (__DEV__) console.log('react-native-math-view: Mathjax preload completed');
             }, 0);
         }

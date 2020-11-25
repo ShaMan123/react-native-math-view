@@ -33,14 +33,14 @@ function MathBaseView(props: MathViewBaseProps, ref: Ref<any>) {
     //  -----------------------------------------------------------------------------------------------------------------------------------------------
     //  used to remount RNMathView in order to recompute layout properly 
     //  occurs after props.math changes svg
-    //const key = useMemo(() => _.uniqueId('MathView'), [props.svg]);
+    const key = useMemo(() => _.uniqueId('MathView'), [props.svg]);
 
     return (
         <RNMathView
             {...props}
             style={[styles.container, props.resizeMode === 'contain' && styles.contain, props.style]}
             ref={ref}
-        //key={key}
+            key={key}
         />
     );
 }
@@ -85,7 +85,7 @@ export function useLatexToSVGSync(props: MathViewProps) {
 function MathView(props: MathViewProps, ref: any) {
     if (!props.math) return null;
     try {
-        const svg = MathjaxFactory(props.config).toSVG(props.math)//useLatexToSVGAsync(props);
+        const svg = useLatexToSVGAsync(props);
         return (
             <ControlledMathView
                 {...props}

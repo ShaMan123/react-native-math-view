@@ -1,24 +1,24 @@
 
-import React, { useEffect, useMemo, forwardRef } from 'react';
+import React, { forwardRef, useEffect, useMemo } from 'react';
 import { Animated, TouchableOpacityProps, ViewProps } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import MathView, { MathViewProps } from 'react-native-math-view';
 import { useColor } from './Hooks';
 import styles from './styles';
-import { TouchableHighlight, TouchableOpacity } from 'react-native-gesture-handler';
 
-function MathItem(props: MathViewProps & TouchableOpacityProps & { containerStyle?: ViewProps['style'] }, ref: any) {
+const MathItem = forwardRef((props: MathViewProps & TouchableOpacityProps & { containerStyle?: ViewProps['style'] }, ref: any) => {
     const color = useColor();
-
-    const opacity = useMemo(() => new Animated.Value(0), []);
-    useEffect(() => {
-        Animated
-            .timing(opacity, {
-                toValue: 1,
-                useNativeDriver: true
-            })
-            .start();
-    }, []);
-
+    /*
+        const opacity = useMemo(() => new Animated.Value(0), []);
+        useEffect(() => {
+            Animated
+                .timing(opacity, {
+                    toValue: 1,
+                    useNativeDriver: true
+                })
+                .start();
+        }, []);
+    */
     return (
         <TouchableOpacity
             {...props}
@@ -35,12 +35,10 @@ function MathItem(props: MathViewProps & TouchableOpacityProps & { containerStyl
             />
         </TouchableOpacity>
     );
-}
+});
 
-const MathItemWrapper = forwardRef(MathItem);
-
-MathItemWrapper.defaultProps = {
+MathItem.defaultProps = {
     containerStyle: styles.flexContainer
 }
 
-export default MathItemWrapper;
+export default MathItem;

@@ -13,15 +13,17 @@ import { LayoutRectangle } from 'react-native';
 import * as matrixUtil from 'transformation-matrix';
 import { MathToSVGConfig, mathToSVGDefaultConfig } from './Config';
 import { accTransformations, compose, extractDataFromMathjaxId, parseSVG, transformationToMatrix, Memoize } from './Util';
-
+/*
 import { MathML } from 'mathjax-full/js/input/mathml';
 import { MathList } from 'mathjax-full/js/core/MathList';
 import { MathItem } from 'mathjax-full/js/core/MathItem';
 import { HTMLMathItem } from 'mathjax-full/js/handlers/html/HTMLMathItem';
 import { speechAction } from './SpeechAction';
 import { BBox } from 'mathjax-full/ts/core/MathItem';
+*/
 import * as TreeWalker from './TreeWalker';
 import TexError from 'mathjax-full/js/input/tex/TexError';
+import { MathError } from '../common';
 //import { MmlFactory } from 'mathjax-full/js/core/MmlTree/MmlFactory';
 /*
 declare const global: any;
@@ -69,7 +71,9 @@ class ConvertMemoize extends Memoize {
             const mathElement = doc.convert(math, ConvertMemoize.getConvertOptions(options)) as LiteElement;
             const isError = doc.inputJax[0].parseOptions.error;
             if (isError) {
-                throw new Error(ERROR_MAP.get(math)?.message || '');
+                const error = new Error(ERROR_MAP.get(math)?.message || '');
+                error.name = MathError.parsing;
+                throw error;
             }
             this.cache.push({ math, options, mathElement });
             return mathElement;

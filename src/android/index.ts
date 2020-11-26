@@ -1,6 +1,5 @@
 
-import MathViewBase from './MathView';
+export { default } from './MathView';
 export * from './MathView';
-export { MathViewBase };
-export * from './MathViewController';
-export { default, MathViewControllerProps as MathViewProps } from './MathViewController';
+export { default as MathBaseView } from './MathBaseView';
+export * from './MathBaseView';

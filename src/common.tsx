@@ -1,4 +1,5 @@
-import React from "react";
+import _ from "lodash";
+import React, { PropsWithChildren } from "react";
 import { StyleProp, StyleSheet, Text, View, ViewProps, ViewStyle } from "react-native";
 import { MathToSVGConfig } from "./mathjax";
 
@@ -30,9 +31,33 @@ export interface MathViewProps extends ViewProps {
     renderError?: React.FC<MathViewErrorProps> | JSX.Element
 }
 
+export enum MathError {
+    parsing = "MATH_ERROR/PARSING"
+}
+
 export interface MathViewErrorProps extends MathViewProps {
     error: string
 }
+
+export const ErrorComponent = (props: MathViewErrorProps) => <View style={[props.style, styles.multilineText]}>
+    <Text style={props.style}>{props.math}</Text>
+    <Text style={[props.style, styles.error]}>{props.error}</Text>
+</View>;
+
+export function mathErrorBoundary(error: Error, props: MathViewProps) {
+    if (_.every((MathError), enumo => enumo !== error.name)) throw error;
+    const { renderError: Fallback } = props;
+    return typeof Fallback === 'function' ?
+        <Fallback
+            error={`${error.message}`}    //escape backslash "\" used in LaTex 
+            {...props}
+        /> :
+        React.isValidElement(Fallback) ?
+            Fallback :
+            null;
+}
+
+export const getPreserveAspectRatio = (alignment: string, scale: string) => `${alignment} ${scale}`;
 
 export const styles = StyleSheet.create({
     container: {
@@ -52,8 +77,3 @@ export const styles = StyleSheet.create({
         flexDirection: 'column'
     }
 });
-
-export const ErrorComponent = (props: MathViewErrorProps) => <View style={[props.style, styles.multilineText]}>
-    <Text style={props.style}>{props.math}</Text>
-    <Text style={[props.style, styles.error]}>{props.error}</Text>
-</View>;

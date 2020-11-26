@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import React, { useState, useCallback, useRef, useMemo, MutableRefObject, useEffect, useImperativeHandle } from 'react';
 import { LayoutRectangle, StyleSheet, View, LayoutChangeEvent, Insets, TouchableOpacity, TouchableOpacityProps, GestureResponderEvent, I18nManager, Animated, Text } from 'react-native';
 import MathjaxFactory, { MathFragmentResponse } from '../mathjax/MathjaxFactory';
-import MathView, { ControlledMathView } from './MathView';
+import MathView, { MathBaseView } from './MathView';
 import HitRectUtil, { defaultHitSlop, MathFragmentRect } from './HitRectUtil';
 import * as TreeWalker from '../mathjax/TreeWalker';
 import { MathViewProps } from 'src/common';
@@ -113,7 +113,7 @@ function FragmentedMathView(props: FragmentedMathViewProps, ref: any) {
                         key={`MathFragment${index}`}
                         style={[StyleSheet.absoluteFill, styles.flexContainer, { transform: [{ translateX: animaF[index] }, { scale: anima[index] }] }]}
                     >
-                        <ControlledMathView
+                        <MathBaseView
                             {...props}
                             svg={svg}
                             style={{ color: 'blue' }}
@@ -150,7 +150,7 @@ function FragmentedMathView(props: FragmentedMathViewProps, ref: any) {
                 console.log(math, svg)
                 return (
                     <View key={`MEditable${index}`} style={[StyleSheet.absoluteFill, { alignItems: 'flex-end', flexDirection: 'row-reverse', margin: 5 }]}>
-                        <ControlledMathView
+                        <MathBaseView
 
                             //math='abc' 
                             //math={math}

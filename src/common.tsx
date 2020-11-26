@@ -1,5 +1,5 @@
 import _ from "lodash";
-import React, { PropsWithChildren } from "react";
+import React from "react";
 import { StyleProp, StyleSheet, Text, View, ViewProps, ViewStyle } from "react-native";
 import { MathToSVGConfig } from "./mathjax";
 
@@ -45,7 +45,7 @@ export const ErrorComponent = (props: MathViewErrorProps) => <View style={[props
 </View>;
 
 export function mathErrorBoundary(error: Error, props: MathViewProps) {
-    if (_.every((MathError), enumo => enumo !== error.name)) throw error;
+    if (_.every(_.values(MathError), enumo => enumo !== error.name)) throw error;
     const { renderError: Fallback } = props;
     return typeof Fallback === 'function' ?
         <Fallback

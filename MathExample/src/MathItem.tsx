@@ -1,6 +1,6 @@
 
-import React, { forwardRef, useEffect, useMemo } from 'react';
-import { Animated, TouchableOpacityProps, ViewProps } from 'react-native';
+import React, { forwardRef } from 'react';
+import { Text, TouchableOpacityProps, View, ViewProps } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import MathView, { MathViewProps } from 'react-native-math-view';
 import { useColor } from './Hooks';
@@ -31,6 +31,7 @@ const MathItem = forwardRef((props: MathViewProps & TouchableOpacityProps & { co
                 style={{ color }} // can use color prop instead
                 {...props}
                 ref={ref}
+                renderError={() => <Text style={{ backgroundColor: 'red', flex: 1, color: 'black' }}>sdggsdfgdsfgsdfgdsfg</Text>}
             //config={{ ex: 50 }}
             />
         </TouchableOpacity>

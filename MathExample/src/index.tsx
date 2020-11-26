@@ -1,8 +1,8 @@
 
 import _ from 'lodash';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Switch, Text, View } from 'react-native';
-import { RectButton, FlatList } from 'react-native-gesture-handler';
+import { FlatList, RectButton } from 'react-native-gesture-handler';
 import MathjaxFactory, { FactoryMemoize } from 'react-native-math-view/src/mathjax';
 import AppContext, { useAppContext } from './Context';
 import DifferentLayouts from './DifferentLayouts';
@@ -12,8 +12,8 @@ import MathStrings from './math';
 import MathSectionList from './MathSectionList';
 import Standalone from './Standalone';
 import styles from './styles';
-import TouchableMathList from './TouchableMathView';
 import SvgXml from './SvgXml';
+import TouchableMathList from './TouchableMathView';
 import WrapWithText from './WrapWithText';
 
 const allMath = _.flatten(_.values(MathStrings));
@@ -54,7 +54,7 @@ function MainScreen() {
             />
             <View style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Button
-                    onPress={() => FactoryMemoize.cache.clear()}
+                    onPress={() => FactoryMemoize.cache.clear!()}
                     title='clear cache'
                     color='blue'
                 />

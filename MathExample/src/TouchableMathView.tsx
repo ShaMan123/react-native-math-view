@@ -1,8 +1,8 @@
 
 import React, { useCallback, useRef, useState } from 'react';
-import { Animated, SectionListProps, I18nManager } from 'react-native';
-import { State, TapGestureHandler, PanGestureHandler, GestureHandlerGestureEvent, PanGestureHandlerGestureEvent, TapGestureHandlerStateChangeEvent } from 'react-native-gesture-handler';
-import { MathViewProps } from 'react-native-math-view/src';
+import { Animated, I18nManager, SectionListProps } from 'react-native';
+import { PanGestureHandler, PanGestureHandlerGestureEvent, TapGestureHandler, TapGestureHandlerStateChangeEvent } from 'react-native-gesture-handler';
+import { MathViewProps } from 'react-native-math-view';
 import MathStrings from './math';
 import MathItem from './MathItem';
 import MathSectionList from './MathSectionList';
@@ -10,16 +10,16 @@ import styles from './styles';
 
 export function TouchableMathView({ math }: MathViewProps) {
     const [editing, setEditable] = useState(false);
-    const ref = useRef();
+    const ref = useRef(null);
     const reactToTouch = useCallback((e: PanGestureHandlerGestureEvent | TapGestureHandlerStateChangeEvent) => {
         if (!editing) {
             setEditable(true);
             return;
         }
-        
+
         ref.current && ref.current.__test(e.nativeEvent.x, e.nativeEvent.y);
     }, [ref, editing]);
-    
+
     const tap = useRef();
     const pan = useRef();
 
@@ -33,7 +33,7 @@ export function TouchableMathView({ math }: MathViewProps) {
                     onGestureEvent={reactToTouch}
                     ref={pan}
                     maxDeltaX={20}
-                    //waitFor={[tap]}
+                //waitFor={[tap]}
                 >
                     <Animated.View collapsable={false}>
                         <MathItem

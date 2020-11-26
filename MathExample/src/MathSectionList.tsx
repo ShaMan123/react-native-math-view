@@ -1,12 +1,11 @@
 
-import * as _ from 'lodash';
-import React, { useCallback, useState, useEffect, useContext } from 'react';
-import { SectionList, SectionListProps, Text, SectionListData, Dimensions, Animated } from 'react-native';
+import _ from 'lodash';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { Animated, SectionListData, SectionListProps, Text } from 'react-native';
+import AppContext from './Context';
 import MathStrings from './math';
 import MathItem from './MathItem';
 import styles from './styles';
-import { useWidth } from './Hooks';
-import AppContext from './Context';
 
 export default function MathSectionList(props: Partial<SectionListProps<typeof MathStrings>> = {}) {
     const [sections, setSections] = useState(_.map(MathStrings, (group, key) => {
@@ -28,7 +27,7 @@ export default function MathSectionList(props: Partial<SectionListProps<typeof M
     }, [refreshing]);
 
     const { width } = useContext(AppContext);
-    
+
     return (
         <Animated.SectionList
             renderItem={({ item, index, section }) => <MathItem math={item} />}

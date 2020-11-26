@@ -1,12 +1,12 @@
 
-import React, { useCallback, useContext, useMemo } from 'react';
-import { Text, YellowBox } from 'react-native';
+import React, { useCallback, useContext } from 'react';
+import { LogBox, Text } from 'react-native';
+import AppContext from './Context';
 import MathItem from './MathItem';
 import MathSectionList from './MathSectionList';
 import styles from './styles';
-import AppContext from './Context';
 
-YellowBox.ignoreWarnings(['Warning: `flexWrap: `wrap`` is not supported with the `VirtualizedList` components.']);
+LogBox.ignoreLogs(['Warning: `flexWrap: `wrap`` is not supported with the `VirtualizedList` components.']);
 
 export default function FlexWrapMathSectionList() {
     const { inc } = useContext(AppContext);
@@ -20,7 +20,7 @@ export default function FlexWrapMathSectionList() {
             </Text>
         );
     }, []);
-    
+
     const renderItem = useCallback(({ item }) => {
         return (
             <MathItem
@@ -31,7 +31,7 @@ export default function FlexWrapMathSectionList() {
         );
     }, []);
 
-   
+
 
     return (
         <MathSectionList

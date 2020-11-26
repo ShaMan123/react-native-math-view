@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, useContext } from "react";
 import { Animated } from "react-native";
 import AppContext from "./Context";
 
-const interval = 3000;
+const interval = 500;
 
 export function useWidth(switchValue: boolean, animated: boolean = false) {
     const [width, setWidth] = useState(1);
@@ -10,7 +10,7 @@ export function useWidth(switchValue: boolean, animated: boolean = false) {
     //switchValue = switchValue || context.switch;
 
     const widthAnimatedValue = useMemo(() => new Animated.Value(1), []);
-    
+
     let i = 0;
     useEffect(() => {
         const t = setInterval(() => {

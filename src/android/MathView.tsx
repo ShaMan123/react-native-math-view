@@ -1,6 +1,8 @@
 'use strict';
 
+import _ from 'lodash';
 import React, { forwardRef, useEffect, useMemo, useState } from 'react';
+import { View } from 'react-native';
 import { ErrorComponent, mathErrorBoundary, MathViewProps } from '../common';
 import MathjaxFactory from '../mathjax';
 import MathBaseView, { MathViewBaseProps } from './MathBaseView';
@@ -16,9 +18,19 @@ export function useLatexToSVGAsync(props: MathViewProps) {
     const { math, config } = props;
     const mathjax = useMemo(() => MathjaxFactory(config), [config]);
     const [svg, setSVG] = useState(mathjax.toSVG.cache.has(math) ? mathjax.toSVG.cache.get(math) : undefined);
+    const [error, setError] = useState();
     useEffect(() => {
-        setSVG(mathjax.toSVG(math));
+        try {
+            setSVG(mathjax.toSVG(math));
+        } catch (error) {
+            setError(error);
+        }
     }, [math, mathjax]);
+    if (error) {
+        const err = error;
+        setError(undefined);
+        throw err;
+    }
     return svg;
 }
 

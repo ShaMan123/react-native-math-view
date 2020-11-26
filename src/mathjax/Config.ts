@@ -1,4 +1,3 @@
-//@ts-ignore 
 import { AllPackages } from 'mathjax-full/js/input/tex/AllPackages';
 
 export interface MathToSVGConfig {

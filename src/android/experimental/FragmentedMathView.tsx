@@ -1,12 +1,13 @@
 
-import * as _ from 'lodash';
+import _ from 'lodash';
 import React, { useState, useCallback, useRef, useMemo, MutableRefObject, useEffect, useImperativeHandle } from 'react';
 import { LayoutRectangle, StyleSheet, View, LayoutChangeEvent, Insets, TouchableOpacity, TouchableOpacityProps, GestureResponderEvent, I18nManager, Animated, Text } from 'react-native';
-import MathjaxFactory, { MathFragmentResponse } from '../mathjax/MathjaxFactory';
-import MathView, { MathBaseView } from './MathView';
+import MathjaxFactory from '../../mathjax/MathjaxFactory';
+import MathView from '../../android/MathView';
 import HitRectUtil, { defaultHitSlop, MathFragmentRect } from './HitRectUtil';
-import * as TreeWalker from '../mathjax/TreeWalker';
-import { MathViewProps } from 'src/common';
+import * as TreeWalker from '../../mathjax/TreeWalker';
+import { MathViewProps } from '../../common';
+import { MathFragmentResponse } from '../../mathjax/MathjaxAdaptor';
 
 
 function useLayout(initial = { x: 0, y: 0, width: 0, height: 0 }) {

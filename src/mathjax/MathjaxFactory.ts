@@ -44,7 +44,7 @@ const IFactoryMemoize = _.set(memoize.get.bind(memoize), 'cache', memoize);
 const LFactoryMemoize = _.memoize((stringifiedOptions: string) => new MathjaxAdaptor(JSON.parse(stringifiedOptions) as MathToSVGConfig));
 
 /** MathjaxAdaptor Factory memoize */
-export const FactoryMemoize = useLodashMem ? LFactoryMemoize : IFactoryMemoize as typeof LFactoryMemoize | typeof IFactoryMemoize;
+export const FactoryMemoize = useLodashMem ? LFactoryMemoize : IFactoryMemoize as (typeof LFactoryMemoize | typeof IFactoryMemoize) & _.MemoizedFunction;
 
 function parseConfig(config?: Partial<MathToSVGConfig>) {
     const options = _.defaultsDeep(config || {}, mathToSVGDefaultConfig) as MathToSVGConfig;

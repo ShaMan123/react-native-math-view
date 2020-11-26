@@ -1,7 +1,7 @@
 
 import * as _ from 'lodash';
+import { MathFragmentResponse } from '../../mathjax/MathjaxAdaptor';
 import { Insets, LayoutRectangle } from 'react-native';
-import { MathFragmentResponse } from '../mathjax/MathjaxFactory';
 import Rect from './Rect';
 
 export const defaultHitSlop = {

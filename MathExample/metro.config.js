@@ -14,14 +14,14 @@ module.exports = {
       path.resolve(__dirname, '../node_modules/react'),
       path.resolve(__dirname, '../node_modules/react-native'),
       path.resolve(__dirname, '../node_modules/react-native-svg'),
-      path.resolve(__dirname, '../MathExampl1e'),
     ]),
     extraNodeModules: {
       '@babel/runtime': path.resolve(__dirname, 'node_modules/@babel/runtime'),
       'lodash': path.resolve(__dirname, 'node_modules/lodash'),
       'react': path.resolve(__dirname, 'node_modules/react'),
       'react-native': path.resolve(__dirname, 'node_modules/react-native'),
-      'react-native-svg': path.resolve(__dirname, 'node_modules/react-native-svg')
+      'react-native-svg': path.resolve(__dirname, 'node_modules/react-native-svg'),
+      'mathjax-full': path.resolve(__dirname, '../node_modules/mathjax-full')
     }
   },
   watchFolders: [path.resolve(__dirname, '..')],

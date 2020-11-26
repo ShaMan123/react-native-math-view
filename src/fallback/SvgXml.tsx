@@ -3,7 +3,7 @@
 import React, { forwardRef, Ref } from 'react';
 import { SvgFromXml } from 'react-native-svg';
 import { ErrorComponent, mathErrorBoundary, MathViewProps, styles } from '../common';
-import MathjaxFactory from '../mathjax/index';
+import MathjaxFactory from '../mathjax';
 
 const FallbackMathView = forwardRef((props: MathViewProps, ref: Ref<any>) => {
     try {

@@ -1,19 +1,20 @@
 
 import * as _ from 'lodash';
 import React, { useContext, useMemo } from 'react';
-import { View, Text, I18nManager, YellowBox } from 'react-native';
+import { View, Text, I18nManager, LogBox } from 'react-native';
 import AppContext from './Context';
 import MathStrings from './math';
 import MathItem from './MathItem';
 import styles from './styles';
 import { TouchableOpacity, FlatList, ScrollView } from 'react-native-gesture-handler';
 
-const processString = _.replace(`When $a \\ne 0$, there are two solutions \nto \\(ax^2 + bx + c = 0\\) and they are $$x_{1,2} = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$`, /\\(\(|\))/g, '$');
+const processString0 = `When $a \\ne 0$, there are two solutions \nto $ax^2 + bx + c = 0$ and they are $$x_{1,2} = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$`;
+let processString = _.replace(`Here I create a long text. This text with a variable should be wrapped correctly for \\( \\alpha \\) within the view. \nAdditionally the following formula should be inline with the text: \\( a^2 + b^2 = c^2 \\)`, /\\(\(|\))/g, '$');
 const processString1 = `hello world! I'm trying to understand why $ $flex wrap styling messes up text vertical alignment`;
 
 const allMath = _.flatten(_.values(MathStrings));
 
-YellowBox.ignoreWarnings(['VirtualizedLists should never be nested inside plain ScrollViews with the same orientation - use another VirtualizedList-backed container instead.'])
+LogBox.ignoreLogs(['VirtualizedLists should never be nested inside plain ScrollViews with the same orientation - use another VirtualizedList-backed container instead.'])
 
 function InlineItem({ value, isMath }: { value: string, isMath: boolean }) {
     if (value === '') return null;
@@ -52,6 +53,29 @@ function MathParagraph({ math, renderRow }: { math: string, renderRow: (value: s
     );
 }
 
+function MathRow({ value, isMath }: { value: string, isMath: boolean }) {
+    const parts = useMemo(() => _.flatten(_.map(_.split(value, /\$+/g), (value, i) => {
+        if (isMath || i % 2 === 1) {
+            return [{ value, isMath: true }];
+        } else {
+            return _.map(_.split(value, ' '), value => ({ value, isMath: false }));
+        }
+    })), [value, isMath]);
+    return (
+        <View
+            style={[styles.diverseContainer]}
+        >
+            {
+                _.map(parts, ({ value, isMath }, i) => {
+                    const el = <InlineItem value={value} isMath={isMath} key={`${value}${i}`} />;
+                    if (i === parts.length - 1) return el;
+                    return React.cloneElement(<>{el}<Text> </Text></>, { key: `space${i}` });
+                })
+            }
+        </View>
+    )
+}
+
 
 export default function Composition() {
     const { switch: mode, inc } = useContext(AppContext);
@@ -61,32 +85,22 @@ export default function Composition() {
             <Text>Compose with Text & MathView</Text>
             <MathParagraph
                 math={value}
-                renderRow={(value, isMath) => {
-                    return (
-                        <View
-                            style={[styles.diverseContainer]}
-                        >
-                            {
-                                _.map(_.split(value, /\$+/g), (value, i) => {
-                                    return <InlineItem value={value} isMath={isMath || i % 2 === 1} key={`${value}${i}`} />
-                                })
-                            }
-                        </View>
-                    )
-                }}
+                renderRow={(value, isMath) => <MathRow value={value} isMath={isMath} />}
             />
-
             <Text>Compose with FlatList</Text>
             <View>
                 <FlatList
-                    data={_.split(_.replace(processString, /\n+/g, '$$ $$'), /\$+/g)}
-                    renderItem={({ index, item }) => <InlineItem value={item} isMath={index % 2 === 1} />}
-                    keyExtractor={(item, index) => `${item}${index}`}
+                    data={_.flatten(_.map(_.split(value, '\n'), (val) => {
+                        const parts = _.split(val, '$$');
+                        return _.map(parts, (part, index) => ({ value: part, isMath: index % 2 === 1 }));
+                    }))}
+                    renderItem={({ item }) => <MathRow value={item.value} isMath={item.isMath} />}
+                    keyExtractor={(item, index) => `${item.value}${index}`}
                     contentContainerStyle={[{ flexWrap: 'wrap', display: 'flex', alignItems: 'center' }, styles.flexLeft]}
                     style={styles.defaultColorTheme}
                 />
             </View>
-            <Text>Split input, wrap text with op \\text{}</Text>
+            <Text>Split input, wrap text with op \\text{ }</Text>
             <MathParagraph
                 math={value}
                 renderRow={(value, isMath) => {
@@ -105,11 +119,18 @@ export default function Composition() {
                 math={`\\text{${_.replace(_.replace(processString, /\n+/g, '$$ $$'), /\$\$/g, '$')}}`}
                 style={styles.defaultColorTheme}
             />
+            <MathItem
+                math={`${_.replace(processString, /\n+/g, '$$')}`}
+                style={styles.defaultColorTheme}
+            />
             <Text>Raw</Text>
             <MathItem
                 math={processString}
                 style={styles.defaultColorTheme}
                 config={{ inline: false }}
+            />
+            <MathItem
+                math="When $a \ne 0$, there are two solutions to \(ax^2 + bx + c = 0\) and they are $$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$"
             />
         </ScrollView>
     );

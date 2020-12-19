@@ -108,7 +108,7 @@ npm run android
 
 [Native android math view](https://github.com/himamis/ReTeX)
 
-[Web Math Editors](https://github.com/mathjax/MathJax-docs/wiki/List-of-web-based-math-editors) -> [**CortexJS**](https://cortexjs.io/guides/mathfield-getting-started/) looks very promising!
+[Web Math Editors](https://github.com/mathjax/MathJax-docs/wiki/List-of-web-based-math-editors) -> [**MathLive**](https://github.com/arnog/mathlive) looks very promising!
 
 [KaTeX](https://github.com/Khan/KaTeX) - Math keypad that works with `<WebView>`. See [this](https://github.com/ShaMan123/math-input)
 

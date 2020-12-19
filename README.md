@@ -108,6 +108,8 @@ npm run android
 
 [Native android math view](https://github.com/himamis/ReTeX)
 
+[Web Math Editors](https://github.com/mathjax/MathJax-docs/wiki/List-of-web-based-math-editors)
+
 [KaTeX](https://github.com/Khan/KaTeX) - Math keypad that works with `<WebView>`. See [this](https://github.com/ShaMan123/math-input)
 
 [React with LaTeX](https://github.com/Pomax/BezierInfo-2) - using server side rendering to speed things up.

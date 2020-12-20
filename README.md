@@ -101,6 +101,9 @@ npm run android
   - [ ] [iOS native MathView](https://github.com/kostub/iosMath) - POC successful, need to implement native measuring. For now fallbacking to `react-native-svg`
 
   - [x] Android MathView - **native since V2**, based on [Android SVGImageView](https://bigbadaboom.github.io/androidsvg). Need to implement `editable` state.
+  
+## Looking for Web support?
+Check out [react-math-view](https://github.com/ShaMan123/react-math-view#react-math-view)!
 
 ### FollowUp
 

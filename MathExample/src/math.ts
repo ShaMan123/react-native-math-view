@@ -2,6 +2,11 @@ import * as _ from "lodash";
 
 export const trig = [
     {
+        "string": "\\sum_{n=0}^\\infty",
+        "math": true,
+        "alt": "����� ����� �����",
+    },
+    {
         "string": "\\sin\\left(2\\alpha\\right)=2\\sin\\left(\\alpha\\right)\\cos\\left(\\alpha\\right)",
         "math": true,
         "alt": "����� ����� �����",

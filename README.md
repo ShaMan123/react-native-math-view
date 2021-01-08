@@ -40,7 +40,7 @@ npm run compile
 
 ## Getting Started
 
-```ts
+```tsx
 import MathView, { MathText } from 'react-native-math-view';
 
   return (

@@ -10,14 +10,14 @@ import { TouchableOpacity, FlatList, ScrollView } from 'react-native-gesture-han
 import { MathText } from 'react-native-math-view';
 
 const processString0 = `When $a \\ne 0$, there are two solutions \nto $ax^2 + bx + c = 0$ and they are $$x_{1,2} = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$`;
-let processString = `This text includes math notations and should be wrapped correctly for \\( \\alpha \\) and $\\beta$ within the view. \nThe following formula shouldn't be inline:$$x_{1,2} = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}$$However the following formula should be inline with the text: \\( a^2 + b^2 = c^2 \\)`;
+let processString = `$$\\sum_{n=0}^\\infty$$ This text includes math notations such as $\\sum_{n=0}^\\infty$ and should be wrapped correctly for \\( \\alpha \\) and $\\beta$ within the view. \nThe following formula shouldn't be inline:$$x_{1,2} = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}$$However the following formula should be inline with the text: \\( a^2 + b^2 = c^2 \\)`;
 const processString1 = `hello world! I'm trying to understand why $ $flex wrap styling messes up text vertical alignment`;
 
 const allMath = _.flatten(_.values(MathStrings));
 
 LogBox.ignoreLogs(['VirtualizedLists should never be nested inside plain ScrollViews with the same orientation - use another VirtualizedList-backed container instead.'])
 
-function InlineItem({ value, isMath }: { value: string, isMath: boolean }) {
+function InlineItem({ value, isMath, inline }: { value: string, isMath: boolean, inline?: boolean }) {
     if (value === '') return null;
     return isMath ?
         <MathItem
@@ -26,6 +26,7 @@ function InlineItem({ value, isMath }: { value: string, isMath: boolean }) {
             color="cyan"
             style={styles.defaultColorTheme}
             containerStyle={[styles.inlineContainer]}
+            config={{ inline: typeof inline === 'boolean' ? inline : false }}
         /> :
         <TouchableOpacity
             style={[styles.default, styles.centerContent]}
@@ -40,9 +41,9 @@ function InlineItem({ value, isMath }: { value: string, isMath: boolean }) {
 function MathRow({ value, isMath }: { value: string, isMath: boolean }) {
     const parts = useMemo(() => _.flatten(_.map(_.split(value, /\$+/g), (value, i) => {
         if (isMath || i % 2 === 1) {
-            return [{ value, isMath: true }];
+            return [{ value, isMath: true, inline: !isMath }];
         } else {
-            return _.map(_.split(_.trim(value), ' '), value => ({ value, isMath: false }));
+            return _.map(_.split(_.trim(value), ' '), value => ({ value, isMath: false, inline: true }));
         }
     })), [value, isMath]);
     return (
@@ -50,8 +51,8 @@ function MathRow({ value, isMath }: { value: string, isMath: boolean }) {
             style={[styles.diverseContainer]}
         >
             {
-                _.map(parts, ({ value, isMath }, i) => {
-                    const el = <InlineItem value={value} isMath={isMath} key={`${value}${i}`} />;
+                _.map(parts, ({ value, isMath, inline }, i) => {
+                    const el = <InlineItem value={value} isMath={isMath} inline={inline} key={`${value}${i}`} />;
                     if (i === parts.length - 1) return el;
                     return React.cloneElement(<>{el}<Text> </Text></>, { key: `space${i}` });
                 })
@@ -81,6 +82,14 @@ export default function Composition() {
                 CellRendererComponent={<TouchableOpacity style={styles.defaultColorTheme} />}
                 renderItem={inc % 3 === 0 ? (props) => <InlineItem {...props} /> : undefined}
             />
+            <Text>Inline vs. Not</Text>
+            <MathText
+                style={styles.defaultColorTheme}
+                value="$\sum_{n=0}^\infty$ $$\sum_{n=0}^\infty$$"
+                direction="ltr"
+                containerStyle={[styles.centerContent]}
+                CellRendererComponent={<TouchableOpacity style={styles.defaultColorTheme} />}
+            />
             <Text>Compose with FlatList</Text>
             <View>
                 <FlatList
@@ -88,7 +97,7 @@ export default function Composition() {
                         const parts = _.split(val, '$$');
                         return _.map(parts, (part, index) => ({ value: part, isMath: index % 2 === 1 }));
                     }))}
-                    renderItem={({ item }) => <MathRow value={item.value} isMath={item.isMath} />}
+                    renderItem={({ item }) => <MathRow {...item} />}
                     keyExtractor={(item, index) => `${item.value}${index}`}
                     contentContainerStyle={[{ flexWrap: 'wrap', display: 'flex', alignItems: 'center' }, styles.flexLeft]}
                     style={styles.defaultColorTheme}

@@ -10,38 +10,44 @@ type ElementOrRenderer<T = {}> = ((props: T) => JSX.Element) | JSX.Element
 
 export type Direction = 'ltr' | 'rtl' | 'auto';
 
-export type MathTextRenderingProps = {
+export type MathTextRowRenderingProps = {
     value: string,
-    isMath: boolean
-}
+    isMath: boolean,
+    index: number
+};
 
-export type MathTextItemProps<T extends boolean = any> = (T extends true ? Omit<MathViewProps, 'math'> : TextProps) & {
+export type MathTextItemRenderingProps = MathTextRowRenderingProps & { rowIndex: number, inline: boolean };
+
+export type MathTextItemProps<T extends boolean = boolean> = (T extends true ? Omit<MathViewProps, 'math'> : TextProps) & {
     value: string,
     isMath: T,
-    CellRendererComponent?: ElementOrRenderer
+    CellRendererComponent?: ElementOrRenderer,
+    inline?: boolean
 }
 
 export type MathTextRowProps = MathTextItemProps & {
     direction?: Direction,
     containerStyle?: StyleProp<ViewStyle>,
     index: number,
-    renderItem?: (props: MathTextRenderingProps & { index: number, rowIndex: number }) => JSX.Element
+    renderItem?: (props: MathTextItemRenderingProps) => JSX.Element
 }
 
 export type MathTextProps = Pick<MathTextRowProps, 'direction' | 'containerStyle' | 'renderItem' | 'CellRendererComponent'> & {
     value?: string,
     math?: string,
     style?: StyleProp<ViewStyle>,
-    renderRow?: (props: MathTextRenderingProps & { index: number }) => JSX.Element
+    renderRow?: (props: MathTextRowRenderingProps) => JSX.Element
 }
 
-export const InlineMathItem = React.memo(({ value, isMath, CellRendererComponent, ...props }: MathTextItemProps) => {
+export const InlineMathItem = React.memo(({ value, isMath, CellRendererComponent, inline, ...props }: MathTextItemProps) => {
     if (value === '') return null;
+    const config = useMemo(() => ({ inline }), [inline]);
     const el = isMath ?
         <MathView
             {...props}
             math={value}
             resizeMode='contain'
+            config={config}
         /> :
         <Text
             {...props}
@@ -56,9 +62,9 @@ export const InlineMathItem = React.memo(({ value, isMath, CellRendererComponent
 export const MathTextRow = React.memo(({ value, isMath, direction, containerStyle, CellRendererComponent, renderItem, index, ...props }: MathTextRowProps) => {
     const parts = useMemo(() => _.flatten(_.map(_.split(value, /\$+/g), (value, i) => {
         if (isMath || i % 2 === 1) {
-            return [{ value, isMath: true }];
+            return [{ value, isMath: true, inline: !isMath }];
         } else {
-            return _.map(_.split(_.trim(value), ' '), value => ({ value, isMath: false }));
+            return _.map(_.split(_.trim(value), ' '), value => ({ value, isMath: false, inline: true }));
         }
     })), [value, isMath]);
     const Renderer = renderItem || InlineMathItem;
@@ -71,11 +77,12 @@ export const MathTextRow = React.memo(({ value, isMath, direction, containerStyl
             ]}
         >
             {
-                _.map(parts, ({ value, isMath }, i) => {
+                _.map(parts, ({ value, isMath, inline }, i) => {
                     const el = <Renderer
                         {...props}
                         value={value}
                         isMath={isMath}
+                        inline={inline || false}
                         CellRendererComponent={CellRendererComponent}
                         index={i}
                         rowIndex={index}

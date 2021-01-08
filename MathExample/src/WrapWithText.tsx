@@ -9,7 +9,7 @@ import styles from './styles';
 import { TouchableOpacity, FlatList, ScrollView } from 'react-native-gesture-handler';
 
 const processString0 = `When $a \\ne 0$, there are two solutions \nto $ax^2 + bx + c = 0$ and they are $$x_{1,2} = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$`;
-let processString = _.replace(`Here I create a long text. This text with a variable should be wrapped correctly for \\( \\alpha \\) within the view. \nAdditionally the following formula should be inline with the text: \\( a^2 + b^2 = c^2 \\)`, /\\(\(|\))/g, '$');
+let processString = _.replace(`Here I create a long text. This text with math notations should be wrapped correctly for \\( \\alpha \\) $\\beta$ within the view. The following formula shouldn't be inline:$$x_{1,2} = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}$$ However the following formula should be inline with the text: \\( a^2 + b^2 = c^2 \\)`, /\\(\(|\))/g, '$');
 const processString1 = `hello world! I'm trying to understand why $ $flex wrap styling messes up text vertical alignment`;
 
 const allMath = _.flatten(_.values(MathStrings));

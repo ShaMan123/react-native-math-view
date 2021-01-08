@@ -40,8 +40,8 @@ npm run compile
 
 ## Getting Started
 
-```ts
-import MathView from 'react-native-math-view';
+```tsx
+import MathView, { MathText } from 'react-native-math-view';
 
   return (
     ...
@@ -55,6 +55,11 @@ import MathView from 'react-native-math-view';
 	   math='\cos\left(x=\frac{b}{c}'
 	   renderError={({ error }) => <Text style={[{ fontWeight: 'bold' }]}>{error}</Text>}
 	/> 
+	<MathText
+            value={`This text includes math notations and should be wrapped correctly for \\( \\alpha \\) and $\\beta$ within the view. \nThe following formula shouldn't be inline:$$x_{1,2} = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}$$However the following formula should be inline with the text: \\( a^2 + b^2 = c^2 \\)`}
+            direction="ltr"
+            CellRendererComponent={<TouchableOpacity />}
+        />
     ...
   );
 

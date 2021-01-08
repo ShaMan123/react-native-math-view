@@ -29,7 +29,8 @@ export type MathTextRowProps = MathTextItemProps & {
 }
 
 export type MathTextProps = Pick<MathTextRowProps, 'direction' | 'containerStyle' | 'renderItem' | 'CellRendererComponent'> & {
-    value: string,
+    value?: string,
+    math?: string,
     style?: StyleProp<ViewStyle>,
     renderRow?: (props: MathTextRenderingProps & { index: number }) => JSX.Element
 }
@@ -86,8 +87,14 @@ export const MathTextRow = React.memo(({ value, isMath, direction, containerStyl
     )
 });
 
-const MathText = React.memo(({ value, renderRow, style, ...props }: MathTextProps) => {
-    const statements = useMemo(() => _.split(_.replace(value, /\\(\(|\))/g, '$'), /\$\$/g), [value]);
+const MathText = React.memo(({ value, renderRow, style, math, ...props }: MathTextProps) => {
+    if (__DEV__ && value && math) {
+        console.warn('MathText has received both `value` and `math` props');
+    } else if (!value && !math) {
+        __DEV__ && console.warn('MathText: please provide `value` or `math` prop');
+        return null;
+    }
+    const statements = useMemo(() => _.split(_.replace(value || `$${math}$`, /\\(\(|\))/g, '$'), /\$\$/g), [value]);
     const Container = renderRow || MathTextRow;
 
     return (

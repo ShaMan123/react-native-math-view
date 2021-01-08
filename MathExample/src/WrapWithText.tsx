@@ -65,7 +65,7 @@ export default function Composition() {
     const value = inc % 2 === 0 ? _.replace(processString, /\n/g, '') : processString;
     return (
         <ScrollView style={[styles.default, { backgroundColor: 'pink' }]}>
-            <Text>Compose with Text & MathView</Text>
+            <Text>Compose with MathText</Text>
             <MathText
                 style={styles.defaultColorTheme}
                 value={value}
@@ -73,10 +73,18 @@ export default function Composition() {
                 CellRendererComponent={<TouchableOpacity style={styles.defaultColorTheme} />}
                 renderItem={inc % 3 === 0 ? (props) => <InlineItem {...props} /> : undefined}
             />
+            <Text>Use MathText for single math notation</Text>
+            <MathText
+                style={styles.defaultColorTheme}
+                math={"x_{1,2} = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}"}
+                direction="ltr"
+                CellRendererComponent={<TouchableOpacity style={styles.defaultColorTheme} />}
+                renderItem={inc % 3 === 0 ? (props) => <InlineItem {...props} /> : undefined}
+            />
             <Text>Compose with FlatList</Text>
             <View>
                 <FlatList
-                    data={_.flatten(_.map(_.split(value, '\n'), (val) => {
+                    data={_.flatten(_.map(_.split(_.replace(value, /\\(\(|\))/g, '$'), '\n'), (val) => {
                         const parts = _.split(val, '$$');
                         return _.map(parts, (part, index) => ({ value: part, isMath: index % 2 === 1 }));
                     }))}

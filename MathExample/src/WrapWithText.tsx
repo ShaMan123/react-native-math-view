@@ -10,7 +10,7 @@ import { TouchableOpacity, FlatList, ScrollView } from 'react-native-gesture-han
 import { MathText } from 'react-native-math-view';
 
 const processString0 = `When $a \\ne 0$, there are two solutions \nto $ax^2 + bx + c = 0$ and they are $$x_{1,2} = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$`;
-let processString = _.replace(`Here I create a long text. This text with math notations should be wrapped correctly for \\( \\alpha \\) and $\\beta$ within the view. \nThe following formula shouldn't be inline:$$x_{1,2} = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}$$However the following formula should be inline with the text: \\( a^2 + b^2 = c^2 \\)`, /\\(\(|\))/g, '$');
+let processString = `This text includes math notations and should be wrapped correctly for \\( \\alpha \\) and $\\beta$ within the view. \nThe following formula shouldn't be inline:$$x_{1,2} = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}$$However the following formula should be inline with the text: \\( a^2 + b^2 = c^2 \\)`;
 const processString1 = `hello world! I'm trying to understand why $ $flex wrap styling messes up text vertical alignment`;
 
 const allMath = _.flatten(_.values(MathStrings));
@@ -23,7 +23,7 @@ function InlineItem({ value, isMath }: { value: string, isMath: boolean }) {
         <MathItem
             key={value}
             math={_.trim(value)}
-            color="magenta"
+            color="cyan"
             style={styles.defaultColorTheme}
             containerStyle={[styles.inlineContainer]}
         /> :

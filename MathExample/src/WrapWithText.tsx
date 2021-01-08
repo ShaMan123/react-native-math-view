@@ -7,9 +7,10 @@ import MathStrings from './math';
 import MathItem from './MathItem';
 import styles from './styles';
 import { TouchableOpacity, FlatList, ScrollView } from 'react-native-gesture-handler';
+import { MathText } from 'react-native-math-view';
 
 const processString0 = `When $a \\ne 0$, there are two solutions \nto $ax^2 + bx + c = 0$ and they are $$x_{1,2} = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$`;
-let processString = _.replace(`Here I create a long text. This text with math notations should be wrapped correctly for \\( \\alpha \\) $\\beta$ within the view. The following formula shouldn't be inline:$$x_{1,2} = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}$$ However the following formula should be inline with the text: \\( a^2 + b^2 = c^2 \\)`, /\\(\(|\))/g, '$');
+let processString = _.replace(`Here I create a long text. This text with math notations should be wrapped correctly for \\( \\alpha \\) and $\\beta$ within the view. \nThe following formula shouldn't be inline:$$x_{1,2} = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}$$However the following formula should be inline with the text: \\( a^2 + b^2 = c^2 \\)`, /\\(\(|\))/g, '$');
 const processString1 = `hello world! I'm trying to understand why $ $flex wrap styling messes up text vertical alignment`;
 
 const allMath = _.flatten(_.values(MathStrings));
@@ -21,7 +22,8 @@ function InlineItem({ value, isMath }: { value: string, isMath: boolean }) {
     return isMath ?
         <MathItem
             key={value}
-            math={value}
+            math={_.trim(value)}
+            color="magenta"
             style={styles.defaultColorTheme}
             containerStyle={[styles.inlineContainer]}
         /> :
@@ -30,27 +32,9 @@ function InlineItem({ value, isMath }: { value: string, isMath: boolean }) {
             key={value}
         >
 
-            <Text style={[styles.defaultColorTheme, { fontSize: 16, fontStyle: 'italic', textAlignVertical: 'center' }]}>{value}</Text>
+            <Text style={[styles.defaultColorTheme, { fontSize: 16, fontStyle: 'italic', textAlignVertical: 'center' }]}>{_.trim(value)}</Text>
         </TouchableOpacity>
 
-}
-
-function MathParagraph({ math, renderRow }: { math: string, renderRow: (value: string, isMath: boolean) => JSX.Element }) {
-    const statements = _.split(math, /\$\$/g);
-    const bits = _.split(math, /\n|{\$\$}/g);
-    return (
-        <View
-            style={[styles.defaultColorTheme, { alignItems: 'flex-end' }]}
-        >
-            {
-                _.map(statements, (value, i) => {
-                    if (value === '') return null;
-                    const isMath = i % 2 === 1;
-                    return _.map(_.split(value, /\n/g), (val, index) => React.cloneElement(renderRow(val, isMath), { key: value + i + index }))
-                })
-            }
-        </View>
-    );
 }
 
 function MathRow({ value, isMath }: { value: string, isMath: boolean }) {
@@ -58,7 +42,7 @@ function MathRow({ value, isMath }: { value: string, isMath: boolean }) {
         if (isMath || i % 2 === 1) {
             return [{ value, isMath: true }];
         } else {
-            return _.map(_.split(value, ' '), value => ({ value, isMath: false }));
+            return _.map(_.split(_.trim(value), ' '), value => ({ value, isMath: false }));
         }
     })), [value, isMath]);
     return (
@@ -76,16 +60,18 @@ function MathRow({ value, isMath }: { value: string, isMath: boolean }) {
     )
 }
 
-
 export default function Composition() {
     const { switch: mode, inc } = useContext(AppContext);
     const value = inc % 2 === 0 ? _.replace(processString, /\n/g, '') : processString;
     return (
         <ScrollView style={[styles.default, { backgroundColor: 'pink' }]}>
             <Text>Compose with Text & MathView</Text>
-            <MathParagraph
-                math={value}
-                renderRow={(value, isMath) => <MathRow value={value} isMath={isMath} />}
+            <MathText
+                style={styles.defaultColorTheme}
+                value={value}
+                direction="ltr"
+                CellRendererComponent={<TouchableOpacity style={styles.defaultColorTheme} />}
+                renderItem={inc % 3 === 0 ? (props) => <InlineItem {...props} /> : undefined}
             />
             <Text>Compose with FlatList</Text>
             <View>
@@ -101,9 +87,9 @@ export default function Composition() {
                 />
             </View>
             <Text>Split input, wrap text with op \\text{ }</Text>
-            <MathParagraph
-                math={value}
-                renderRow={(value, isMath) => {
+            <MathText
+                value={value}
+                renderRow={({ isMath, value }) => {
                     return (
                         <MathItem
                             key={value}

@@ -1,10 +1,20 @@
-import * as _ from "lodash";
+import _ from "lodash";
 
 export const trig = [
     {
+        "string": "f'(x,y)={x^2 \\over y^2} + \\sum_{i=1}^{100}x^2",
+        "math": true,
+        "alt": "",
+    },
+    {
+        "string": "\\cos\\left(x\\right)=\\sum_{n=0}^\\infty\\pm\\dotsb",
+        "math": true,
+        "alt": "",
+    },
+    {
         "string": "\\sum_{n=0}^\\infty",
         "math": true,
-        "alt": "����� ����� �����",
+        "alt": "",
     },
     {
         "string": "\\sin\\left(2\\alpha\\right)=2\\sin\\left(\\alpha\\right)\\cos\\left(\\alpha\\right)",

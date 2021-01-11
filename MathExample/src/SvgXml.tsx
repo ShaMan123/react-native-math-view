@@ -16,7 +16,7 @@ export default function SvgXml() {
         <View style={[styles.default, styles.centerContent]}>
             <View style={[styles.centerContent, styles.defaultColorTheme]}>
                 <MathViewFallback
-                    //config={{ ex: 50 }}
+                    config={{ inline: false }}
                     math={tag}
                     style={[styles.defaultColorTheme, { marginVertical: 10 }]}
                     resizeMode="cover"

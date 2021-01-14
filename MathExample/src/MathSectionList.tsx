@@ -1,7 +1,7 @@
 
 import _ from 'lodash';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { Animated, SectionListData, SectionListProps, Text } from 'react-native';
+import { Animated, I18nManager, SectionListData, SectionListProps, Text } from 'react-native';
 import AppContext from './Context';
 import MathStrings from './math';
 import MathItem from './MathItem';
@@ -30,12 +30,13 @@ export default function MathSectionList(props: Partial<SectionListProps<typeof M
 
     return (
         <Animated.SectionList
-            renderItem={({ item, index, section }) => <MathItem math={item} />}
+            renderItem={({ item, index, section }) => <MathItem math={item} config={{ inline: false }} />}
             renderSectionHeader={({ section: { title } }) => <Text style={styles.sectionHeader}>{title}</Text>}
             sections={sections}
             onRefresh={onRefresh}
             refreshing={refreshing}
             style={[{ flex: 1, maxWidth: width }]}
+            contentContainerStyle={I18nManager.isRTL && { alignItems: 'flex-end' }}
             extraData={width}
             {...props}
         />

@@ -1,7 +1,7 @@
 
 import _ from 'lodash';
 import React, { useMemo } from 'react';
-import { FlatList, I18nManager, StyleProp, StyleSheet, Text, TextProps, View, ViewStyle } from 'react-native';
+import { I18nManager, StyleProp, StyleSheet, Text, TextProps, View, ViewStyle } from 'react-native';
 import { MathViewProps } from './common';
 //@ts-ignore
 import MathView from './MathView';

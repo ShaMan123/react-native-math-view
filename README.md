@@ -7,9 +7,10 @@
 A react native view used to easily display and handle math. 
 The library doesn't use `WebView`.
 
-| Launch Test | Example App |
-| --- | --- |
-| ![Launch](./docs/launchAndroid.gif) | ![Example App](./docs/exampleAndroid.gif) |
+| MathView Example | Lists Example | MathText |
+| --- | --- | --- |
+| ![Runner](./docs/math-standalone.gif) | ![Lists Example](./docs/math-lists.gif) | <img src="./docs/math-text.png" width="320px" alt="MathText" /> |
+
 
 
 ## Installation

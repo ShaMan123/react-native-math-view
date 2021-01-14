@@ -19,7 +19,7 @@ export default function SvgXml() {
                     config={{ inline: false }}
                     math={tag}
                     style={[styles.defaultColorTheme, { marginVertical: 10 }]}
-                    resizeMode="cover"
+                    resizeMode="contain"
                     renderError={({ error }) => <Text style={[styles.defaultColorTheme, { marginVertical: 10 }, { fontWeight: 'bold' }]}>{error}</Text>}
                 />
             </View>

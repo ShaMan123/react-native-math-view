@@ -1,5 +1,9 @@
 import { AllPackages } from 'mathjax-full/js/input/tex/AllPackages';
 
+/**
+ * input config: http://docs.mathjax.org/en/latest/options/input/tex.html
+ * output config: http://docs.mathjax.org/en/latest/options/output/svg.html
+ */
 export interface MathToSVGConfig {
 	/** 
 	 *  process as inline math

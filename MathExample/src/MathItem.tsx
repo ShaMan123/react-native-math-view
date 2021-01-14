@@ -31,7 +31,7 @@ const MathItem = forwardRef((props: MathViewProps & TouchableOpacityProps & { co
                 style={{ color }} // can use color prop instead
                 {...props}
                 ref={ref}
-                renderError={() => <Text style={{ backgroundColor: 'red', flex: 1, color: 'black' }}>sdggsdfgdsfgsdfgdsfg</Text>}
+                renderError={(e) => <Text style={{ backgroundColor: 'red', flex: 1, color: 'black' }}>{e}</Text>}
             //config={{ ex: 50 }}
             />
         </TouchableOpacity>

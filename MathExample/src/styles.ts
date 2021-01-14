@@ -25,7 +25,7 @@ export default StyleSheet.create({
     sectionHeader: {
         backgroundColor: 'blue',
         color: 'white',
-        flex: 1,
+        //flex: 1,
         elevation: 5,
         textAlign: 'left',//I18nManager.isRTL ? 'right' : 'left'
         minWidth: '100%'

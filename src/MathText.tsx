@@ -21,6 +21,7 @@ export type MathTextItemRenderingProps = MathTextRowRenderingProps & { rowIndex:
 export type MathTextItemProps<T extends boolean = boolean> = (T extends true ? Omit<MathViewProps, 'math'> : TextProps) & {
     value: string,
     isMath: T,
+    Component?: MathView,
     CellRendererComponent?: ElementOrRenderer,
     inline?: boolean
 }
@@ -39,11 +40,12 @@ export type MathTextProps = Pick<MathTextRowProps, 'direction' | 'containerStyle
     renderRow?: (props: MathTextRowRenderingProps) => JSX.Element
 }
 
-export const InlineMathItem = React.memo(({ value, isMath, CellRendererComponent, inline, ...props }: MathTextItemProps) => {
+export const InlineMathItem = React.memo(({ value, isMath, CellRendererComponent, Component, inline, ...props }: MathTextItemProps) => {
     if (value === '') return null;
     const config = useMemo(() => ({ inline }), [inline]);
+    const Renderer = Component || MathView;
     const el = isMath ?
-        <MathView
+        <Renderer
             {...props}
             math={value}
             resizeMode='contain'

@@ -10,7 +10,7 @@ import { TouchableOpacity, FlatList, ScrollView } from 'react-native-gesture-han
 import { MathText } from 'react-native-math-view';
 
 const processString0 = `When $a \\ne 0$, there are two solutions \nto $ax^2 + bx + c = 0$ and they are $$x_{1,2} = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}.$$`;
-let processString = `$$\\sum_{n=0}^\\infty$$ This text includes math notations such as $\\sum_{n=0}^\\infty$ and should be wrapped correctly for \\( \\alpha \\) and $\\beta$ within the view. \nThe following formula shouldn't be inline:$$x_{1,2} = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}$$However the following formula should be inline with the text: \\( a^2 + b^2 = c^2 \\)`;
+export let MATH_TEXT_VALUE = `$$\\sum_{n=0}^\\infty$$ This text includes math notations such as $\\sum_{n=0}^\\infty$ and should be wrapped correctly for \\( \\alpha \\) and $\\beta$ within the view. \nThe following formula shouldn't be inline:$$x_{1,2} = {-b \\pm \\sqrt{b^2-4ac} \\over 2a}$$However the following formula should be inline with the text: \\( a^2 + b^2 = c^2 \\)`;
 const processString1 = `hello world! I'm trying to understand why $ $flex wrap styling messes up text vertical alignment`;
 
 const allMath = _.flatten(_.values(MathStrings));
@@ -63,7 +63,7 @@ function MathRow({ value, isMath }: { value: string, isMath: boolean }) {
 
 export default function Composition() {
     const { switch: mode, inc } = useContext(AppContext);
-    const value = inc % 2 === 0 ? _.replace(processString, /\n/g, '') : processString;
+    const value = inc % 2 === 0 ? _.replace(MATH_TEXT_VALUE, /\n/g, '') : MATH_TEXT_VALUE;
     return (
         <ScrollView style={[styles.default, { backgroundColor: 'pink' }]}>
             <Text>Compose with MathText</Text>
@@ -119,16 +119,16 @@ export default function Composition() {
             />
             <Text>Inline</Text>
             <MathItem
-                math={`\\text{${_.replace(_.replace(processString, /\n+/g, '$$ $$'), /\$\$/g, '$')}}`}
+                math={`\\text{${_.replace(_.replace(MATH_TEXT_VALUE, /\n+/g, '$$ $$'), /\$\$/g, '$')}}`}
                 style={styles.defaultColorTheme}
             />
             <MathItem
-                math={`${_.replace(processString, /\n+/g, '$$')}`}
+                math={`${_.replace(MATH_TEXT_VALUE, /\n+/g, '$$')}`}
                 style={styles.defaultColorTheme}
             />
             <Text>Raw</Text>
             <MathItem
-                math={processString}
+                math={MATH_TEXT_VALUE}
                 style={styles.defaultColorTheme}
                 config={{ inline: false }}
             />

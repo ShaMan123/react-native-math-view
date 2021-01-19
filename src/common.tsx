@@ -1,6 +1,6 @@
 import _ from "lodash";
 import React from "react";
-import { StyleProp, StyleSheet, Text, View, ViewProps, ViewStyle } from "react-native";
+import { StyleProp, StyleSheet, Text, TextStyle, View, ViewProps, ViewStyle } from "react-native";
 import { MathToSVGConfig } from "./mathjax";
 
 export type ResizeMode = 'cover' | 'contain';
@@ -17,7 +17,7 @@ export interface MathViewProps extends ViewProps {
      * can be set via `setNativeProps` or passed via `style`
      * */
     color?: string,
-    style?: StyleProp<ViewStyle & { color: string | any }>
+    style?: StyleProp<ViewStyle & Pick<TextStyle, 'color'>>
 
     /**
      * defaults to 'center'

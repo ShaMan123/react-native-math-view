@@ -40,7 +40,7 @@ export type MathTextProps = Pick<MathTextRowProps, 'direction' | 'containerStyle
     renderRow?: (props: MathTextRowRenderingProps) => JSX.Element
 }
 
-export const InlineMathItem = React.memo(({ value, isMath, CellRendererComponent, Component, inline, ...props }: MathTextItemProps) => {
+export const InlineMathItem = React.memo(({ value, isMath, CellRendererComponent, Component, inline, style, ...props }: MathTextItemProps) => {
     if (value === '') return null;
     const config = useMemo(() => ({ inline }), [inline]);
     const Renderer = Component || MathView;
@@ -53,12 +53,12 @@ export const InlineMathItem = React.memo(({ value, isMath, CellRendererComponent
         /> :
         <Text
             {...props}
-            style={[styles.textMiddle, props.style]}
+            style={styles.textMiddle}
         >
             {value}
         </Text>;
     const container = typeof CellRendererComponent === 'function' ? <CellRendererComponent /> : CellRendererComponent || <></>;
-    return React.cloneElement(container, { style: [styles.centerContent, container.props?.style] }, el);
+    return React.cloneElement(container, {}, el);
 });
 
 export const MathTextRow = React.memo(({ value, isMath, direction, containerStyle, CellRendererComponent, renderItem, index, ...props }: MathTextRowProps) => {

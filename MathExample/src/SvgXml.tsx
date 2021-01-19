@@ -33,8 +33,7 @@ export default function SvgXml() {
                     style={styles.defaultColorTheme}
                     value={MATH_TEXT_VALUE}
                     direction="ltr"
-                    // containerStyle={{ flex: 1 }}
-                    CellRendererComponent={<TouchableOpacity style={[styles.defaultColorTheme]} />}
+                    CellRendererComponent={<TouchableOpacity style={[styles.defaultColorTheme, { borderColor: 'orange', borderWidth: 2 }]} />}
                 //CellRendererComponent={<View style={[styles.defaultColorTheme]} />}
                 />
             </View>

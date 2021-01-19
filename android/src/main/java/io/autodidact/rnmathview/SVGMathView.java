@@ -27,7 +27,7 @@ public class SVGMathView extends SVGImageView {
     private boolean mIsDirty;
     private SVG mSVG;
     private SVGAttributes mSVGAttributes;
-    private PreserveAspectRatio mPreserveAspectRatio = PreserveAspectRatio.LETTERBOX;
+    private PreserveAspectRatio mPreserveAspectRatio = PreserveAspectRatio.of("xMinYMid meet");
     private String mCSS = "";
     private String mColor;
     private String mColorCSS = "";
@@ -58,7 +58,7 @@ public class SVGMathView extends SVGImageView {
     }
 
     public void setSVGString(String svg) {
-        if(mSVGString == null || mSVGString != svg) mIsDirty = true;
+        if(mSVGString == null || !mSVGString.equals(svg)) mIsDirty = true;
         mSVGString = svg;
     }
 

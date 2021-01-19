@@ -33,7 +33,7 @@ export type MathTextRowProps = MathTextItemProps & {
     renderItem?: (props: MathTextItemRenderingProps) => JSX.Element
 }
 
-export type MathTextProps = Pick<MathTextRowProps, 'direction' | 'containerStyle' | 'renderItem' | 'CellRendererComponent'> & {
+export type MathTextProps = Pick<MathTextRowProps, 'direction' | 'containerStyle' | 'renderItem' | 'CellRendererComponent' | 'Component'> & {
     value?: string,
     math?: string,
     style?: StyleProp<ViewStyle>,

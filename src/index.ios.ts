@@ -1,5 +1,5 @@
 //export * from './ios/MathView';
-export const MathjaxFactory = () => { };
+export { default as MathjaxFactory } from './mathjax';
 export const Constants = {};
 //  fallback to SvgXml
 //export { default } from './ios/MathView';

@@ -30,7 +30,7 @@ export default function MathSectionList(props: Partial<SectionListProps<typeof M
 
     return (
         <Animated.SectionList
-            renderItem={({ item, index, section }) => <MathItem math={item} config={{ inline: false }} />}
+            renderItem={({ item, index, section }) => <MathItem math={item} config={{ inline: false, displayAlign: 'left' }} />}
             renderSectionHeader={({ section: { title } }) => <Text style={styles.sectionHeader}>{title}</Text>}
             sections={sections}
             onRefresh={onRefresh}

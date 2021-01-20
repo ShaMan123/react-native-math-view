@@ -27,7 +27,7 @@ export default function FlexWrapMathSectionList() {
                 math={item}
                 resizeMode='contain'
                 containerStyle={[styles.flexWrapContainer]}
-                config={{ inline: false }}
+                config={{ inline: false, displayAlign: 'left' }}
             />
         );
     }, []);

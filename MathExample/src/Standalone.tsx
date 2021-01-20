@@ -17,7 +17,7 @@ export default function Standalone() {
             <MathItem
                 math={tag}
                 style={styles.defaultColorTheme}
-                config={{ inline: false }}
+                config={{ inline: false, displayAlign: 'center' }}
             />
         </View>
     );

@@ -7,7 +7,7 @@ import { AllPackages } from 'mathjax-full/js/input/tex/AllPackages';
  */
 export interface MathToSVGConfig {
 	/** 
-	 *  process as inline math
+	 *  process as inline math, equivalent to 'display' prop
 	 *  default: true
 	 *  */
 	inline: boolean,

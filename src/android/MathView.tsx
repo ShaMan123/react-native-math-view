@@ -1,8 +1,6 @@
 'use strict';
 
-import _ from 'lodash';
 import React, { forwardRef, useEffect, useMemo, useState } from 'react';
-import { View } from 'react-native';
 import { ErrorComponent, mathErrorBoundary, MathViewProps } from '../common';
 import MathjaxFactory from '../mathjax';
 import MathBaseView, { MathViewBaseProps } from './MathBaseView';

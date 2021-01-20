@@ -12,6 +12,11 @@ export interface MathToSVGConfig {
 	inline: boolean,
 
 	/**
+	 * align the math in the container
+	 */
+	displayAlign: 'auto' | 'center' | 'left' | 'right'
+
+	/**
 	 * em-size in pixels
 	 * default: 16 
 	 * */
@@ -53,15 +58,13 @@ export interface MathToSVGConfig {
 	 * */
 	enrichSpeech: 'none' | 'shallow' | 'deep',
 
-	/**
-	 * https://docs.mathjax.org/en/v1.0/options/tex2jax.html#configure-tex2jax
-	 */
 	inlineMath: string[][],
 	displayMath: string[][]
 }
 
 export const mathToSVGDefaultConfig = {
 	inline: true,
+	displayAlign: 'auto',
 	em: 16,
 	ex: 8,
 	width: 80 * 16,

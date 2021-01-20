@@ -135,8 +135,9 @@ export default class MathjaxAdaptor {
         });
 
         this.svg = new SVG({
-            fontCache: (options.fontCache ? 'local' : 'none'),
-            internalSpeechTitles: true
+            fontCache: options.fontCache ? 'local' : 'none',
+            internalSpeechTitles: true,
+            displayAlign: options.displayAlign
         });
 
         this.html = mathjax.document('', {

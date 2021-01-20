@@ -1,6 +1,7 @@
 import { AllPackages } from 'mathjax-full/js/input/tex/AllPackages';
 
 /**
+ * options config: https://github.com/mathjax/MathJax-demos-node/blob/master/direct/tex2svg
  * input config: http://docs.mathjax.org/en/latest/options/input/tex.html
  * output config: http://docs.mathjax.org/en/latest/options/output/svg.html
  */
@@ -13,6 +14,7 @@ export interface MathToSVGConfig {
 
 	/**
 	 * align the math in the container
+	 * see output config: http://docs.mathjax.org/en/latest/options/output/svg.html
 	 */
 	displayAlign: 'auto' | 'center' | 'left' | 'right'
 
@@ -37,6 +39,7 @@ export interface MathToSVGConfig {
 	/**
 	  * the packages to use, e.g. "base, ams"
 	  * default: AllPackages
+	  * see input config: http://docs.mathjax.org/en/latest/options/input/tex.html
 	  * */
 	packages: string[],
 
@@ -49,7 +52,8 @@ export interface MathToSVGConfig {
 
 	/**
 	 * whether to use a local font cache or not
-	 * default: true 
+	 * default: true
+	 * see output config: http://docs.mathjax.org/en/latest/options/output/svg.html
 	 * */
 	fontCache: boolean,
 
@@ -58,7 +62,14 @@ export interface MathToSVGConfig {
 	 * */
 	enrichSpeech: 'none' | 'shallow' | 'deep',
 
+	/**
+	 * see input config: http://docs.mathjax.org/en/latest/options/input/tex.html
+	 */
 	inlineMath: string[][],
+
+	/**
+	 * see input config: http://docs.mathjax.org/en/latest/options/input/tex.html
+	 */
 	displayMath: string[][]
 }
 

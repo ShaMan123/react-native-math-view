@@ -29,7 +29,7 @@ export interface MathViewProps extends ViewProps {
     config?: Partial<MathToSVGConfig>,
 
     /**Fallback component that will be rendered if a parsing error occurs */
-    renderError?: React.FC<MathViewErrorProps> | JSX.Element
+    renderError?: React.FC<MathViewErrorProps> | React.ReactElement<MathViewErrorProps>
 
     onError?: (error: Error) => any
 

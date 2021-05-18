@@ -140,6 +140,7 @@ export const chemistry = [
 
 export const math = [
     'x_{1,2}=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}',
+    '\\begin{array}{r} 735 \\\\ +196 \\\\ \\hline 931 \\end{array}'
 ];
 
 export function getTaylor(n: number) {

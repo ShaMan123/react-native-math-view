@@ -1,7 +1,9 @@
 'use strict';
 
 import React from 'react';
-import { ErrorComponent, MathViewProps, mathViewAsyncRenderer, mathViewRender } from '../common';
+import { MathViewProps } from '../common';
+import { ErrorComponent } from '../Error';
+import { mathViewRender } from '../hooks';
 import MathBaseView, { MathViewBaseProps } from './MathBaseView';
 
 /**

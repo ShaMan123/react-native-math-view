@@ -2,7 +2,9 @@
 
 import React, { Ref } from 'react';
 import { SvgFromXml } from 'react-native-svg';
-import { ErrorComponent, MathViewProps, mathViewRender, styles } from '../common';
+import { MathViewProps, styles } from '../common';
+import { ErrorComponent } from '../Error';
+import { mathViewRender } from '../hooks';
 
 const FallbackMathView = mathViewRender('svg-xml', false, (props: MathViewProps, ref: Ref<any>) => {
     return (

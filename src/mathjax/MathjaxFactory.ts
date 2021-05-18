@@ -10,8 +10,6 @@ import MathjaxAdaptor from './MathjaxAdaptor';
  * */
 const useLodashMem = true;
 
-
-
 /** custom memoization */
 class AdaptorMemoize extends Memoize {
     cache: Array<{ config: MathToSVGConfig, adaptor: MathjaxAdaptor }> = [];

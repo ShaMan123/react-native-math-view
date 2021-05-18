@@ -112,7 +112,7 @@ export function useSyncParser(type: HookType, props: MathViewProps) {
 }
 
 export function mathViewAsyncRenderer<T extends MathViewProps, R extends any>(type: HookType, render: React.ForwardRefRenderFunction<R, T>) {
-    return React.forwardRef((props: T, ref: React.Ref<R>) => {
+    return React.forwardRef((props: MathViewProps, ref: React.Ref<R>) => {
         const resultProps = useAsyncParser(type, props);
         useDebug(props.debug, resultProps);
         if (resultProps?.error) {
@@ -136,7 +136,7 @@ export function mathViewAsyncRenderer<T extends MathViewProps, R extends any>(ty
 }
 
 export function mathViewSyncRenderer<T extends MathViewProps, R extends any>(type: HookType, render: React.ForwardRefRenderFunction<R, T>) {
-    return React.forwardRef((props: T, ref: React.Ref<R>) => {
+    return React.forwardRef((props: MathViewProps, ref: React.Ref<R>) => {
         const resultProps = useSyncParser(type, props);
         return resultProps.error ?
             <MathErrorBoundary {...props} {...resultProps as { error: Error }} /> :

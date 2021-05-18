@@ -128,7 +128,6 @@ export default class MathjaxAdaptor {
             displayMath: options.displayMath,
             formatError: (jax: TeX<any, any, any>, err: TexError) => {
                 const math = jax.latex;
-                __DEV__ && console.warn('MathView: LaTex parsing Error', { ...err, math });
                 ERROR_MAP.set(math, err);
                 return jax.formatError(err);
             },

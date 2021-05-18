@@ -31,7 +31,9 @@ const MathItem = forwardRef((props: MathViewProps & TouchableOpacityProps & { co
                 style={{ color }} // can use color prop instead
                 {...props}
                 ref={ref}
-                renderError={(e) => <Text style={{ backgroundColor: 'red', flex: 1, color: 'black' }}>{e.error}</Text>}
+                onError={e => console.log('ERROR!', e)}
+                renderError={({ error }) => <Text style={[{ marginVertical: 10, fontWeight: 'bold', backgroundColor: 'red' }]}>{error.name} {error.message}</Text>}
+            //debug
             //config={{ ex: 50 }}
             />
         </TouchableOpacity>

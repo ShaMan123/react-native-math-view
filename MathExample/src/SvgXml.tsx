@@ -19,11 +19,13 @@ export default function SvgXml() {
             <View style={[styles.default, styles.centerContent]}>
                 <View style={[styles.centerContent, styles.defaultColorTheme]}>
                     <MathViewFallback
+                        //debug
                         config={{ inline: false }}
                         math={tag}
                         style={[styles.defaultColorTheme, { marginVertical: 10 }]}
                         resizeMode="contain"
-                        renderError={({ error }) => <Text style={[styles.defaultColorTheme, { marginVertical: 10 }, { fontWeight: 'bold' }]}>{error}</Text>}
+                        onError={e => console.log('ERROR!', e)}
+                        renderError={({ error }) => <Text style={[{ marginVertical: 10, fontWeight: 'bold', backgroundColor: 'red' }]}>{error.name} {error.message}</Text>}
                     />
                 </View>
 

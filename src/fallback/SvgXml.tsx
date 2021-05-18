@@ -1,24 +1,17 @@
 'use strict';
 
-import React, { forwardRef, Ref } from 'react';
+import React, { Ref } from 'react';
 import { SvgFromXml } from 'react-native-svg';
-import { ErrorComponent, mathErrorBoundary, MathViewProps, styles } from '../common';
-import MathjaxFactory from '../mathjax';
+import { ErrorComponent, MathViewProps, mathViewRender, styles } from '../common';
 
-const FallbackMathView = forwardRef((props: MathViewProps, ref: Ref<any>) => {
-    try {
-        const svgXmlProps = MathjaxFactory(props.config).toSVGXMLProps(props.math);
-        return (
-            <SvgFromXml
-                {...props}
-                style={[props.resizeMode === 'contain' && styles.contain, props.style]}
-                ref={ref}
-                {...svgXmlProps}
-            />
-        );
-    } catch (error) {
-        return mathErrorBoundary(error, props);
-    }
+const FallbackMathView = mathViewRender('svg-xml', false, (props: MathViewProps, ref: Ref<any>) => {
+    return (
+        <SvgFromXml
+            {...props}
+            style={[props.resizeMode === 'contain' && styles.contain, props.style]}
+            ref={ref}
+        />
+    )
 });
 
 FallbackMathView.defaultProps = {

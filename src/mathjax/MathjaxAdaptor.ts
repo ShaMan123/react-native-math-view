@@ -104,6 +104,10 @@ export default class MathjaxAdaptor {
     private html: MathDocument<any, any, any>;
     private tex: TeX<{}, {}, {}>;   //  html.inputJax
     private svg: SVG<{}, {}, {}>;    //  html.outputJax
+    /**
+     * the css generated for the svg
+     */
+    private css: string;
     options: MathToSVGConfig;
     key = _.uniqueId('MathjaxAdaptor')
 
@@ -147,6 +151,8 @@ export default class MathjaxAdaptor {
 
             //enrichSpeech: options.enrichSpeech
         });
+
+        this.css = this.adaptor.textContent(this.svg.styleSheet(this.html));//this.svg.cssStyles
         /*
                 this.html.addRenderAction(
                     'mip',
@@ -167,10 +173,6 @@ export default class MathjaxAdaptor {
 
     protected get parseOptions() {
         return this.tex.parseOptions;
-    }
-
-    static parseSVG(svg: string) {
-        return _.replace(svg, /xlink:xlink/g, 'xlink');
     }
 
     convert = _.memoize((math: string) => {
@@ -209,15 +211,28 @@ export default class MathjaxAdaptor {
         return response as string[];
     })
 
+    parseSVG(svgNode: LiteElement, includeStyle: boolean = false) {
+        const svg = parseSVG(this.adaptor.outerHTML(svgNode));
+        if (includeStyle) {
+            const defsNode = this.adaptor.firstChild(svgNode) as LiteElement;
+            const defs = `<defs><style>${this.css}</style>${this.adaptor.innerHTML(defsNode)}</defs>`;
+            const closingTag = '</defs>';
+            return svg.slice(0, svg.indexOf('<defs')) + defs + svg.slice(svg.indexOf(closingTag) + closingTag.length);
+        } else {
+            return svg;
+        }
+    }
+
     toSVG = _.memoize((math: string) => {
         const node = this.convert(math);
-        return parseSVG(this.adaptor.innerHTML(node)) as string; //   css option won't be used in react-native context    //   opts.css ? adaptor.textContent(svg.styleSheet(html)) : adaptor.innerHTML(node);
+        const svgNode = this.adaptor.firstChild(node) as LiteElement;
+        return this.parseSVG(svgNode);
     })
 
     toSVGXMLProps = _.memoize((math: string) => {
         const node = this.convert(math);
         const svgNode = this.adaptor.firstChild(node) as LiteElement;
-        const svg = parseSVG(this.adaptor.innerHTML(node)) as string;
+        const svg = this.parseSVG(svgNode);
         const width = parseSize(this.adaptor.getAttribute(svgNode, 'width'), this.options);
         const height = parseSize(this.adaptor.getAttribute(svgNode, 'height'), this.options);
 

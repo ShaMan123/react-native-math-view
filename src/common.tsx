@@ -1,5 +1,5 @@
 import _ from "lodash";
-import React, { forwardRef, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { StyleProp, StyleSheet, Text, TextStyle, View, ViewProps, ViewStyle } from "react-native";
 import MathjaxFactory, { MathToSVGConfig } from "./mathjax";
 import MathjaxAdaptor from "./mathjax/MathjaxAdaptor";
@@ -77,7 +77,7 @@ function useMathjax<T extends HookType>(type: T, props: MathViewProps) {
  * if `math` prop didn't mount yet (no memoized value) revert to async rendering, otherwise use memoized value (prevents an unnecessary render and wait)
  */
 export function useAsyncParser<T extends HookType>(type: T, props: MathViewProps) {
-    const { math, config } = props;
+    const { math } = props;
     const [mathjax, func] = useMathjax(type, props);
     const [result, setResult] = useState<NormalizedReturnValueByHook<T> | undefined>(() => {
         const value = func.cache.has(math) ? func.cache.get(math) : undefined;
@@ -86,7 +86,7 @@ export function useAsyncParser<T extends HookType>(type: T, props: MathViewProps
     useEffect(() => {
         try {
             const res = func(math);
-            setResult(type === 'svg' ? { svg: res } : res);
+            setResult((type === 'svg' ? { svg: res as string } : res) as NormalizedReturnValueByHook<T>);
         } catch (error) {
             setResult({ error });
         }

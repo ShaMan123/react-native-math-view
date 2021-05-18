@@ -1,18 +1,21 @@
 import _ from 'lodash';
-import { EnrichHandler } from 'mathjax-full/js/a11y/semantic-enrich';
-import { LiteElement, LiteNode } from 'mathjax-full/js/adaptors/lite/Element';
+//import { EnrichHandler } from 'mathjax-full/js/a11y/semantic-enrich';
+import { LiteElement } from 'mathjax-full/js/adaptors/lite/Element';
 import { liteAdaptor } from 'mathjax-full/js/adaptors/liteAdaptor';
 import { MathDocument } from 'mathjax-full/js/core/MathDocument';
 import { RegisterHTMLHandler } from 'mathjax-full/js/handlers/html';
 import { TeX } from 'mathjax-full/js/input/tex';
+import TexError from 'mathjax-full/js/input/tex/TexError';
 import TexParser from 'mathjax-full/js/input/tex/TexParser';
 import { mathjax } from 'mathjax-full/js/mathjax';
 import { SVG } from 'mathjax-full/js/output/svg';
-import { STATE } from 'mathjax-full/js/core/MathItem';
+import { CSSProperties } from 'react';
+//import { STATE } from 'mathjax-full/js/core/MathItem';
 import { LayoutRectangle } from 'react-native';
 import * as matrixUtil from 'transformation-matrix';
-import { MathToSVGConfig, mathToSVGDefaultConfig } from './Config';
-import { accTransformations, compose, extractDataFromMathjaxId, parseSVG, transformationToMatrix, Memoize } from './Util';
+import { MathError } from '../common';
+import { MathToSVGConfig } from './Config';
+import { fromSelector } from 'hast-util-from-selector'
 /*
 import { MathML } from 'mathjax-full/js/input/mathml';
 import { MathList } from 'mathjax-full/js/core/MathList';
@@ -22,8 +25,7 @@ import { speechAction } from './SpeechAction';
 import { BBox } from 'mathjax-full/ts/core/MathItem';
 */
 import * as TreeWalker from './TreeWalker';
-import TexError from 'mathjax-full/js/input/tex/TexError';
-import { MathError } from '../common';
+import { compose, extractDataFromMathjaxId, Memoize, parseSVG, transformationToMatrix } from './Util';
 //import { MmlFactory } from 'mathjax-full/js/core/MmlTree/MmlFactory';
 /*
 declare const global: any;
@@ -108,6 +110,8 @@ export default class MathjaxAdaptor {
      * the css generated for the svg
      */
     private css: string;
+    private styles: { [key: string]: { [key: string]: string } };
+    private styleQuery: { tree: LiteElement[], value: number }[];
     options: MathToSVGConfig;
     key = _.uniqueId('MathjaxAdaptor')
 
@@ -151,8 +155,18 @@ export default class MathjaxAdaptor {
 
             //enrichSpeech: options.enrichSpeech
         });
-
-        this.css = this.adaptor.textContent(this.svg.styleSheet(this.html));//this.svg.cssStyles
+        this.css = this.adaptor.textContent(this.svg.styleSheet(this.html));
+        this.styles = this.svg.cssStyles.styles as {
+            [key: string]: {
+                [key: string]: string;
+            };
+        };
+        const strokeWidthStyles = _.pickBy(this.styles, (css, key) => _.has(css, 'stroke-width'));
+        this.styleQuery = _.map(strokeWidthStyles, (css, key: string) => {
+            const tree = TreeWalker.walkDown<TreeWalker.Parent<{ tagName: string, properties: any }>, LiteElement>(fromSelector(key),
+                (n, l) => new LiteElement(n.tagName, _.mapKeys(n.properties, (value, key) => _.kebabCase(key))));
+            return { tree: tree.reverse(), value: parseFloat(css['stroke-width']) }
+        });
         /*
                 this.html.addRenderAction(
                     'mip',
@@ -232,6 +246,27 @@ export default class MathjaxAdaptor {
     toSVGXMLProps = _.memoize((math: string) => {
         const node = this.convert(math);
         const svgNode = this.adaptor.firstChild(node) as LiteElement;
+        TreeWalker.walkDown(svgNode, (n: LiteElement) => {
+            _.forEach(this.styleQuery, ({ tree, value }) => {
+                const cssRuleCompliant = TreeWalker.walkUp<LiteElement, boolean>(n, (n, l, acc, quit) => {
+                    if (tree.length <= l) quit();
+                    const mirror = tree[l];
+                    const isSameKind = n.kind === mirror.kind ||
+                        (n.kind === 'use' && this.adaptor.elementById(svgNode, n.attributes['xlink:href'].slice(1)).kind);
+                    const complaint = isSameKind &&
+                        _.every(mirror.attributes, (value: any, key: string) => {
+                            const sourceAttr = n.attributes[key];
+                            console.log(key, n.attributes, sourceAttr, value)
+                            return typeof value === 'boolean' ? sourceAttr : sourceAttr === value;
+                        });
+                    if (!complaint) quit();
+                    return complaint;
+                });
+                if (_.every(cssRuleCompliant)) {
+                    this.adaptor.setAttribute(n, 'stroke-width', value);
+                }
+            });
+        })
         const svg = this.parseSVG(svgNode);
         const width = parseSize(this.adaptor.getAttribute(svgNode, 'width'), this.options);
         const height = parseSize(this.adaptor.getAttribute(svgNode, 'height'), this.options);
@@ -281,7 +316,7 @@ export default class MathjaxAdaptor {
         const tempKey = 'accTransform';
         const pathToTempAttr = `attributes.${tempKey}`;
         const pathToAttr = 'attributes.transform';
-        const collection = TreeWalker.walkDown<LiteElement>(clone, (n, l) => {
+        const collection = TreeWalker.walkDown(clone, (n, l) => {
             if (l === 0) return _.set(n, pathToTempAttr, _.get(n, pathToAttr, ''));
             const mat = compose(transformationToMatrix(n.parent, tempKey), transformationToMatrix(n));
             const accTransformAttr = matrixUtil.toSVG(mat);

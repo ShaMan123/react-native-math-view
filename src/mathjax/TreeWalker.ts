@@ -1,7 +1,15 @@
 import * as _ from 'lodash';
 import { LiteElement, LiteNode } from 'mathjax-full/js/adaptors/lite/Element';
 
-export type TreeWalkerCallback<T> = (node: LiteElement, level: number, accum: T[]) => T
+export type TreeWalkerCallback<N, T> = (node: N, level: number, accum: T[], quit: () => void) => T;
+
+export type Child<T = {}> = {
+    parent?: Child<T>
+} & T
+
+export type Parent<T = {}> = {
+    children?: Parent<T>[]
+} & T
 
 /**
  * walk up the tree starting at {node}
@@ -9,12 +17,14 @@ export type TreeWalkerCallback<T> = (node: LiteElement, level: number, accum: T[
  * @param callback
  * @returns accumulated array of {callback} responses
  */
-export function walkUp<T>(node: LiteElement, callback: TreeWalkerCallback<T>) {
-    let n = node;
+export function walkUp<N extends Child | LiteElement = LiteElement, T = LiteElement>(node: N, callback: TreeWalkerCallback<N, T>) {
+    let n: N = node;
     let i = 0;
+    let _break = false;
+    const quit = () => { _break = true };
     const accum: T[] = [];
-    while (n.parent) {
-        accum.push(callback(n, i, accum));
+    while (n.parent && !_break) {
+        accum.push(callback(n, i, accum, quit));
         i++;
         n = n.parent;
     }
@@ -27,20 +37,22 @@ export function walkUp<T>(node: LiteElement, callback: TreeWalkerCallback<T>) {
  * @param callback
  * @returns accumulated array of {callback} responses
  */
-export function walkDown<T>(node: LiteElement, callback: TreeWalkerCallback<T>) {
-    let stack = [] as LiteElement[];
-    let n: LiteElement = node;
+export function walkDown<N extends Parent | LiteElement = LiteElement, T = LiteElement>(node: N, callback: TreeWalkerCallback<N, T>) {
+    let stack = [] as N[];
+    let n: N | undefined = node;
     let i = 0;
+    let _break = false;
+    const quit = () => { _break = true };
     const accum: T[] = [];
-    let children: LiteElement[];
+    let children: N[];
 
     while (n) {
         i = _.get(n, 'attributes.pLevel', 0);
-        accum.push(callback(n as LiteElement, i, accum));
-        children = _.get(n, 'children', []) as LiteElement[];
+        accum.push(callback(n, i, accum, quit));
+        children = _.get(n, 'children', []) as N[];
 
         if (_.size(children) > 0) {
-            children = _.map(children, child => _.set(child, 'attributes.pLevel', i + 1));
+            children = _.map(children, (child: N) => _.set(child, 'attributes.pLevel', i + 1));
             stack = _.concat(children, stack);
         }
 

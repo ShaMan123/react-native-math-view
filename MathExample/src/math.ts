@@ -1,11 +1,10 @@
 import _ from "lodash";
 
+export const tests = [
+    '\\begin{array}{r} 735 \\\\ +196 \\\\ \\hline 931 \\end{array}'
+]
+
 export const trig = [
-    {
-        "string": "f'(x,y)={x^2 \\over y^2} + \\sum_{i=1}^{100}x^2",
-        "math": true,
-        "alt": "",
-    },
     {
         "string": "\\cos\\left(x\\right)=\\sum_{n=0}^\\infty\\pm\\dotsb",
         "math": true,
@@ -140,7 +139,7 @@ export const chemistry = [
 
 export const math = [
     'x_{1,2}=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}',
-    '\\begin{array}{r} 735 \\\\ +196 \\\\ \\hline 931 \\end{array}'
+    "f'(x,y)={x^2 \\over y^2} + \\sum_{i=1}^{100}x^2"
 ];
 
 export function getTaylor(n: number) {
@@ -158,6 +157,7 @@ export function getRecursiveFrac(n: number) {
 }
 
 export default {
+    tests,
     trig: _.map(_.filter(trig, 'math'), 'string'),
     calculus: _.map(_.filter(calculus, 'math'), 'string'),
     chemistry,

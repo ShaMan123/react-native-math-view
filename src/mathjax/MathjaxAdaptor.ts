@@ -249,14 +249,16 @@ export default class MathjaxAdaptor {
         TreeWalker.walkDown(svgNode, (n: LiteElement) => {
             _.forEach(this.styleQuery, ({ tree, value }) => {
                 const cssRuleCompliant = TreeWalker.walkUp<LiteElement, boolean>(n, (n, l, acc, quit) => {
-                    if (tree.length <= l) quit();
+                    if (tree.length <= l) {
+                        quit();
+                        return true;
+                    }
                     const mirror = tree[l];
                     const isSameKind = n.kind === mirror.kind ||
-                        (n.kind === 'use' && this.adaptor.elementById(svgNode, n.attributes['xlink:href'].slice(1)).kind);
+                        (mirror.kind === 'use' && n.kind === this.adaptor.elementById(svgNode, n.attributes['xlink:href'].slice(1)).kind);
                     const complaint = isSameKind &&
                         _.every(mirror.attributes, (value: any, key: string) => {
                             const sourceAttr = n.attributes[key];
-                            console.log(key, n.attributes, sourceAttr, value)
                             return typeof value === 'boolean' ? sourceAttr : sourceAttr === value;
                         });
                     if (!complaint) quit();

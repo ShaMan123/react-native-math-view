@@ -81,6 +81,7 @@ export default function DifferentLayouts() {
                     resizeMode='cover'
                 />
                 <Text>chem: not fully supported</Text>
+                <Text>{_.last(chemistry)}</Text>
                 <MathItem
                     math={_.last(chemistry)}
                     style={[styles.defaultColorTheme, { flex: 1, minHeight: 200 }]}

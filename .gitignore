@@ -10,6 +10,16 @@ npm-debug.log
 yarn-error.log
 *.lock
 package-lock.json
+# Yarn v2.0
+# https://yarnpkg.com/getting-started/qa#which-files-should-be-gitignored
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+
 
 # Xcode
 #

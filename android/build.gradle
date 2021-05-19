@@ -65,9 +65,15 @@ allprojects {
 }
 
 dependencies {
+    //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'com.caverock:androidsvg-aar:1.4'
+
+    // android native math view
+    // https://mvnrepository.com/artifact/org.scilab.forge/jlatexmath
+    // implementation group: 'org.scilab.forge', name: 'jlatexmath', version: '1.0.2'
+
 }
 
 

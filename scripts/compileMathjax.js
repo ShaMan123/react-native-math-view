@@ -27,7 +27,7 @@ catch (e) { };
 
 child_process.execSync('npm run postcompile', processConfig);
 
-const innerPathToFile = 'input/tex/mhchem/mhchem_parser.js';
+const innerPathToFile = 'input/tex/mhchem/mhchemparser/mhchemParser.js';
 fs.copyFileSync(path.resolve(processConfig.cwd, 'ts', innerPathToFile), path.resolve(processConfig.cwd, 'js', innerPathToFile));
 
 console.log(chalk.bold('\n\n\nreact-native-math-view:'));

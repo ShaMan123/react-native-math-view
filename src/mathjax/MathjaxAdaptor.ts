@@ -162,11 +162,14 @@ export default class MathjaxAdaptor {
             };
         };
         const strokeWidthStyles = _.pickBy(this.styles, (css, key) => _.has(css, 'stroke-width'));
-        this.styleQuery = _.map(strokeWidthStyles, (css, key: string) => {
-            const tree = TreeWalker.walkDown<TreeWalker.Parent<{ tagName: string, properties: any }>, LiteElement>(fromSelector(key),
-                (n, l) => new LiteElement(n.tagName, _.mapKeys(n.properties, (value, key) => _.kebabCase(key))));
-            return { tree: tree.reverse(), value: parseFloat(css['stroke-width']) }
-        });
+        this.styleQuery = _.flatten(_.map(strokeWidthStyles, (css, key: string) => {
+            const selectors = key.split(',');
+            return _.map(selectors, selector => {
+                const tree = TreeWalker.walkDown<TreeWalker.Parent<{ tagName: string, properties: any }>, LiteElement>(fromSelector(selector),
+                    (n, l) => new LiteElement(n.tagName, _.mapKeys(n.properties, (value, key) => _.kebabCase(key))));
+                return { tree: tree.reverse(), value: parseFloat(css['stroke-width']) }
+            });
+        }));
         /*
                 this.html.addRenderAction(
                     'mip',
@@ -247,7 +250,7 @@ export default class MathjaxAdaptor {
                     }
                     const mirror = tree[l];
                     const isSameKind = n.kind === mirror.kind ||
-                        (mirror.kind === 'use' && n.kind === this.adaptor.elementById(node, n.attributes['xlink:href'].slice(1)).kind);
+                        (n.kind === 'use' && mirror.kind === this.adaptor.elementById(node, n.attributes['xlink:href'].slice(1)).kind);
                     const complaint = isSameKind &&
                         _.every(mirror.attributes, (value: any, key: string) => {
                             const sourceAttr = n.attributes[key];

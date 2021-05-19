@@ -1,10 +1,10 @@
 'use strict';
 
 import React from 'react';
-import { MathViewProps } from '../common';
+import { MathViewInjectedProps, MathViewProps } from '../common';
 import { ErrorComponent } from '../Error';
 import { mathViewRender } from '../hooks';
-import MathBaseView, { MathViewBaseProps } from './MathBaseView';
+import MathBaseView from './MathBaseView';
 
 /**
  * uses async rendering for better performance in combination with memoization
@@ -12,19 +12,19 @@ import MathBaseView, { MathViewBaseProps } from './MathBaseView';
  * @param props
  * @param ref
  */
-const MathView = mathViewRender('svg', true, (props: MathViewBaseProps, ref: any) => {
+const MathView = mathViewRender((props: MathViewInjectedProps, ref: any) => {
     return (
         <MathBaseView
             {...props}
             ref={ref}
         />
     );
-});
+}, { async: true });
 
 MathBaseView.defaultProps = {
     resizeMode: 'contain',
     config: {}
-} as Partial<MathViewBaseProps>;
+} as Partial<MathViewInjectedProps>;
 
 MathView.defaultProps = {
     ...MathBaseView.defaultProps,

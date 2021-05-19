@@ -2,14 +2,17 @@
 
 import React, { Ref } from 'react';
 import { SvgFromXml } from 'react-native-svg';
-import { MathViewProps, styles } from '../common';
+import { MathViewInjectedProps, MathViewProps, styles } from '../common';
 import { ErrorComponent } from '../Error';
 import { mathViewRender } from '../hooks';
 
-const FallbackMathView = mathViewRender('svg-xml', false, (props: MathViewProps, ref: Ref<any>) => {
+const FallbackMathView = mathViewRender((props: MathViewInjectedProps, ref: Ref<any>) => {
+    const { size, svg, ...passProps } = props;
     return (
         <SvgFromXml
-            {...props}
+            {...passProps}
+            xml={svg}
+            {...size}
             style={[props.resizeMode === 'contain' && styles.contain, props.style]}
             ref={ref}
         />

@@ -5,13 +5,7 @@ import { MathToSVGConfig } from "./mathjax/Config";
 
 export type ResizeMode = 'cover' | 'contain';
 
-export interface MathViewProps extends ViewProps {
-    /**
-     * see the list of LaTeX commands:
-     * http://docs.mathjax.org/en/latest/input/tex/macros/index.html
-     * */
-    math: string,
-
+export interface MathViewCommonProps extends ViewProps {
     /**
      * set text color
      * can be set via `setNativeProps` or passed via `style`
@@ -36,6 +30,24 @@ export interface MathViewProps extends ViewProps {
     debug?: boolean
 }
 
+export interface MathViewProps extends MathViewCommonProps {
+    /**
+     * see the list of LaTeX commands:
+     * http://docs.mathjax.org/en/latest/input/tex/macros/index.html
+     * */
+    math: string,
+}
+
+export interface ParserResponse {
+    svg: string,
+    size: {
+        width: number,
+        height: number
+    }
+}
+
+export interface MathViewInjectedProps extends MathViewCommonProps, ParserResponse { }
+
 export enum MathError {
     parsing = "MATH_ERROR/PARSING"
 }
@@ -43,22 +55,6 @@ export enum MathError {
 export interface MathViewErrorProps extends MathViewProps {
     error: Error
 }
-
-export type HookType = 'svg' | 'svg-xml';
-
-export type ReturnValueByHook<T extends HookType> = T extends 'svg-xml' ?
-    { xml: string; width: number; height: number; } :
-    T extends 'svg' ?
-    string :
-    never;
-
-export type NormalizedReturnValueByHook<T extends HookType> = (T extends 'svg-xml' ?
-    { xml: string; width: number; height: number; } :
-    T extends 'svg' ?
-    { svg: string } :
-    never) | { error: Error };
-
-export type Func<T extends HookType> = (((math: string) => ReturnValueByHook<T>) & _.MemoizedFunction);
 
 export const getPreserveAspectRatio = (alignment: string, scale: string) => `${alignment} ${scale}`;
 

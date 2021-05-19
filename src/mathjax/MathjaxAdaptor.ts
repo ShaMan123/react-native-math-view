@@ -237,16 +237,8 @@ export default class MathjaxAdaptor {
         }
     }
 
-    toSVG = _.memoize((math: string) => {
-        const node = this.convert(math);
-        const svgNode = this.adaptor.firstChild(node) as LiteElement;
-        return this.parseSVG(svgNode);
-    })
-
-    toSVGXMLProps = _.memoize((math: string) => {
-        const node = this.convert(math);
-        const svgNode = this.adaptor.firstChild(node) as LiteElement;
-        TreeWalker.walkDown(svgNode, (n: LiteElement) => {
+    private applyCSSRules(node: LiteElement) {
+        TreeWalker.walkDown(node, (n: LiteElement) => {
             _.forEach(this.styleQuery, ({ tree, value }) => {
                 const cssRuleCompliant = TreeWalker.walkUp<LiteElement, boolean>(n, (n, l, acc, quit) => {
                     if (tree.length <= l) {
@@ -255,7 +247,7 @@ export default class MathjaxAdaptor {
                     }
                     const mirror = tree[l];
                     const isSameKind = n.kind === mirror.kind ||
-                        (mirror.kind === 'use' && n.kind === this.adaptor.elementById(svgNode, n.attributes['xlink:href'].slice(1)).kind);
+                        (mirror.kind === 'use' && n.kind === this.adaptor.elementById(node, n.attributes['xlink:href'].slice(1)).kind);
                     const complaint = isSameKind &&
                         _.every(mirror.attributes, (value: any, key: string) => {
                             const sourceAttr = n.attributes[key];
@@ -268,15 +260,24 @@ export default class MathjaxAdaptor {
                     this.adaptor.setAttribute(n, 'stroke-width', value);
                 }
             });
-        })
+        });
+        return node;
+    }
+
+    toSVG = _.memoize((math: string) => {
+        const node = this.convert(math);
+        const svgNode = this.adaptor.firstChild(node) as LiteElement;
+        this.applyCSSRules(svgNode);
         const svg = this.parseSVG(svgNode);
         const width = parseSize(this.adaptor.getAttribute(svgNode, 'width'), this.options);
         const height = parseSize(this.adaptor.getAttribute(svgNode, 'height'), this.options);
 
         return {
-            xml: svg,
-            width,
-            height
+            svg,
+            size: {
+                width,
+                height
+            }
         }
     })
 

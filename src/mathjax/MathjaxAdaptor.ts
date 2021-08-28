@@ -90,6 +90,11 @@ class ConvertMemoize extends Memoize {
         return _.get(item, 'mathElement');
     }
 
+    /**
+     * 
+     * @param options 
+     * @returns https://docs.mathjax.org/en/latest/web/typeset.html#conversion-options
+     */
     static getConvertOptions(options: MathToSVGConfig) {
         return {
             display: !options.inline,

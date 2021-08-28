@@ -44,6 +44,22 @@ export interface MathToSVGConfig {
 	packages: string[],
 
 	/**
+	 * tex macros
+	 * http://docs.mathjax.org/en/latest/input/tex/extensions/configmacros.html#tex-configmacros-options
+	 */
+	macros: {
+		[cmd: string]: string | any[]
+	},
+
+	/**
+	 * tex environments
+	 * http://docs.mathjax.org/en/latest/input/tex/extensions/configmacros.html#tex-configmacros-options
+	 */
+	environments: {
+		[env: string]: any[]
+	},
+
+	/**
 	 * output the required CSS rather than the SVG itself
 	 * default: false 
 	 * won't be used in react-native context
@@ -80,6 +96,8 @@ export const mathToSVGDefaultConfig = {
 	ex: 8,
 	width: 80 * 16,
 	packages: AllPackages,
+	macros: {},
+	environments: {},
 	//css: false,
 	fontCache: true,
 	enrichSpeech: 'deep',

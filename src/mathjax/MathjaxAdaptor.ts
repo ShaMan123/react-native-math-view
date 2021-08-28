@@ -139,6 +139,8 @@ export default class MathjaxAdaptor {
             packages: options.packages,
             inlineMath: options.inlineMath,
             displayMath: options.displayMath,
+            macros: options.macros,
+            environments: options.environments,
             formatError: (jax: TeX<any, any, any>, err: TexError) => {
                 const math = jax.latex;
                 ERROR_MAP.set(math, err);

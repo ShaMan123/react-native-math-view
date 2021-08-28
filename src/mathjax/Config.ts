@@ -45,6 +45,7 @@ export interface MathToSVGConfig {
 
 	/**
 	 * tex macros
+	 * http://docs.mathjax.org/en/latest/input/tex/macros.html#tex-macros
 	 * http://docs.mathjax.org/en/latest/input/tex/extensions/configmacros.html#tex-configmacros-options
 	 */
 	macros: {

@@ -34,10 +34,11 @@
   "dependencies": {
     "hast-util-from-selector": "^2.0.0",
     "lodash": "^4.17.21",
+    "mathjax": "^3.2.1",
     "mathjax-full": "^3.1.4",
     "react": "*",
     "react-native": "*",
-    "transformation-matrix": "^2.8.0"
+    "transformation-matrix": "^2.11.1"
   },
   "peerDependencies": {
     "react-native": "*",

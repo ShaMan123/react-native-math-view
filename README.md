@@ -127,7 +127,6 @@ Check out [react-math-view](https://github.com/ShaMan123/react-math-view#react-m
 
 [Writing math dynamically](https://github.com/nicolewhite/algebra.js)
 
-[SSR]:
-(https://latex.codecogs.com/svg.latex?\Large&space;x=\frac{-b\pm\sqrt{b^2-4ac}}{2a})
+[SSR](https://latex.codecogs.com/svg.latex?\Large&space;x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}):\
 ![\Large x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}](https://latex.codecogs.com/svg.latex?\Large&space;x=\frac{-b\pm\sqrt{b^2-4ac}}{2a})
 

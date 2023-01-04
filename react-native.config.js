@@ -12,9 +12,5 @@ module.exports = {
             },
             ios: {}
         },
-        assets: [
-            //"MathJaxProvider/index.html"
-            //"MathJaxProvider/dist"
-        ],
     },
 };

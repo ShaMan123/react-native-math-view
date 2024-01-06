@@ -21,7 +21,6 @@ android {
 /*
 repositories {
     mavenCentral()
-    jcenter()
     google()
     maven {
         url "https://dl.bintray.com/kexanie/maven"
@@ -31,7 +30,6 @@ repositories {
 buildscript {
     repositories {
         maven { url "https://maven.google.com" }
-        jcenter()
         google()
         maven {
             url 'https://maven.google.com/'
@@ -51,7 +49,7 @@ allprojects {
     repositories {
         mavenLocal()
         maven { url "https://maven.google.com" }
-        jcenter()
+        mavenCentral()
         google()
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm

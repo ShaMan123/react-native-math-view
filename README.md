@@ -1,8 +1,12 @@
-# react-native-math-view
+# react-native-math-view (READ ONLY)
 
 [![NPM](https://img.shields.io/npm/v/react-native-math-view.svg)](https://www.npmjs.com/package/react-native-math-view)
 
-## WIP V3
+**This repo will not receive anymore updates and will be archived.**
+
+Refer to https://github.com/ShaMan123/react-native-math-view/issues/97.
+
+## V3
 
 A react native view used to easily display and handle math. 
 The library doesn't use `WebView`.
